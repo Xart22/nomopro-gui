@@ -232,43 +232,43 @@ const deviceData = [
     //     tags: ['arduino'],
     //     helpLink: 'https://store.arduino.cc/usa/leonardo'
     // },
-    {
-        name: "Arduino Mega 2560",
-        deviceId: "arduinoMega2560",
-        manufactor: "arduino.cc",
-        learnMore: "https:store.arduino.cc/usa/mega-2560-r3",
-        type: DeviceType.arduino,
-        iconURL: arduinoMega2560IconURL,
-        description: (
-            <FormattedMessage
-                defaultMessage="The 8-bit board with 54 digital pins, 16 analog inputs, and 4 serial ports."
-                description="Description for the Arduino Mega 2560 device"
-                id="gui.device.arduinoMega2560.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: false,
-        serialportRequired: true,
-        defaultBaudRate: "9600",
-        internetConnectionRequired: false,
-        launchPeripheralConnectionFlow: true,
-        useAutoScan: false,
-        connectionIconURL: arduinoMega2560ConnectionIconURLL,
-        connectionSmallIconURL: arduinoMega2560ConnectionSmallIconURL,
-        connectingMessage: (
-            <FormattedMessage
-                defaultMessage="Connecting"
-                description="Message to help people connect to their device."
-                id="gui.device.arduinoMega2560.connectingMessage"
-            />
-        ),
-        baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ["realtime", "upload"],
-        programLanguage: ["block", "c", "cpp"],
-        tags: ["arduino"],
-        helpLink: "https:store.arduino.cc/usa/mega-2560-r3",
-    },
+    // {
+    //     name: "Arduino Mega 2560",
+    //     deviceId: "arduinoMega2560",
+    //     manufactor: "arduino.cc",
+    //     learnMore: "https:store.arduino.cc/usa/mega-2560-r3",
+    //     type: DeviceType.arduino,
+    //     iconURL: arduinoMega2560IconURL,
+    //     description: (
+    //         <FormattedMessage
+    //             defaultMessage="The 8-bit board with 54 digital pins, 16 analog inputs, and 4 serial ports."
+    //             description="Description for the Arduino Mega 2560 device"
+    //             id="gui.device.arduinoMega2560.description"
+    //         />
+    //     ),
+    //     featured: true,
+    //     disabled: false,
+    //     bluetoothRequired: false,
+    //     serialportRequired: true,
+    //     defaultBaudRate: "9600",
+    //     internetConnectionRequired: false,
+    //     launchPeripheralConnectionFlow: true,
+    //     useAutoScan: false,
+    //     connectionIconURL: arduinoMega2560ConnectionIconURLL,
+    //     connectionSmallIconURL: arduinoMega2560ConnectionSmallIconURL,
+    //     connectingMessage: (
+    //         <FormattedMessage
+    //             defaultMessage="Connecting"
+    //             description="Message to help people connect to their device."
+    //             id="gui.device.arduinoMega2560.connectingMessage"
+    //         />
+    //     ),
+    //     baseToolBoxXml: arduinoBaseToolBox,
+    //     programMode: ["realtime", "upload"],
+    //     programLanguage: ["block", "c", "cpp"],
+    //     tags: ["arduino"],
+    //     helpLink: "https:store.arduino.cc/usa/mega-2560-r3",
+    // },
     {
         name: "ESP32",
         deviceId: "arduinoEsp32",
@@ -456,43 +456,43 @@ const deviceData = [
     //     tags: ['arduino'],
     //     helpLink: 'https://wiki.openblock.cc/general-hardware-guidelines/boards/raspberry-pi-pico'
     // },
-    {
-        name: "Micro:bit",
-        deviceId: "microbit",
-        manufactor: "microbit.org",
-        learnMore: "https://microbit.org/",
-        type: DeviceType.microbit,
-        iconURL: microbitIconURL,
-        description: (
-            <FormattedMessage
-                defaultMessage="The pocket-sized computer transforming digital skills learning."
-                description="Description for the micro:bit device"
-                id="gui.device.microbit.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: false,
-        serialportRequired: true,
-        defaultBaudRate: "115200",
-        internetConnectionRequired: false,
-        launchPeripheralConnectionFlow: true,
-        useAutoScan: false,
-        connectionIconURL: microbitConnectionIconURLL,
-        connectionSmallIconURL: microbitConnectionSmallIconURL,
-        connectingMessage: (
-            <FormattedMessage
-                defaultMessage="Connecting"
-                description="Message to help people connect to their device."
-                id="gui.device.microbit.connectingMessage"
-            />
-        ),
-        baseToolBoxXml: microbitBaseToolBox,
-        programMode: ["upload"],
-        programLanguage: ["block", "microPython"],
-        tags: ["microPython"],
-        helpLink: "https://microbit.org/get-started/first-steps/introduction/",
-    },
+    // {
+    //     name: "Micro:bit",
+    //     deviceId: "microbit",
+    //     manufactor: "microbit.org",
+    //     learnMore: "https://microbit.org/",
+    //     type: DeviceType.microbit,
+    //     iconURL: microbitIconURL,
+    //     description: (
+    //         <FormattedMessage
+    //             defaultMessage="The pocket-sized computer transforming digital skills learning."
+    //             description="Description for the micro:bit device"
+    //             id="gui.device.microbit.description"
+    //         />
+    //     ),
+    //     featured: true,
+    //     disabled: false,
+    //     bluetoothRequired: false,
+    //     serialportRequired: true,
+    //     defaultBaudRate: "115200",
+    //     internetConnectionRequired: false,
+    //     launchPeripheralConnectionFlow: true,
+    //     useAutoScan: false,
+    //     connectionIconURL: microbitConnectionIconURLL,
+    //     connectionSmallIconURL: microbitConnectionSmallIconURL,
+    //     connectingMessage: (
+    //         <FormattedMessage
+    //             defaultMessage="Connecting"
+    //             description="Message to help people connect to their device."
+    //             id="gui.device.microbit.connectingMessage"
+    //         />
+    //     ),
+    //     baseToolBoxXml: microbitBaseToolBox,
+    //     programMode: ["upload"],
+    //     programLanguage: ["block", "microPython"],
+    //     tags: ["microPython"],
+    //     helpLink: "https://microbit.org/get-started/first-steps/introduction/",
+    // },
     {
         name: "Micro:bit V2",
         deviceId: "microbitV2",

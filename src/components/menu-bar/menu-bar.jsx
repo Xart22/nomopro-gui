@@ -330,10 +330,10 @@ class MenuBar extends React.Component {
         }
     }
     handleClickOpenCommunity() {
-        window.open("https://nomokit.robo-club.com");
+        window.open("https://nomo-kit.com/community");
     }
     handleClickOpenWiki() {
-        window.open("https://nomokit.robo-club.com");
+        window.open("https://nomo-kit.com");
     }
     restoreOptionMessage(deletedItem) {
         switch (deletedItem) {
