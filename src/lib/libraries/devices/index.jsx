@@ -17,6 +17,10 @@ import arduinoNanoIconURL from "./arduinoNano/arduinoNano.png";
 import arduinoNanoConnectionIconURLL from "./arduinoNano/arduinoNano-illustration.svg";
 import arduinoNanoConnectionSmallIconURL from "./arduinoNano/arduinoNano-small.svg";
 
+import arduinoNano33IconURL from "./arduinoNano33/nano33.png";
+import arduinoNano33ConnectionIconURLL from "./arduinoNano33/nano33.svg";
+import arduinoNano33ConnectionSmallIconURL from "./arduinoNano33/nano33-small.svg";
+
 import arduinoLeonardoIconURL from "./arduinoLeonardo/arduinoLeonardo.png";
 import arduinoLeonardoConnectionIconURLL from "./arduinoLeonardo/arduinoLeonardo-illustration.svg";
 import arduinoLeonardoConnectionSmallIconURL from "./arduinoLeonardo/arduinoLeonardo-small.svg";
@@ -36,6 +40,10 @@ import microbitV2ConnectionSmallIconURL from "./microbitV2/microbitV2-small.svg"
 import esp32IconURL from "./esp32/esp32.png";
 import esp32ConnectionIconURLL from "./esp32/esp32-illustration.svg";
 import esp32ConnectionSmallIconURL from "./esp32/esp32-small.svg";
+
+import esp32CamIconURL from "./esp32Cam/esp32Cam.png";
+import esp32CamConnectionIconURLL from "./esp32Cam/esp32Cam.svg";
+import esp32CamConnectionSmallIconURL from "./esp32Cam/esp32Cam-small.svg";
 
 import esp8266NodeMCUIconURL from "./esp8266NodeMCU/esp8266NodeMCU.png";
 import esp8266NodeMCUConnectionIconURL from "./esp8266NodeMCU/esp8266NodeMCU-illustration.svg";
@@ -306,6 +314,83 @@ const deviceData = [
         tags: ["arduino"],
         helpLink:
             "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
+    },
+    {
+        name: "ESP32-CAM",
+        deviceId: "arduinoEsp32Cam",
+        manufactor: "espressif",
+        learnMore: "https:www.espressif.com/",
+        type: DeviceType.arduino,
+        iconURL: esp32CamIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="The ESP32-CAM is a small size, low power consumption camera module based on ESP32. It comes with an OV2640 camera and provides onboard TF card slot"
+                description="Description for the arduinoEsp32Cam device"
+                id="gui.device.arduinoEsp32Cam.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "115200",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: esp32CamConnectionIconURLL,
+        connectionSmallIconURL: esp32CamConnectionSmallIconURL,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their esp32."
+                id="gui.device.arduinoEsp32Cam.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
+        helpLink:
+            "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
+    },
+    {
+        name: "Arduino Nano 33 BLE Sense",
+        deviceId: "arduinoNano33BleSense",
+        manufactor: "arduino.cc",
+        learnMore:
+            "https://store-usa.arduino.cc/products/nano-33-ble-sense-rev2",
+        type: DeviceType.arduino,
+        iconURL: arduinoNano33IconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="An AI enabled board in the shape of the classic Nano board, with all the sensors to start building your next project right away."
+                description="Description for the arduinoNano33BleSense device"
+                id="gui.device.arduinoNano33BleSense.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "115200",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: arduinoNano33ConnectionIconURLL,
+        connectionSmallIconURL: arduinoNano33ConnectionSmallIconURL,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their esp32."
+                id="gui.device.arduinoNano33BleSense.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
+        helpLink:
+            "https://store-usa.arduino.cc/products/nano-33-ble-sense-rev2",
     },
     {
         name: "NodeMCU",
