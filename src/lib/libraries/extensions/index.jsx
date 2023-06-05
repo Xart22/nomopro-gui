@@ -25,6 +25,18 @@ import mlInsetIconURL from "./ml/ml-small.png";
 import speechIconUrl from "./speech/speech.png";
 import speechInsetIconURL from "./speech/voice.png";
 
+import tm2scratchIconUrl from "./tm2scratch/tm.png";
+import tm2scratchInsetIconURL from "./tm2scratch/tm-small.png";
+
+import ob2scratchIconUrl from "./ob2scratch/ob.png";
+import ob2scratchInsetIconURL from "./ob2scratch/ob-small.png";
+
+import handposeIconUrl from "./handpose/handpose2scratch.png";
+import handposeInsetIconURL from "./handpose/handpose2scratch-small.png";
+
+import tmPoseIconUrl from "./tmPose/tmPose2scratch.png";
+import tmPoseInsetIconURL from "./tmPose/tmpose2scratch-small.png";
+
 // import ev3IconURL from './ev3/ev3.png';
 // import ev3InsetIconURL from './ev3/ev3-small.svg';
 // import ev3ConnectionIconURL from './ev3/ev3-hub-illustration.svg';
@@ -74,7 +86,7 @@ export default [
     {
         name: (
             <FormattedMessage
-                defaultMessage="ml"
+                defaultMessage="Machine Learning"
                 description="Name for the 'ml' extension"
                 id="gui.extension.ml.name"
             />
@@ -87,6 +99,98 @@ export default [
                 defaultMessage="Machine Learning Blocks."
                 description="Description for Machine Learning Blocks."
                 id="gui.extension.ml.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        internetConnectionRequired: true,
+    },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="Teachable Machine"
+                description="Name for the 'tm2scratch' extension"
+                id="gui.extension.tm2scratch.name"
+            />
+        ),
+        extensionId: "tm2scratch",
+        iconURL: tm2scratchIconUrl,
+        insetIconURL: tm2scratchInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Recognize own images and sounds."
+                description="Description for Machine Learning With Teachable Machine."
+                id="gui.extension.tm2scratch.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        internetConnectionRequired: true,
+    },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="Object Detection"
+                description="Name for the 'objectDetection' extension"
+                id="gui.extension.ob2scratch.name"
+            />
+        ),
+        extensionId: "ob2scratch",
+        iconURL: ob2scratchIconUrl,
+        insetIconURL: ob2scratchInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Object Detection"
+                description="Description for Object Detection."
+                id="gui.extension.ob2scratch.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        internetConnectionRequired: true,
+    },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="TM Pose"
+                description="Name for the 'tmpose2scratch' extension"
+                id="gui.extension.tmpose2scratch.name"
+            />
+        ),
+        extensionId: "tmpose2scratch",
+        iconURL: tmPoseIconUrl,
+        insetIconURL: tmPoseInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Recognize human poses."
+                description="Description for TM Pose."
+                id="gui.extension.tmpose2scratch.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        internetConnectionRequired: true,
+    },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="Hand Pose"
+                description="Name for the 'handpose2scratch' extension"
+                id="gui.extension.handpose2scratch.name"
+            />
+        ),
+        extensionId: "handpose2scratch",
+        iconURL: handposeIconUrl,
+        insetIconURL: handposeInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Identify hand gestures."
+                description="Description for HandPose."
+                id="gui.extension.handpose2scratch.description"
             />
         ),
         featured: true,
