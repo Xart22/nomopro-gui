@@ -66,6 +66,8 @@ import esp8266NodeMCUConnectionSmallIconURL from "./esp8266NodeMCU/esp8266NodeMC
 // import makeymakeyConnectionSmallIconURL from "./makeymakey/makeymakey-small.svg";
 
 import nobotIconUrl from "./nobot/nobot.png";
+import nobotSmallIconUrl from "./nobot/nobot40.svg";
+import nobotConnectionSmallIconUrl from "./nobot/nobot108-small.svg";
 
 const deviceData = [
     /**
@@ -227,8 +229,8 @@ const deviceData = [
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
-        connectionIconURL: arduinoNanoConnectionIconURLL,
-        connectionSmallIconURL: arduinoNanoConnectionSmallIconURL,
+        connectionIconURL: nobotSmallIconUrl,
+        connectionSmallIconURL: nobotConnectionSmallIconUrl,
         connectingMessage: (
             <FormattedMessage
                 defaultMessage="Connecting"
