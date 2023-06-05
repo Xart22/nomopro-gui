@@ -109,7 +109,7 @@ export default [
     {
         name: (
             <FormattedMessage
-                defaultMessage="Teachable Machine"
+                defaultMessage="Teachable Machine "
                 description="Name for the 'tm2scratch' extension"
                 id="gui.extension.tm2scratch.name"
             />
