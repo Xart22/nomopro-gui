@@ -49,21 +49,23 @@ import esp8266NodeMCUIconURL from "./esp8266NodeMCU/esp8266NodeMCU.png";
 import esp8266NodeMCUConnectionIconURL from "./esp8266NodeMCU/esp8266NodeMCU-illustration.svg";
 import esp8266NodeMCUConnectionSmallIconURL from "./esp8266NodeMCU/esp8266NodeMCU-small.svg";
 
-import k210MaixDockIconURL from "./k210MaixDock/k210MaixDock.png";
-import k210MaixDockConnectionIconURLL from "./k210MaixDock/k210MaixDock-illustration.svg";
-import k210MaixDockConnectionSmallIconURL from "./k210MaixDock/k210MaixDock-small.svg";
+// import k210MaixDockIconURL from "./k210MaixDock/k210MaixDock.png";
+// import k210MaixDockConnectionIconURLL from "./k210MaixDock/k210MaixDock-illustration.svg";
+// import k210MaixDockConnectionSmallIconURL from "./k210MaixDock/k210MaixDock-small.svg";
 
-import k210MaixduinoIconURL from "./k210Maixduino/k210Maixduino.png";
-import k210MaixduinoConnectionIconURLL from "./k210Maixduino/k210Maixduino-illustration.svg";
-import k210MaixduinoConnectionSmallIconURL from "./k210Maixduino/k210Maixduino-small.svg";
+// import k210MaixduinoIconURL from "./k210Maixduino/k210Maixduino.png";
+// import k210MaixduinoConnectionIconURLL from "./k210Maixduino/k210Maixduino-illustration.svg";
+// import k210MaixduinoConnectionSmallIconURL from "./k210Maixduino/k210Maixduino-small.svg";
 
-import raspberryPiPicoIconURL from "./raspberryPiPico/raspberryPiPico.png";
-import raspberryPiPicoConnectionIconURL from "./raspberryPiPico/raspberryPiPico-illustration.svg";
-import raspberryPiPicoConnectionSmallIconURL from "./raspberryPiPico/raspberryPiPico-small.svg";
+// import raspberryPiPicoIconURL from "./raspberryPiPico/raspberryPiPico.png";
+// import raspberryPiPicoConnectionIconURL from "./raspberryPiPico/raspberryPiPico-illustration.svg";
+// import raspberryPiPicoConnectionSmallIconURL from "./raspberryPiPico/raspberryPiPico-small.svg";
 
-import makeymakeyIconURL from "./makeymakey/makeymakey.png";
-import makeymakeyConnectionIconURL from "./makeymakey/makeymakey-illustration.svg";
-import makeymakeyConnectionSmallIconURL from "./makeymakey/makeymakey-small.svg";
+// import makeymakeyIconURL from "./makeymakey/makeymakey.png";
+// import makeymakeyConnectionIconURL from "./makeymakey/makeymakey-illustration.svg";
+// import makeymakeyConnectionSmallIconURL from "./makeymakey/makeymakey-small.svg";
+
+import nobotIconUrl from "./nobot/nobot.png";
 
 const deviceData = [
     /**
@@ -201,6 +203,43 @@ const deviceData = [
         programMode: ["realtime", "upload"],
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
+        helpLink: "https://store.arduino.cc/usa/arduino-nano",
+    },
+    {
+        name: "NoBot Base",
+        deviceId: "arduinoNanoNobot",
+        manufactor: "arduino.cc",
+        learnMore: "https://store.arduino.cc/usa/arduino-nano",
+        type: DeviceType.arduino,
+        iconURL: nobotIconUrl,
+        description: (
+            <FormattedMessage
+                defaultMessage="Build : Robot Avoider , Robot Line Follower ,Robot Light Follower , Robot Object Following,Robot Soccer, Robot Sumo."
+                description="Description for the Nobot Base Kit device"
+                id="gui.device.arduinoNanoNobot.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "9600",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: arduinoNanoConnectionIconURLL,
+        connectionSmallIconURL: arduinoNanoConnectionSmallIconURL,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their device."
+                id="gui.device.arduinoNanoNobot.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["realtime", "upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["kit", "arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
     },
     // {
