@@ -10,7 +10,7 @@ import log from "../lib/log.js";
 import MessageBoxType from "../lib/message-box.js";
 
 const onClickLogo = () => {
-    window.location = "https://nomokit.robo-club.com";
+    window.location = "https://nomo-kit.com/home";
 };
 
 const onClickCheckUpdate = () => {
