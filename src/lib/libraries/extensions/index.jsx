@@ -34,8 +34,8 @@ import ob2scratchInsetIconURL from "./ob2scratch/ob-small.png";
 import handposeIconUrl from "./handpose/handpose2scratch.png";
 import handposeInsetIconURL from "./handpose/handpose2scratch-small.png";
 
-import tmPoseIconUrl from "./tmPose/tmPose2scratch.png";
-import tmPoseInsetIconURL from "./tmPose/tmpose2scratch-small.png";
+import tmPoseIconUrl from "./tmpose/tmpose2scratch.png";
+import tmPoseInsetIconURL from "./tmpose/tmpose2scratch-small.png";
 
 // import ev3IconURL from './ev3/ev3.png';
 // import ev3InsetIconURL from './ev3/ev3-small.svg';
