@@ -138,6 +138,11 @@ const ariaMessages = defineMessages({
         defaultMessage: "Wiki",
         description: "accessibility text for the wiki button",
     },
+    nomotutorials: {
+        id: "gui.menuBar.nomotutorials",
+        defaultMessage: "Nomokit Tutorials",
+        description: "accessibility text for the community button",
+    },
 });
 
 const MenuBarItemTooltip = ({
@@ -334,6 +339,10 @@ class MenuBar extends React.Component {
     }
     handleClickOpenWiki() {
         window.open("https://nomo-kit.com");
+    }
+
+    handleClickOpenNomoTutorials() {
+        window.open("https://nomo-kit.com/tutorial");
     }
     restoreOptionMessage(deletedItem) {
         switch (deletedItem) {
@@ -877,19 +886,20 @@ class MenuBar extends React.Component {
                         />
                         <FormattedMessage {...ariaMessages.community} />
                     </div>
-                    {/* <div
+                    <div
                         aria-label={this.props.intl.formatMessage(
-                            ariaMessages.wiki
+                            ariaMessages.nomotutorials
                         )}
                         className={classNames(
                             styles.menuBarItem,
                             styles.hoverable
                         )}
-                        onClick={this.handleClickOpenWiki}
+                        onClick={this.handleClickOpenNomoTutorials}
                     >
                         <img className={styles.wikiIcon} src={wikiIcon} />
-                        <FormattedMessage {...ariaMessages.wiki} />
-                    </div> */}
+                        <FormattedMessage {...ariaMessages.nomotutorials} />
+                    </div>
+                    <Divider className={classNames(styles.divider)} />
                     <div
                         aria-label={this.props.intl.formatMessage(
                             ariaMessages.tutorials
@@ -904,7 +914,7 @@ class MenuBar extends React.Component {
                         <FormattedMessage {...ariaMessages.tutorials} />
                     </div>
                     <Divider className={classNames(styles.divider)} />
-                    <div
+                    {/* <div
                         className={classNames(
                             styles.menuBarItem,
                             styles.hoverable
@@ -917,7 +927,7 @@ class MenuBar extends React.Component {
                             draggable={false}
                             src={screenshotIcon}
                         />
-                    </div>
+                    </div> */}
                     <Divider className={classNames(styles.divider)} />
                     <div
                         className={classNames(
