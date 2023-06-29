@@ -350,7 +350,7 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ["upload", "realtime"],
+        programMode: ["realtime", "upload"],
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink:
@@ -651,7 +651,7 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: microbitBaseToolBox,
-        programMode: ["upload"],
+        programMode: ["realtime", "upload"],
         programLanguage: ["block", "microPython"],
         tags: ["microPython"],
         helpLink: "https://microbit.org/get-started/first-steps/introduction/",
