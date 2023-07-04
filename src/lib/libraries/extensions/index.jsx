@@ -258,52 +258,52 @@ export default [
         ),
         featured: true,
     },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="Text to Speech"
+                description="Name for the Text to Speech extension"
+                id="gui.extension.text2speech.name"
+            />
+        ),
+        extensionId: "text2speech",
+        collaborator: "Amazon Web Services",
+        iconURL: text2speechIconURL,
+        insetIconURL: text2speechInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Make your projects talk."
+                description="Description for the Text to speech extension"
+                id="gui.extension.text2speech.description"
+            />
+        ),
+        featured: true,
+        internetConnectionRequired: true,
+    },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="Translate"
+                description="Name for the Translate extension"
+                id="gui.extension.translate.name"
+            />
+        ),
+        extensionId: "translate",
+        collaborator: "Google",
+        iconURL: translateIconURL,
+        insetIconURL: translateInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Translate text into many languages."
+                description="Description for the Translate extension"
+                id="gui.extension.translate.description"
+            />
+        ),
+        featured: true,
+        internetConnectionRequired: true,
+    },
     // {
-    //     name: (
-    //         <FormattedMessage
-    //             defaultMessage="Text to Speech"
-    //             description="Name for the Text to Speech extension"
-    //             id="gui.extension.text2speech.name"
-    //         />
-    //     ),
-    //     extensionId: "text2speech",
-    //     collaborator: "Amazon Web Services",
-    //     iconURL: text2speechIconURL,
-    //     insetIconURL: text2speechInsetIconURL,
-    //     description: (
-    //         <FormattedMessage
-    //             defaultMessage="Make your projects talk."
-    //             description="Description for the Text to speech extension"
-    //             id="gui.extension.text2speech.description"
-    //         />
-    //     ),
-    //     featured: true,
-    //     internetConnectionRequired: true,
-    // },
-    // {
-    //     name: (
-    //         <FormattedMessage
-    //             defaultMessage="Translate"
-    //             description="Name for the Translate extension"
-    //             id="gui.extension.translate.name"
-    //         />
-    //     ),
-    //     extensionId: "translate",
-    //     collaborator: "Google",
-    //     iconURL: translateIconURL,
-    //     insetIconURL: translateInsetIconURL,
-    //     description: (
-    //         <FormattedMessage
-    //             defaultMessage="Translate text into many languages."
-    //             description="Description for the Translate extension"
-    //             id="gui.extension.translate.description"
-    //         />
-    //     ),
-    //     featured: true,
-    //     internetConnectionRequired: true,
-    // },
-    // {
-    //     name: (
+    //    name: (
     //         <FormattedMessage
     //             defaultMessage="Makey Makey"
     //             description="Name for the Makey Makey extension"
