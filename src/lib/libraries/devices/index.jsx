@@ -249,15 +249,15 @@ const deviceData = [
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
     },
     {
-        name: "WeeeMake ELF Uno",
+        name: "G-Bot Nomo",
         deviceId: "arduinoELFUno",
         manufactor: "arduino.cc",
-        learnMore: "https://www.weeemake.com/",
+        learnMore: "https://www.nomo-kit.com/",
         type: DeviceType.arduino,
         iconURL: weeemakeELFUnoIconURL,
         description: (
             <FormattedMessage
-                defaultMessage="Weeemake is a metal educational robot DIY platform for kids 8+ to professional level to learn robotics, programming, AI, IoT, etc."
+                defaultMessage="G-Bot Nomo is a metal educational robot DIY platform for kids 8+ to professional level to learn robotics, programming, AI, IoT, etc."
                 description="Description for the Arduino Uno device"
                 id="gui.device.arduinoELFUno.description"
             />
