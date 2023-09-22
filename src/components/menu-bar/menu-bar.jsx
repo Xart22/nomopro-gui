@@ -130,7 +130,7 @@ const ariaMessages = defineMessages({
     },
     community: {
         id: "gui.menuBar.community",
-        defaultMessage: "Open Community",
+        defaultMessage: "Community",
         description: "accessibility text for the community button",
     },
     wiki: {
@@ -773,14 +773,8 @@ class MenuBar extends React.Component {
                         onMouseUp={this.handleSelectDeviceMouseUp}
                     >
                         <img className={styles.deviceIcon} src={deviceIcon} />
-                        {this.props.deviceName ? (
+                        {this.props.deviceName ?? (
                             <div>{this.props.deviceName}</div>
-                        ) : (
-                            <FormattedMessage
-                                defaultMessage="No device selected"
-                                description="Text for menubar no device select button"
-                                id="gui.menuBar.noDeviceSelected"
-                            />
                         )}
                     </div>
                     <Divider className={classNames(styles.divider)} />
@@ -797,18 +791,12 @@ class MenuBar extends React.Component {
                                     className={styles.connectedIcon}
                                     src={connectedIcon}
                                 />
-                                {this.props.peripheralName}
                             </React.Fragment>
                         ) : (
                             <React.Fragment>
                                 <img
                                     className={styles.unconnectedIcon}
                                     src={unconnectedIcon}
-                                />
-                                <FormattedMessage
-                                    defaultMessage="Unconnected"
-                                    description="Text for menubar unconnected button"
-                                    id="gui.menuBar.noConnection"
                                 />
                             </React.Fragment>
                         )}
