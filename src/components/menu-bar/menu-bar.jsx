@@ -420,7 +420,11 @@ class MenuBar extends React.Component {
         }
     }
     handleUploadFirmware() {
-        if (this.props.deviceId) {
+        if (this.props.deviceId.includes("microbit")) {
+        } else if (
+            !this.props.deviceId.includes("microbit") &&
+            this.props.deviceId
+        ) {
             this.props.vm.uploadFirmwareToPeripheral(this.props.deviceId);
             this.props.onSetRealtimeConnection(false);
             this.props.onOpenUploadProgress();
@@ -921,13 +925,15 @@ class MenuBar extends React.Component {
                         className={classNames(
                             styles.menuBarItem,
                             this.props.isRealtimeMode &&
-                                this.props.peripheralName
+                                this.props.peripheralName &&
+                                !this.props.deviceId.includes("microbit")
                                 ? styles.hoverable
                                 : styles.disabled
                         )}
                         onMouseUp={
                             this.props.isRealtimeMode &&
-                            this.props.peripheralName
+                            this.props.peripheralName &&
+                            !this.props.deviceId.includes("microbit")
                                 ? this.handleUploadFirmware
                                 : null
                         }
