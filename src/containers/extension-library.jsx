@@ -56,6 +56,11 @@ const messages = defineMessages({
         description:
             "Machine Learning tag to filter all machine learning libraries.",
     },
+    kitTag: {
+        id: "gui.library.kit",
+        defaultMessage: "kit",
+        description: "Kit tag to filter all kit libraries.",
+    },
     otherTag: {
         id: "gui.library.otherTag",
         defaultMessage: "Other",
@@ -75,6 +80,7 @@ const MACHINE_LEARNING_TAG = {
     tag: "machinelearning",
     intlLabel: messages.machineLearningTag,
 };
+const KIT_TAG = { tag: "kit", intlLabel: messages.kitTag };
 const OTHER_TAG = { tag: "other", intlLabel: messages.otherTag };
 
 const tagListPrefix = [
@@ -84,6 +90,7 @@ const tagListPrefix = [
     DISPLAY_TAG,
     COMMUNICATION_TAG,
     MACHINE_LEARNING_TAG,
+    KIT_TAG,
     OTHER_TAG,
 ];
 

@@ -335,14 +335,14 @@ class MenuBar extends React.Component {
         }
     }
     handleClickOpenCommunity() {
-        window.open("https://nomo-kit.com/community");
+        // window.open("https://nomo-kit.com/community");
     }
     handleClickOpenWiki() {
-        window.open("https://nomo-kit.com");
+        // window.open("https://nomo-kit.com");
     }
 
     handleClickOpenNomoTutorials() {
-        window.open("https://nomo-kit.com/tutorial");
+        // window.open("https://nomo-kit.com/tutorial");
     }
     restoreOptionMessage(deletedItem) {
         switch (deletedItem) {
