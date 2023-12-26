@@ -73,6 +73,10 @@ import weeemakeELFUnoIconURL from "./weeemakeELFUno/weeemakeELFUno.png";
 import weeemakeELFUnoSmallIconURL from "./weeemakeELFUno/weeemakeELFUno.svg";
 import weeemakeELFUnoConnectionSmallIconUrl from "./weeemakeELFUno/weeemakeELFUno-small.svg";
 
+import nomobotStarterKitIconURL from "./nomoBotStarterKit/nomobot-startkerkit.png";
+import nomobotStarterKitConnectionSmallIconUrl from "./nomoBotStarterKit/nomobot-starterkit-small.png";
+import nomoBotStarterKitSmallIconUrl from "./nomoBotStarterKit/nomobot-starterkit-illustration.png";
+
 const deviceData = [
     /**
      * Unselect the deivce back to pure scratch mode
@@ -511,6 +515,44 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https:arduino-esp8266.readthedocs.io/en/3.0.0/index.html",
+    },
+    {
+        name: "Nomo Bot Starter Kit",
+        deviceId: "nomoBotStarterKit",
+        manufactor: "IDN Boarding School & Instar Education",
+        learnMore: "https:www.nodemcu.com",
+        type: DeviceType.arduino,
+        iconURL: nomobotStarterKitIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Low-cost Robot Kit based on ESP8266 board for build and learn about robotics, IoT, etc."
+                description="Description for the Nomo Bot Starter Kit device"
+                id="gui.device.nomoBotStarterKit.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "76800",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: nomoBotStarterKitSmallIconUrl,
+        connectionSmallIconURL: nomobotStarterKitConnectionSmallIconUrl,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their device."
+                id="gui.device.nomoBotStarterKit.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        deviceExtensionsCompatible: "arduinoEsp8266",
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino", "kit"],
+        helpLink: "https:nomo-kit.com",
     },
     // {
     //     name: 'MaixDock',
