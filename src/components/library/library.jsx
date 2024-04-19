@@ -289,6 +289,8 @@ class LibraryComponent extends React.Component {
                                 onMouseLeave={this.handleMouseLeave}
                                 onSelect={this.handleSelect}
                                 version={dataItem.version}
+                                active={dataItem.active}
+                                freeDevice={dataItem.freeDevice}
                             />
                         ))
                     ) : (

@@ -42,7 +42,7 @@ class LibraryItem extends React.PureComponent {
         this.handleMouseLeave(id);
     }
     handleClick(e) {
-        if (!this.props.disabled) {
+        if (!this.props.disabled && this.props.active) {
             if (!this.state.isProcessing) {
                 if (this.props.isUnloadble) {
                     this.setState({
@@ -178,6 +178,8 @@ class LibraryItem extends React.PureComponent {
                 programMode={this.props.programMode}
                 programLanguage={this.props.programLanguage}
                 version={this.props.version}
+                active={this.props.active}
+                freeDevice={this.props.freeDevice}
             />
         );
     }
@@ -219,6 +221,8 @@ LibraryItem.propTypes = {
     programMode: PropTypes.arrayOf(PropTypes.string),
     showPlayButton: PropTypes.bool,
     version: PropTypes.string,
+    active: PropTypes.bool,
+    freeDevice: PropTypes.bool,
 };
 
 LibraryItem.defaultProps = {

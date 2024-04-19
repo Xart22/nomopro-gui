@@ -140,6 +140,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-uno-rev3",
+        freeDevice: true,
     },
     {
         name: "Arduino Nano",
@@ -553,6 +554,8 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino", "kit"],
         helpLink: "https:nomo-kit.com",
+        freeDevice: false,
+        active: false,
     },
     // {
     //     name: 'MaixDock',

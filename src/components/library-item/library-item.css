@@ -37,7 +37,7 @@
 }
 
 .disabled {
-    opacity: .5;
+    opacity: 0.5;
     cursor: auto;
 }
 
@@ -102,11 +102,11 @@
     white-space: nowrap;
     min-width: 0;
     color: $text-primary;
-    text-decoration:none;
+    text-decoration: none;
 }
 
-.library-item-name:hover{
-    text-decoration:underline;
+.library-item-name:hover {
+    text-decoration: underline;
 }
 
 .featured-item {
@@ -146,8 +146,8 @@
     display: block;
     font-weight: normal;
     line-height: 1.375rem;
-    padding-top: .3125rem;
-    padding-bottom: .25rem;
+    padding-top: 0.3125rem;
+    padding-bottom: 0.25rem;
 }
 
 .featured-extension-metadata-first-row {
@@ -195,7 +195,7 @@
     flex-direction: row;
     align-items: flex-start;
     font-size: 12px;
-    margin-top:auto;
+    margin-top: auto;
     color: $text-primary;
     opacity: 0.75;
 }
@@ -212,7 +212,7 @@
     width: 100%;
     font-size: 12px;
     color: $text-primary;
-    margin-top:auto;
+    margin-top: auto;
 }
 
 .featured-extension-load-state {
@@ -271,16 +271,16 @@
     justify-content: flex-end;
 }
 
-.featured-extension-learn-more a{
+.featured-extension-learn-more a {
     height: 100%;
     padding-top: 0.4rem;
     font-weight: bold;
-    text-decoration:none;
+    text-decoration: none;
     color: $motion-primary;
 }
 
 .featured-extension-learn-more a:hover {
-    text-decoration:underline;
+    text-decoration: underline;
 }
 
 .featured-extension-help-link {
@@ -290,16 +290,16 @@
     justify-content: flex-end;
 }
 
-.featured-extension-help-link a{
+.featured-extension-help-link a {
     height: 100%;
     padding-top: 0.4rem;
     font-weight: bold;
-    text-decoration:none;
+    text-decoration: none;
     color: $motion-primary;
 }
 
-.featured-extension-help-link a:hover{
-    text-decoration:underline;
+.featured-extension-help-link a:hover {
+    text-decoration: underline;
 }
 
 .featured-extension-program-language {
@@ -326,7 +326,7 @@
     font-weight: bold;
 }
 
-.featured-extension-metadata-detail img{
+.featured-extension-metadata-detail img {
     margin-right: 0.5rem;
     height: 1.25rem;
 }
@@ -335,9 +335,9 @@
     position: absolute;
     background-color: $data-primary;
     border-radius: 1rem;
-    box-shadow: 0 0 .5rem hsla(0, 0%, 0%, .25);
-    padding: .5rem 1rem;
-    font-size: .875rem;
+    box-shadow: 0 0 0.5rem hsla(0, 0%, 0%, 0.25);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
     font-weight: bold;
     color: $ui-white;
 }
@@ -347,5 +347,24 @@
 }
 
 [dir="rtl"] .coming-soon-text {
+    transform: translate(calc(-2 * $space), calc(2 * $space));
+}
+
+.buy-now-text {
+    position: absolute;
+    background-color: $data-primary;
+    border-radius: 1rem;
+    box-shadow: 0 0 0.5rem hsla(0, 0%, 0%, 0.25);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: $ui-white;
+}
+
+[dir="ltr"] .buy-now-text {
+    transform: translate(calc(2 * $space), calc(2 * $space));
+}
+
+[dir="rtl"] .buy-now-text {
     transform: translate(calc(-2 * $space), calc(2 * $space));
 }
