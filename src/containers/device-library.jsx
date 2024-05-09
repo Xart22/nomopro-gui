@@ -56,6 +56,10 @@ class DeviceLibrary extends React.PureComponent {
         bindAll(this, ["handleItemSelect", "requestLoadDevice"]);
     }
     componentDidMount() {
+        fetch("https://663ce54517145c4d8c381740.mockapi.io/api/user-kits")
+            .then((response) => response.json())
+            .then((data) => console.log(data))
+            .catch((error) => console.error(error));
         this.props.vm.extensionManager
             .getDeviceList()
             .then((data) => {
@@ -106,13 +110,15 @@ class DeviceLibrary extends React.PureComponent {
     }
 
     render() {
-        console.log("DEVICE DATA :", this.props.deviceData);
+        // console.log("DEVICE DATA :", this.props.deviceData);
         const deviceLibraryThumbnailData = this.props.deviceData.map(
             (device) => ({
                 rawURL: device.iconURL || deviceIcon,
+                bro: true,
                 ...device,
             })
         );
+        console.log(deviceLibraryThumbnailData);
 
         return (
             <LibraryComponent
