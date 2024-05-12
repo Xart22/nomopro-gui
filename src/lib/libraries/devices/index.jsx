@@ -103,6 +103,7 @@ const deviceData = [
         programMode: ["realtime"],
         programLanguage: ["block"],
         tags: ["realtime"],
+        freeDevice: true,
     },
     {
         name: "Arduino Uno",
@@ -178,6 +179,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
+        freeDevice: true,
     },
     {
         name: "Arduino Nano 2",
@@ -215,6 +217,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
+        freeDevice: true,
     },
     {
         name: "NoBot Base",
@@ -252,6 +255,8 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["kit", "arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
+
+        freeDevice: false,
     },
     {
         name: "G-Bot Nomo",
@@ -289,6 +294,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["kit", "arduino"],
         helpLink: "https://www.weeemake.com/",
+        freeDevice: false,
     },
     // {
     //     name: 'Arduino Leonardo',
@@ -401,6 +407,7 @@ const deviceData = [
         tags: ["arduino"],
         helpLink:
             "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
+        freeDevice: true,
     },
     {
         name: "ESP32-CAM",
@@ -439,6 +446,7 @@ const deviceData = [
         tags: ["arduino"],
         helpLink:
             "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
+        freeDevice: true,
     },
     {
         name: "Arduino Nano 33 BLE Sense",
@@ -478,6 +486,7 @@ const deviceData = [
         tags: ["arduino"],
         helpLink:
             "https://store-usa.arduino.cc/products/nano-33-ble-sense-rev2",
+        freeDevice: true,
     },
     {
         name: "NodeMCU",
@@ -516,6 +525,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https:arduino-esp8266.readthedocs.io/en/3.0.0/index.html",
+        freeDevice: true,
     },
     {
         name: "Nomo Bot Starter Kit",
@@ -555,7 +565,7 @@ const deviceData = [
         tags: ["arduino", "kit"],
         helpLink: "https:nomo-kit.com",
         freeDevice: false,
-        active: false,
+        // active: false,
     },
     // {
     //     name: 'MaixDock',
@@ -741,6 +751,7 @@ const deviceData = [
         programLanguage: ["block", "microPython"],
         tags: ["microPython"],
         helpLink: "https://microbit.org/get-started/first-steps/introduction/",
+        freeDevice: true,
     },
     // {
     //     name: 'Makey Makey',

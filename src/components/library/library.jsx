@@ -291,6 +291,7 @@ class LibraryComponent extends React.Component {
                                 version={dataItem.version}
                                 active={dataItem.active}
                                 freeDevice={dataItem.freeDevice}
+                                available={dataItem.available}
                             />
                         ))
                     ) : (

@@ -180,6 +180,7 @@ class LibraryItem extends React.PureComponent {
                 version={this.props.version}
                 active={this.props.active}
                 freeDevice={this.props.freeDevice}
+                available={this.props.available}
             />
         );
     }
@@ -223,6 +224,7 @@ LibraryItem.propTypes = {
     version: PropTypes.string,
     active: PropTypes.bool,
     freeDevice: PropTypes.bool,
+    available: PropTypes.bool,
 };
 
 LibraryItem.defaultProps = {

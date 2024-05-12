@@ -23,6 +23,7 @@ import programLanguageMicroPythonIconURL from "./program-language-microPython.sv
 /* eslint-disable react/prefer-stateless-function */
 class LibraryItemComponent extends React.PureComponent {
     render() {
+        console.log("PROPS", this.props);
         return this.props.featured ? (
             <div
                 className={classNames(
@@ -30,7 +31,8 @@ class LibraryItemComponent extends React.PureComponent {
                     styles.featuredItem,
                     {
                         [styles.disabled]:
-                            this.props.disabled || !this.props.active,
+                            this.props.disabled ||
+                            (!this.props.available && !this.props.freeDevice),
                     },
                     this.props.extensionId || this.props.deviceId
                         ? styles.libraryItemExtension
@@ -49,7 +51,7 @@ class LibraryItemComponent extends React.PureComponent {
                             />
                         </div>
                     ) : null}
-                    {!this.props.active ? (
+                    {!this.props.available && !this.props.freeDevice ? (
                         <div className={styles.buyNowText}>
                             <FormattedMessage
                                 defaultMessage="Buy Now"
@@ -497,12 +499,13 @@ LibraryItemComponent.propTypes = {
     version: PropTypes.string,
     active: PropTypes.bool,
     freeDevice: PropTypes.bool,
+    available: PropTypes.bool,
 };
 
 LibraryItemComponent.defaultProps = {
     disabled: false,
     showPlayButton: false,
-    active: true,
+    // active: true,
 };
 
 export default LibraryItemComponent;

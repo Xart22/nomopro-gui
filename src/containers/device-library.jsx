@@ -13,6 +13,8 @@ import { makeDeviceLibrary } from "../lib/libraries/devices/index.jsx";
 
 import LibraryComponent from "../components/library/library.jsx";
 import deviceIcon from "../components/action-menu/icon--sprite.svg";
+import Cookies from "js-cookie";
+import LoaderComponent from "../components/loader/loader.jsx";
 
 const messages = defineMessages({
     deviceTitle: {
@@ -53,13 +55,21 @@ const tagListPrefix = [ARDUINO_TAG, MICROPYTHON_TAG, KIT_TAG];
 class DeviceLibrary extends React.PureComponent {
     constructor(props) {
         super(props);
+        this.state = {
+            externalUserKitData: [],
+        };
         bindAll(this, ["handleItemSelect", "requestLoadDevice"]);
     }
     componentDidMount() {
-        fetch("https://663ce54517145c4d8c381740.mockapi.io/api/user-kits")
+        const userId = Cookies.get("user_id");
+        // fetch("https://663ce54517145c4d8c381740.mockapi.io/api/user-kits")
+        fetch(`http://localhost:8000/api/user/${userId}/kits`)
             .then((response) => response.json())
-            .then((data) => console.log(data))
+            .then((data) => {
+                this.setState({ externalUserKitData: data.kit_external_id });
+            })
             .catch((error) => console.error(error));
+        // console.log(externalUserKitData);
         this.props.vm.extensionManager
             .getDeviceList()
             .then((data) => {
@@ -110,19 +120,34 @@ class DeviceLibrary extends React.PureComponent {
     }
 
     render() {
-        // console.log("DEVICE DATA :", this.props.deviceData);
-        const deviceLibraryThumbnailData = this.props.deviceData.map(
-            (device) => ({
-                rawURL: device.iconURL || deviceIcon,
-                bro: true,
-                ...device,
-            })
+        const { externalUserKitData } = this.state;
+        if (externalUserKitData.length === 0) {
+            // Render loading or placeholder component
+            return <LoaderComponent />;
+        }
+        console.log(externalUserKitData);
+
+        const deviceLibraryThumbnailData2 = this.props.deviceData.map(
+            (device) => {
+                // Check if device's deviceId exists in fetchedData
+                const deviceExists =
+                    Array.isArray(this.state.externalUserKitData) &&
+                    this.state.externalUserKitData.some(
+                        (externalDevice) =>
+                            externalDevice.kit_external_id === device.deviceId
+                    );
+
+                return {
+                    rawURL: device.iconURL || deviceIcon,
+                    available: deviceExists, // Set available to true if deviceId exists in fetchedData
+                    ...device,
+                };
+            }
         );
-        console.log(deviceLibraryThumbnailData);
 
         return (
             <LibraryComponent
-                data={deviceLibraryThumbnailData}
+                data={deviceLibraryThumbnailData2}
                 filterable
                 tags={tagListPrefix}
                 id="deviceLibrary"
@@ -150,7 +175,6 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     onSetDeviceData: (data) => dispatch(setDeviceData(data)),
 });
-
 export default compose(
     injectIntl,
     connect(mapStateToProps, mapDispatchToProps)
