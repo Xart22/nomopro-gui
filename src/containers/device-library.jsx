@@ -123,7 +123,7 @@ class DeviceLibrary extends React.PureComponent {
         const { externalUserKitData } = this.state;
         if (externalUserKitData.length === 0) {
             // Render loading or placeholder component
-            return <LoaderComponent />;
+            return <LoaderComponent messageId={"gui.loader.headlineDevice"} />;
         }
         console.log(externalUserKitData);
 
