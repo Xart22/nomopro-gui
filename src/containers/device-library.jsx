@@ -57,6 +57,7 @@ class DeviceLibrary extends React.PureComponent {
         super(props);
         this.state = {
             externalUserKitData: [],
+            isLoading: true,
         };
         bindAll(this, ["handleItemSelect", "requestLoadDevice"]);
     }
@@ -66,7 +67,10 @@ class DeviceLibrary extends React.PureComponent {
         fetch(`http://localhost:8000/api/user/${userId}/kits`)
             .then((response) => response.json())
             .then((data) => {
-                this.setState({ externalUserKitData: data.kit_external_id });
+                this.setState({
+                    externalUserKitData: data.kit_external_id,
+                    isLoading: false,
+                });
             })
             .catch((error) => console.error(error));
         // console.log(externalUserKitData);
@@ -121,12 +125,11 @@ class DeviceLibrary extends React.PureComponent {
 
     render() {
         const { externalUserKitData } = this.state;
-        if (externalUserKitData.length === 0) {
+        if (this.state.isLoading === false) {
             // Render loading or placeholder component
             return <LoaderComponent messageId={"gui.loader.headlineDevice"} />;
         }
         console.log(externalUserKitData);
-
         const deviceLibraryThumbnailData2 = this.props.deviceData.map(
             (device) => {
                 // Check if device's deviceId exists in fetchedData
