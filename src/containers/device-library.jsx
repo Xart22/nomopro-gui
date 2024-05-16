@@ -85,6 +85,7 @@ class DeviceLibrary extends React.PureComponent {
     }
 
     requestLoadDevice(device) {
+        console.log("device container", device);
         const id = device.deviceId;
         const deviceType = device.type;
         const pnpidList = device.pnpidList;
@@ -125,7 +126,7 @@ class DeviceLibrary extends React.PureComponent {
 
     render() {
         const { externalUserKitData } = this.state;
-        if (this.state.isLoading === false) {
+        if (this.state.isLoading === true) {
             // Render loading or placeholder component
             return <LoaderComponent messageId={"gui.loader.headlineDevice"} />;
         }

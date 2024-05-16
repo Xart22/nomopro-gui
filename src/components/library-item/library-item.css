@@ -350,7 +350,7 @@
     transform: translate(calc(-2 * $space), calc(2 * $space));
 }
 
-.buy-now-text {
+/* .buy-now-text {
     position: absolute;
     background-color: $data-primary;
     border-radius: 1rem;
@@ -359,6 +359,20 @@
     font-size: 0.875rem;
     font-weight: bold;
     color: $ui-white;
+} */
+.buy-now-text {
+    position: absolute;
+    top: 25%;
+    left: 25%;
+    transform: translate(-50%, -50%);
+    background-color: $data-primary;
+    border-radius: 1rem;
+    box-shadow: 0 0 0.5rem hsla(0, 0%, 0%, 0.25);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: $ui-white;
+    z-index: 9999;
 }
 
 [dir="ltr"] .buy-now-text {
@@ -367,4 +381,8 @@
 
 [dir="rtl"] .buy-now-text {
     transform: translate(calc(-2 * $space), calc(2 * $space));
+}
+
+.library-component-parent {
+    position: relative;
 }

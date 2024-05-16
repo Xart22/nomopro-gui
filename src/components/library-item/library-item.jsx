@@ -41,6 +41,27 @@ class LibraryItemComponent extends React.PureComponent {
                 )}
                 onClick={this.props.onClick}
             >
+                {!this.props.available && !this.props.freeDevice ? (
+                    <div className={styles.buyNowText}>
+                        <a
+                            className={styles.libraryItemName}
+                            href={this.props.buyNowUrl}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            onClick={
+                                this.props.onClickBuyNow
+                                    ? this.props.onClickBuyNow
+                                    : null
+                            }
+                        >
+                            <FormattedMessage
+                                defaultMessage="Buy Now"
+                                description="Label for extensions that are not yet implemented"
+                                id="gui.extensionLibrary.buyNow"
+                            />
+                        </a>
+                    </div>
+                ) : null}
                 <div className={styles.featuredImageContainer}>
                     {this.props.disabled ? (
                         <div className={styles.comingSoonText}>
@@ -51,15 +72,15 @@ class LibraryItemComponent extends React.PureComponent {
                             />
                         </div>
                     ) : null}
-                    {!this.props.available && !this.props.freeDevice ? (
-                        <div className={styles.buyNowText}>
-                            <FormattedMessage
-                                defaultMessage="Buy Now"
-                                description="Label for extensions that are not yet implemented"
-                                id="gui.extensionLibrary.buyNow"
-                            />
-                        </div>
-                    ) : null}
+                    {/* {!this.props.available && !this.props.freeDevice ? (
+                            <div className={styles.buyNowText}>
+                                <FormattedMessage
+                                    defaultMessage="Buy Now"
+                                    description="Label for extensions that are not yet implemented"
+                                    id="gui.extensionLibrary.buyNow"
+                                />
+                            </div>
+                        ) : null} */}
                     <img
                         className={styles.featuredImage}
                         src={this.props.iconURL}
@@ -500,6 +521,8 @@ LibraryItemComponent.propTypes = {
     active: PropTypes.bool,
     freeDevice: PropTypes.bool,
     available: PropTypes.bool,
+    buyNowUrl: PropTypes.string,
+    onClickBuyNow: PropTypes.func.isRequired,
 };
 
 LibraryItemComponent.defaultProps = {

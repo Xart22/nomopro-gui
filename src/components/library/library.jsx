@@ -68,10 +68,16 @@ class LibraryComponent extends React.Component {
         }
     }
     handleSelect(id) {
-        if (this.props.autoClose) {
-            this.handleClose();
+        const available = this.getFilteredData()[id].available;
+        const freeDevice = this.getFilteredData()[id].freeDevice;
+        if (available || freeDevice) {
+            console.log("handle select");
+            if (this.props.autoClose) {
+                console.log("call props auto close");
+                this.handleClose();
+            }
+            this.props.onItemSelected(this.getFilteredData()[id]);
         }
-        this.props.onItemSelected(this.getFilteredData()[id]);
     }
     handleClose() {
         this.props.onRequestClose();
@@ -292,6 +298,7 @@ class LibraryComponent extends React.Component {
                                 active={dataItem.active}
                                 freeDevice={dataItem.freeDevice}
                                 available={dataItem.available}
+                                buyNowUrl={dataItem.buyNowUrl}
                             />
                         ))
                     ) : (

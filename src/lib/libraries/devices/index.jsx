@@ -257,6 +257,7 @@ const deviceData = [
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
 
         freeDevice: false,
+        buyNowUrl: "https://nomo-kit.com",
     },
     {
         name: "G-Bot Nomo",
@@ -295,6 +296,7 @@ const deviceData = [
         tags: ["kit", "arduino"],
         helpLink: "https://www.weeemake.com/",
         freeDevice: false,
+        buyNowUrl: "https://nomo-kit.com",
     },
     // {
     //     name: 'Arduino Leonardo',
@@ -565,6 +567,7 @@ const deviceData = [
         tags: ["arduino", "kit"],
         helpLink: "https:nomo-kit.com",
         freeDevice: false,
+        buyNowUrl: "https://nomo-kit.com",
         // active: false,
     },
     // {
