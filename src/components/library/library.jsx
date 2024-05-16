@@ -70,10 +70,9 @@ class LibraryComponent extends React.Component {
     handleSelect(id) {
         const available = this.getFilteredData()[id].available;
         const freeDevice = this.getFilteredData()[id].freeDevice;
-        if (available || freeDevice) {
-            console.log("handle select");
+        const isExtension = this.getFilteredData()[id].extensionId != undefined;
+        if (available || freeDevice || isExtension) {
             if (this.props.autoClose) {
-                console.log("call props auto close");
                 this.handleClose();
             }
             this.props.onItemSelected(this.getFilteredData()[id]);

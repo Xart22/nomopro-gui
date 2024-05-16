@@ -45,11 +45,15 @@ class LibraryItem extends React.PureComponent {
     handleClick(e) {
         if (
             !this.props.disabled &&
-            (this.props.available || this.props.freeDevice)
+            (this.props.available ||
+                this.props.freeDevice ||
+                (this.props.deviceId == undefined &&
+                    this.props.extensionId != undefined))
         ) {
             if (!this.state.isProcessing) {
                 console.log("isProcessing");
                 if (this.props.isUnloadble) {
+                    console.log("unloadble");
                     this.setState({
                         isProcessing: true,
                     });
@@ -64,7 +68,6 @@ class LibraryItem extends React.PureComponent {
     }
 
     handleClickBuyNow(e) {
-        console.log("clicked buyt");
         e.stopPropagation();
     }
     handleFocus(id) {

@@ -85,7 +85,6 @@ class DeviceLibrary extends React.PureComponent {
     }
 
     requestLoadDevice(device) {
-        console.log("device container", device);
         const id = device.deviceId;
         const deviceType = device.type;
         const pnpidList = device.pnpidList;
