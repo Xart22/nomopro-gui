@@ -13,6 +13,10 @@ import arduinoUnoIconURL from "./arduinoUno/arduinoUno.png";
 import arduinoUnoConnectionIconURLL from "./arduinoUno/arduinoUno-illustration.svg";
 import arduinoUnoConnectionSmallIconURL from "./arduinoUno/arduinoUno-small.svg";
 
+import arduinoUnoR4WifiIconURL from "./arduinoUnoR4Wifi/r4.png";
+import arduinoUnoR4WifiConnectionIconURLL from "./arduinoUno/arduinoUno-illustration.svg";
+import arduinoUnoR4WifiConnectionSmallIconURL from "./arduinoUno/arduinoUno-small.svg";
+
 import arduinoNanoIconURL from "./arduinoNano/arduinoNano.png";
 import arduinoNanoConnectionIconURLL from "./arduinoNano/arduinoNano-illustration.svg";
 import arduinoNanoConnectionSmallIconURL from "./arduinoNano/arduinoNano-small.svg";
@@ -140,6 +144,43 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-uno-rev3",
+    },
+    {
+        name: "Arduino Uno R4 Wifi",
+        deviceId: "arduinoUnoR4Wifi",
+        manufactor: "arduino.cc",
+        learnMore: "https://store.arduino.cc/products/uno-r4-wifi",
+        type: DeviceType.arduino,
+        iconURL: arduinoUnoR4WifiIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="The Arduino UNO R4 WiFi merges the RA4M1 microprocessor from Renesas with the ESP32-S3 from Espressif"
+                description="Description for the Arduino Uno R4 Wifi device"
+                id="gui.device.arduinoUnoR4Wifi.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "115200",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: arduinoUnoConnectionIconURLL,
+        connectionSmallIconURL: arduinoUnoConnectionSmallIconURL,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their device."
+                id="gui.device.arduinoUnoR4Wifi.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
+        helpLink: "https://store.arduino.cc/products/uno-r4-wifi",
     },
     {
         name: "Arduino Nano",
