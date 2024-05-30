@@ -14,8 +14,8 @@ import arduinoUnoConnectionIconURLL from "./arduinoUno/arduinoUno-illustration.s
 import arduinoUnoConnectionSmallIconURL from "./arduinoUno/arduinoUno-small.svg";
 
 import arduinoUnoR4WifiIconURL from "./arduinoUnoR4Wifi/r4.png";
-import arduinoUnoR4WifiConnectionIconURLL from "./arduinoUno/arduinoUno-illustration.svg";
-import arduinoUnoR4WifiConnectionSmallIconURL from "./arduinoUno/arduinoUno-small.svg";
+import arduinoUnoR4WifiConnectionIconURLL from "./arduinoUnoR4Wifi/r4-108.svg";
+import arduinoUnoR4WifiConnectionSmallIconURL from "./arduinoUnoR4Wifi/r440.svg";
 
 import arduinoNanoIconURL from "./arduinoNano/arduinoNano.png";
 import arduinoNanoConnectionIconURLL from "./arduinoNano/arduinoNano-illustration.svg";
@@ -167,8 +167,8 @@ const deviceData = [
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
-        connectionIconURL: arduinoUnoConnectionIconURLL,
-        connectionSmallIconURL: arduinoUnoConnectionSmallIconURL,
+        connectionIconURL: arduinoUnoR4WifiConnectionIconURLL,
+        connectionSmallIconURL: arduinoUnoR4WifiConnectionSmallIconURL,
         connectingMessage: (
             <FormattedMessage
                 defaultMessage="Connecting"
