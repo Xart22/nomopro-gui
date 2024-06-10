@@ -81,6 +81,10 @@ import nomobotStarterKitIconURL from "./nomoBotStarterKit/nomobot-startkerkit.pn
 import nomobotStarterKitConnectionSmallIconUrl from "./nomoBotStarterKit/nomobot-starterkit-small.png";
 import nomoBotStarterKitSmallIconUrl from "./nomoBotStarterKit/nomobot-starterkit-illustration.png";
 
+import nomobotBasicKitIconURL from "./esp32NomobotBasicKit/nomobot_basicKit.png";
+import nomoBotBasicKitSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-illustration.png";
+import nomobotBasicKitConnectionSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-small.png";
+
 const deviceData = [
     /**
      * Unselect the deivce back to pure scratch mode
@@ -601,7 +605,7 @@ const deviceData = [
         manufactor: "Instar Education",
         learnMore: "https:www.esp32.com",
         type: DeviceType.arduino,
-        iconURL: nomobotStarterKitIconURL,
+        iconURL: nomobotBasicKitIconURL,
         description: (
             <FormattedMessage
                 defaultMessage="Low-cost Robot Kit based on ESP32 board for build and learn about robotics, IoT, AI, etc."
@@ -617,8 +621,8 @@ const deviceData = [
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
-        connectionIconURL: nomoBotStarterKitSmallIconUrl,
-        connectionSmallIconURL: nomobotStarterKitConnectionSmallIconUrl,
+        connectionIconURL: nomoBotBasicKitSmallIconUrl,
+        connectionSmallIconURL: nomobotBasicKitConnectionSmallIconUrl,
         connectingMessage: (
             <FormattedMessage
                 defaultMessage="Connecting"
@@ -627,7 +631,7 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ["upload"],
+        programMode: ["realtime", "upload"],
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino", "kit"],
         helpLink: "https:nomo-kit.com",
