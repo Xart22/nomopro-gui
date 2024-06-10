@@ -595,6 +595,43 @@ const deviceData = [
         tags: ["arduino", "kit"],
         helpLink: "https:nomo-kit.com",
     },
+    {
+        name: "NOMOBOT Basic Kit",
+        deviceId: "arduinoEsp32Nomobot",
+        manufactor: "Instar Education",
+        learnMore: "https:www.esp32.com",
+        type: DeviceType.arduino,
+        iconURL: nomobotStarterKitIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Low-cost Robot Kit based on ESP32 board for build and learn about robotics, IoT, AI, etc."
+                description="Description for the Nomo Bot Starter Kit ESP32 device"
+                id="gui.device.arduinoEsp32Nomobot.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "76800",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: nomoBotStarterKitSmallIconUrl,
+        connectionSmallIconURL: nomobotStarterKitConnectionSmallIconUrl,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their device."
+                id="gui.device.arduinoEsp32Nomobot.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino", "kit"],
+        helpLink: "https:nomo-kit.com",
+    },
     // {
     //     name: 'MaixDock',
     //     deviceId: 'arduinoK210MaixDock',
