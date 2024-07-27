@@ -342,7 +342,7 @@ class MenuBar extends React.Component {
     }
 
     handleClickOpenNomoTutorials() {
-        window.open("https://nomo-kit.com/tutorial");
+        window.open("https://instareducation.com/education-resources/");
     }
     restoreOptionMessage(deletedItem) {
         switch (deletedItem) {
