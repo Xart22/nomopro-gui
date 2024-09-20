@@ -13,6 +13,10 @@ import arduinoUnoIconURL from "./arduinoUno/arduinoUno.png";
 import arduinoUnoConnectionIconURLL from "./arduinoUno/arduinoUno-illustration.svg";
 import arduinoUnoConnectionSmallIconURL from "./arduinoUno/arduinoUno-small.svg";
 
+import arduinoUnoR4WifiIconURL from "./arduinoUnoR4Wifi/r4.png";
+import arduinoUnoR4WifiConnectionIconURLL from "./arduinoUnoR4Wifi/r4-108.svg";
+import arduinoUnoR4WifiConnectionSmallIconURL from "./arduinoUnoR4Wifi/r440.svg";
+
 import arduinoNanoIconURL from "./arduinoNano/arduinoNano.png";
 import arduinoNanoConnectionIconURLL from "./arduinoNano/arduinoNano-illustration.svg";
 import arduinoNanoConnectionSmallIconURL from "./arduinoNano/arduinoNano-small.svg";
@@ -76,6 +80,10 @@ import weeemakeELFUnoConnectionSmallIconUrl from "./weeemakeELFUno/weeemakeELFUn
 import nomobotStarterKitIconURL from "./nomoBotStarterKit/nomobot-startkerkit.png";
 import nomobotStarterKitConnectionSmallIconUrl from "./nomoBotStarterKit/nomobot-starterkit-small.png";
 import nomoBotStarterKitSmallIconUrl from "./nomoBotStarterKit/nomobot-starterkit-illustration.png";
+
+import nomobotBasicKitIconURL from "./esp32NomobotBasicKit/nomobot_basicKit.png";
+import nomoBotBasicKitSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-illustration.png";
+import nomobotBasicKitConnectionSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-small.png";
 
 const deviceData = [
     /**
@@ -142,6 +150,43 @@ const deviceData = [
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-uno-rev3",
         freeDevice: true,
+    },
+    {
+        name: "Arduino Uno R4 Wifi",
+        deviceId: "arduinoUnoR4Wifi",
+        manufactor: "arduino.cc",
+        learnMore: "https://store.arduino.cc/products/uno-r4-wifi",
+        type: DeviceType.arduino,
+        iconURL: arduinoUnoR4WifiIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="The Arduino UNO R4 WiFi merges the RA4M1 microprocessor from Renesas with the ESP32-S3 from Espressif"
+                description="Description for the Arduino Uno R4 Wifi device"
+                id="gui.device.arduinoUnoR4Wifi.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "115200",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: arduinoUnoR4WifiConnectionIconURLL,
+        connectionSmallIconURL: arduinoUnoR4WifiConnectionSmallIconURL,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their device."
+                id="gui.device.arduinoUnoR4Wifi.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
+        helpLink: "https://store.arduino.cc/products/uno-r4-wifi",
     },
     {
         name: "Arduino Nano",
@@ -569,6 +614,43 @@ const deviceData = [
         freeDevice: false,
         buyNowUrl: "https://nomo-kit.com",
         // active: false,
+    },
+    {
+        name: "NOMOBOT Basic Kit",
+        deviceId: "arduinoEsp32Nomobot",
+        manufactor: "Instar Education",
+        learnMore: "https:www.esp32.com",
+        type: DeviceType.arduino,
+        iconURL: nomobotBasicKitIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Low-cost Robot Kit based on ESP32 board for build and learn about robotics, IoT, AI, etc."
+                description="Description for the Nomo Bot Starter Kit ESP32 device"
+                id="gui.device.arduinoEsp32Nomobot.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "76800",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: nomoBotBasicKitSmallIconUrl,
+        connectionSmallIconURL: nomobotBasicKitConnectionSmallIconUrl,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their device."
+                id="gui.device.arduinoEsp32Nomobot.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["realtime", "upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino", "kit"],
+        helpLink: "https:nomo-kit.com",
     },
     // {
     //     name: 'MaixDock',
