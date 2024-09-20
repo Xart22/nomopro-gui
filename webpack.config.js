@@ -1,6 +1,13 @@
 const defaultsDeep = require("lodash.defaultsdeep");
 var path = require("path");
 var webpack = require("webpack");
+// const dotenv = require('dotenv');
+
+// Load environment variables based on the environment
+const Dotenv = require('dotenv-webpack');
+
+// Dynamically load the environment-specific .env file
+const envFile = `.env.${process.env.NODE_ENV || 'local'}`;
 
 // Plugins
 var CopyWebpackPlugin = require("copy-webpack-plugin");
@@ -33,8 +40,7 @@ const base = {
         symlinks: false,
     },
     module: {
-        rules: [
-            {
+        rules: [{
                 test: /\.jsx?$/,
                 loader: "babel-loader",
                 include: [
@@ -64,8 +70,7 @@ const base = {
             {
                 test: /\.css$/,
                 exclude: MONACO_DIR,
-                use: [
-                    {
+                use: [{
                         loader: "style-loader",
                     },
                     {
@@ -111,6 +116,9 @@ const base = {
             languages: ["c", "cpp", "python", "lua", "javascript"],
             features: ["!gotoSymbol"],
         }),
+        new Dotenv({
+            path: path.resolve(__dirname, envFile), // Load .env file based on NODE_ENV
+        }),
     ],
 };
 
@@ -133,15 +141,13 @@ module.exports = [
             filename: "[name].js",
         },
         module: {
-            rules: base.module.rules.concat([
-                {
-                    test: /\.(svg|png|wav|gif|jpg)$/,
-                    loader: "file-loader",
-                    options: {
-                        outputPath: "static/assets/",
-                    },
+            rules: base.module.rules.concat([{
+                test: /\.(svg|png|wav|gif|jpg)$/,
+                loader: "file-loader",
+                options: {
+                    outputPath: "static/assets/",
                 },
-            ]),
+            }, ]),
         },
         optimization: {
             splitChunks: {
@@ -156,16 +162,14 @@ module.exports = [
             new webpack.DefinePlugin({
                 "process.env.NODE_ENV": '"' + process.env.NODE_ENV + '"',
                 "process.env.DEBUG": Boolean(process.env.DEBUG),
-                "process.env.GA_ID":
-                    '"' + (process.env.GA_ID || "UA-000000-01") + '"',
+                "process.env.GA_ID": '"' + (process.env.GA_ID || "UA-000000-01") + '"',
             }),
             new HtmlWebpackPlugin({
                 chunks: ["lib.min", "gui"],
                 template: "src/playground/index.ejs",
                 title: "Nomopro",
-                sentryConfig: process.env.SENTRY_CONFIG
-                    ? '"' + process.env.SENTRY_CONFIG + '"'
-                    : null,
+                sentryConfig: process.env.SENTRY_CONFIG ?
+                    '"' + process.env.SENTRY_CONFIG + '"' : null,
             }),
             new HtmlWebpackPlugin({
                 chunks: ["lib.min", "blocksonly"],
@@ -185,84 +189,66 @@ module.exports = [
                 filename: "player.html",
                 title: "Nomopro GUI: Player Example",
             }),
-            new CopyWebpackPlugin([
-                {
-                    from: "static",
-                    to: "static",
-                },
-            ]),
-            new CopyWebpackPlugin([
-                {
-                    from: "node_modules/openblock-blocks/media",
-                    to: "static/blocks-media",
-                },
-            ]),
-            new CopyWebpackPlugin([
-                {
-                    from: "extensions/**",
-                    to: "static",
-                    context: "src/examples",
-                },
-            ]),
-            new CopyWebpackPlugin([
-                {
-                    from: "extension-worker.{js,js.map}",
-                    context: "node_modules/openblock-vm/dist/web",
-                },
-            ]),
+            new CopyWebpackPlugin([{
+                from: "static",
+                to: "static",
+            }, ]),
+            new CopyWebpackPlugin([{
+                from: "node_modules/openblock-blocks/media",
+                to: "static/blocks-media",
+            }, ]),
+            new CopyWebpackPlugin([{
+                from: "extensions/**",
+                to: "static",
+                context: "src/examples",
+            }, ]),
+            new CopyWebpackPlugin([{
+                from: "extension-worker.{js,js.map}",
+                context: "node_modules/openblock-vm/dist/web",
+            }, ]),
         ]),
     }),
 ].concat(
-    process.env.NODE_ENV === "production" || process.env.BUILD_MODE === "dist"
-        ? // export as library
-          defaultsDeep({}, base, {
-              target: "web",
-              entry: {
-                  "openblock-gui": "./src/index.js",
-              },
-              output: {
-                  libraryTarget: "umd",
-                  path: path.resolve("dist"),
-                  publicPath: `${STATIC_PATH}/`,
-              },
-              externals: {
-                  react: "react",
-                  "react-dom": "react-dom",
-              },
-              module: {
-                  rules: base.module.rules.concat([
-                      {
-                          test: /\.(svg|png|wav|gif|jpg)$/,
-                          loader: "file-loader",
-                          options: {
-                              outputPath: "static/assets/",
-                              publicPath: `${STATIC_PATH}/assets/`,
-                          },
-                      },
-                  ]),
-              },
-              plugins: base.plugins.concat([
-                  new CopyWebpackPlugin([
-                      {
-                          from: "node_modules/openblock-blocks/media",
-                          to: "static/blocks-media",
-                      },
-                  ]),
-                  new CopyWebpackPlugin([
-                      {
-                          from: "extension-worker.{js,js.map}",
-                          context: "node_modules/openblock-vm/dist/web",
-                      },
-                  ]),
-                  // Include library JSON files for scratch-desktop to use for downloading
-                  new CopyWebpackPlugin([
-                      {
-                          from: "src/lib/libraries/*.json",
-                          to: "libraries",
-                          flatten: true,
-                      },
-                  ]),
-              ]),
-          })
-        : []
+    process.env.NODE_ENV === "production" || process.env.BUILD_MODE === "dist" ? // export as library
+    defaultsDeep({}, base, {
+        target: "web",
+        entry: {
+            "openblock-gui": "./src/index.js",
+        },
+        output: {
+            libraryTarget: "umd",
+            path: path.resolve("dist"),
+            publicPath: `${STATIC_PATH}/`,
+        },
+        externals: {
+            react: "react",
+            "react-dom": "react-dom",
+        },
+        module: {
+            rules: base.module.rules.concat([{
+                test: /\.(svg|png|wav|gif|jpg)$/,
+                loader: "file-loader",
+                options: {
+                    outputPath: "static/assets/",
+                    publicPath: `${STATIC_PATH}/assets/`,
+                },
+            }, ]),
+        },
+        plugins: base.plugins.concat([
+            new CopyWebpackPlugin([{
+                from: "node_modules/openblock-blocks/media",
+                to: "static/blocks-media",
+            }, ]),
+            new CopyWebpackPlugin([{
+                from: "extension-worker.{js,js.map}",
+                context: "node_modules/openblock-vm/dist/web",
+            }, ]),
+            // Include library JSON files for scratch-desktop to use for downloading
+            new CopyWebpackPlugin([{
+                from: "src/lib/libraries/*.json",
+                to: "libraries",
+                flatten: true,
+            }, ]),
+        ]),
+    }) : []
 );

@@ -62,9 +62,10 @@ class DeviceLibrary extends React.PureComponent {
         bindAll(this, ["handleItemSelect", "requestLoadDevice"]);
     }
     componentDidMount() {
+        const apiUrl = process.env.API_URL;
+
         const userId = Cookies.get("user_id");
-        // fetch("https://663ce54517145c4d8c381740.mockapi.io/api/user-kits")
-        fetch(`http://localhost:8000/api/user/${userId}/kits`)
+        fetch(`${apiUrl}/api/user/${userId}/kits`)
             .then((response) => response.json())
             .then((data) => {
                 this.setState({
