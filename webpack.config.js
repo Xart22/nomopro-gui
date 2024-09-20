@@ -7,7 +7,7 @@ var webpack = require("webpack");
 const Dotenv = require('dotenv-webpack');
 
 // Dynamically load the environment-specific .env file
-const envFile = `.env.${process.env.NODE_ENV || 'local'}`;
+const envFile = `.env.${process.env.NODE_ENV || 'development'}`;
 
 // Plugins
 var CopyWebpackPlugin = require("copy-webpack-plugin");
@@ -117,7 +117,8 @@ const base = {
             features: ["!gotoSymbol"],
         }),
         new Dotenv({
-            path: path.resolve(__dirname, envFile), // Load .env file based on NODE_ENV
+            path: envFile, // Path to the specific .env file (e.g., .env.staging)
+            systemvars: true // Load system variables in case they exist
         }),
     ],
 };
