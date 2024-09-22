@@ -342,7 +342,8 @@ const deviceData = [
         tags: ["kit", "arduino"],
         helpLink: "https://www.weeemake.com/",
         freeDevice: false,
-        buyNowUrl: "https://nomo-kit.com",
+        buyNowUrl:
+            "https://tokopedia.com/instareducation/g-bot-nomo-std-u-v1-0?extParam=src%3Dshop%26whid%3D13462131",
     },
     // {
     //     name: 'Arduino Leonardo',
@@ -652,6 +653,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino", "kit"],
         helpLink: "https:nomo-kit.com",
+        buyNowUrl: "https://nomo-kit.com",
     },
     // {
     //     name: 'MaixDock',
