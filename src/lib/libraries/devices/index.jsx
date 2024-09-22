@@ -85,6 +85,10 @@ import nomobotBasicKitIconURL from "./esp32NomobotBasicKit/nomobot_basicKit.png"
 import nomoBotBasicKitSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-illustration.png";
 import nomobotBasicKitConnectionSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-small.png";
 
+import nobotAIIconUrl from "./nobotAI/nobotAI.png";
+import nobotAISmallIconUrl from "./nobotAI/nobotAI_illustration.png";
+import nobotAIConnectionSmallIconUrl from "./nobotAI/nobotAI_small.png";
+
 const deviceData = [
     /**
      * Unselect the deivce back to pure scratch mode
@@ -303,7 +307,7 @@ const deviceData = [
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
 
         freeDevice: false,
-        buyNowUrl: "https://nomo-kit.com",
+        buyNowUrl: "https://wa.link/zfyhih",
     },
     {
         name: "G-Bot Nomo",
@@ -498,6 +502,46 @@ const deviceData = [
         freeDevice: true,
     },
     {
+        name: "Add-On ESP32-CAM",
+        deviceId: "arduinoEsp32CamAddOn",
+        manufactor: "espressif",
+        learnMore: "https:www.espressif.com/",
+        type: DeviceType.arduino,
+        iconURL: esp32CamIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="The ESP32-CAM is a small size, low power consumption camera module based on ESP32. It comes with an OV2640 camera and provides onboard TF card slot"
+                description="Description for the arduinoEsp32Cam device"
+                id="gui.device.arduinoEsp32Cam.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "115200",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: esp32CamConnectionIconURLL,
+        connectionSmallIconURL: esp32CamConnectionSmallIconURL,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their esp32."
+                id="gui.device.arduinoEsp32Cam.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
+        helpLink:
+            "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
+        freeDevice: false,
+        buyNowUrl: "https://wa.link/zfyhih",
+    },
+    {
         name: "Arduino Nano 33 BLE Sense",
         deviceId: "arduinoNano33BleSense",
         manufactor: "arduino.cc",
@@ -614,7 +658,7 @@ const deviceData = [
         tags: ["arduino", "kit"],
         helpLink: "https:nomo-kit.com",
         freeDevice: false,
-        buyNowUrl: "https://nomo-kit.com",
+        buyNowUrl: "https://wa.link/zfyhih",
         // active: false,
     },
     {
@@ -653,7 +697,49 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino", "kit"],
         helpLink: "https:nomo-kit.com",
-        buyNowUrl: "https://nomo-kit.com",
+        buyNowUrl: "https://wa.link/zfyhih",
+    },
+    {
+        name: "Nobot AI",
+        deviceId: "nobotAi",
+        manufactor: "Instar Education",
+        learnMore: "https:www.nodemcu.com",
+        type: DeviceType.arduino,
+        iconURL: nobotAIIconUrl,
+        description: (
+            <FormattedMessage
+                defaultMessage="This robot is an educational robot designed to support learning through the STEAM method (Science, Technology, Engineering, Art, and Math)."
+                description="Description for the Nobot AI device"
+                id="gui.device.nobotAi.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "76800",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: nobotAISmallIconUrl,
+        connectionSmallIconURL: nobotAIConnectionSmallIconUrl,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their device."
+                id="gui.device.nomoBotStarterKit.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        deviceExtensionsCompatible: "arduinoEsp32",
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino", "kit"],
+        helpLink: "https:nomo-kit.com",
+        freeDevice: false,
+        buyNowUrl:
+            "https://www.tokopedia.com/instareducation/robot-edukasi-steam-nobot-ai-1-0-akses-nomo-pro-tanpa-batas-waktu?extParam=src%3Dshop%26whid%3D13462131",
+        // active: false,
     },
     // {
     //     name: 'MaixDock',
