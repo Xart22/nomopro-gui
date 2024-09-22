@@ -85,9 +85,9 @@ import nomobotBasicKitIconURL from "./esp32NomobotBasicKit/nomobot_basicKit.png"
 import nomoBotBasicKitSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-illustration.png";
 import nomobotBasicKitConnectionSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-small.png";
 
-import nobotAIIconUrl from "./nobotAI/nobotAI.png";
-import nobotAISmallIconUrl from "./nobotAI/nobotAI_illustration.png";
-import nobotAIConnectionSmallIconUrl from "./nobotAI/nobotAI_small.png";
+import nobotAIIconUrl from "./nobotAI/nobotAi.png";
+import nobotAISmallIconUrl from "./nobotAI/nobotAi_illustration.png";
+import nobotAIConnectionSmallIconUrl from "./nobotAI/nobotAi_small.png";
 
 const deviceData = [
     /**
@@ -512,7 +512,7 @@ const deviceData = [
             <FormattedMessage
                 defaultMessage="The ESP32-CAM is a small size, low power consumption camera module based on ESP32. It comes with an OV2640 camera and provides onboard TF card slot"
                 description="Description for the arduinoEsp32Cam device"
-                id="gui.device.arduinoEsp32Cam.description"
+                id="gui.device.arduinoEsp32CamAddOn.description"
             />
         ),
         featured: true,
@@ -529,7 +529,7 @@ const deviceData = [
             <FormattedMessage
                 defaultMessage="Connecting"
                 description="Message to help people connect to their esp32."
-                id="gui.device.arduinoEsp32Cam.connectingMessage"
+                id="gui.device.arduinoEsp32CamAddOn.connectingMessage"
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
@@ -727,7 +727,7 @@ const deviceData = [
             <FormattedMessage
                 defaultMessage="Connecting"
                 description="Message to help people connect to their device."
-                id="gui.device.nomoBotStarterKit.connectingMessage"
+                id="gui.device.nobotAi.connectingMessage"
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
