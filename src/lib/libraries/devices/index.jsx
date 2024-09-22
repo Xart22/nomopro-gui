@@ -187,6 +187,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/products/uno-r4-wifi",
+        freeDevice: true,
     },
     {
         name: "Arduino Nano",
