@@ -731,7 +731,6 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        deviceExtensionsCompatible: "arduinoEsp32",
         programMode: ["upload"],
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino", "kit"],
