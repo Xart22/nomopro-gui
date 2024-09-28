@@ -81,7 +81,7 @@ import nomobotStarterKitIconURL from "./nomoBotStarterKit/nomobot-startkerkit.pn
 import nomobotStarterKitConnectionSmallIconUrl from "./nomoBotStarterKit/nomobot-starterkit-small.png";
 import nomoBotStarterKitSmallIconUrl from "./nomoBotStarterKit/nomobot-starterkit-illustration.png";
 
-import nomobotBasicKitIconURL from "./esp32NomobotBasicKit/nomobot_basicKit.png";
+import nomobotBasicKitIconURL from "./esp32NomobotBasicKit/nomobot-basicKit.png";
 import nomoBotBasicKitSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-illustration.png";
 import nomobotBasicKitConnectionSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-small.png";
 
