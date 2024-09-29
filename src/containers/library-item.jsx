@@ -12,6 +12,7 @@ class LibraryItem extends React.PureComponent {
             "handleBlur",
             "handleClick",
             "handleClickLearnMore",
+            "handleClickBuyNow",
             "handleFocus",
             "handleKeyPress",
             "handleMouseEnter",
@@ -42,9 +43,17 @@ class LibraryItem extends React.PureComponent {
         this.handleMouseLeave(id);
     }
     handleClick(e) {
-        if (!this.props.disabled) {
+        if (
+            !this.props.disabled &&
+            (this.props.available ||
+                this.props.freeDevice ||
+                (this.props.deviceId == undefined &&
+                    this.props.extensionId != undefined))
+        ) {
             if (!this.state.isProcessing) {
+                console.log("isProcessing");
                 if (this.props.isUnloadble) {
+                    console.log("unloadble");
                     this.setState({
                         isProcessing: true,
                     });
@@ -55,6 +64,10 @@ class LibraryItem extends React.PureComponent {
         e.preventDefault();
     }
     handleClickLearnMore(e) {
+        e.stopPropagation();
+    }
+
+    handleClickBuyNow(e) {
         e.stopPropagation();
     }
     handleFocus(id) {
@@ -178,6 +191,11 @@ class LibraryItem extends React.PureComponent {
                 programMode={this.props.programMode}
                 programLanguage={this.props.programLanguage}
                 version={this.props.version}
+                active={this.props.active}
+                freeDevice={this.props.freeDevice}
+                available={this.props.available}
+                buyNowUrl={this.props.buyNowUrl}
+                onClickBuyNow={this.handleClickBuyNow}
             />
         );
     }
@@ -219,6 +237,10 @@ LibraryItem.propTypes = {
     programMode: PropTypes.arrayOf(PropTypes.string),
     showPlayButton: PropTypes.bool,
     version: PropTypes.string,
+    active: PropTypes.bool,
+    freeDevice: PropTypes.bool,
+    available: PropTypes.bool,
+    buyNowUrl: PropTypes.string,
 };
 
 LibraryItem.defaultProps = {

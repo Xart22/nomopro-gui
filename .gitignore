@@ -20,3 +20,4 @@ npm-*
 
 .env.development
 .env.production
+.env.local

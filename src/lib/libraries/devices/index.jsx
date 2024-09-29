@@ -81,9 +81,13 @@ import nomobotStarterKitIconURL from "./nomoBotStarterKit/nomobot-startkerkit.pn
 import nomobotStarterKitConnectionSmallIconUrl from "./nomoBotStarterKit/nomobot-starterkit-small.png";
 import nomoBotStarterKitSmallIconUrl from "./nomoBotStarterKit/nomobot-starterkit-illustration.png";
 
-import nomobotBasicKitIconURL from "./esp32NomobotBasicKit/nomobot_basicKit.png";
+import nomobotBasicKitIconURL from "./esp32NomobotBasicKit/nomobot-basicKit.png";
 import nomoBotBasicKitSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-illustration.png";
 import nomobotBasicKitConnectionSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-small.png";
+
+import nobotAIIconUrl from "./nobotAI/nobotAi.png";
+import nobotAISmallIconUrl from "./nobotAI/nobotAi_illustration.png";
+import nobotAIConnectionSmallIconUrl from "./nobotAI/nobotAi_small.png";
 
 const deviceData = [
     /**
@@ -111,6 +115,7 @@ const deviceData = [
         programMode: ["realtime"],
         programLanguage: ["block"],
         tags: ["realtime"],
+        freeDevice: true,
     },
     {
         name: "Arduino Uno",
@@ -148,6 +153,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-uno-rev3",
+        freeDevice: true,
     },
     {
         name: "Arduino Uno R4 Wifi",
@@ -185,6 +191,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/products/uno-r4-wifi",
+        freeDevice: true,
     },
     {
         name: "Arduino Nano",
@@ -222,6 +229,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
+        freeDevice: true,
     },
     {
         name: "Arduino Nano 2",
@@ -259,6 +267,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
+        freeDevice: true,
     },
     {
         name: "NoBot Base",
@@ -296,6 +305,9 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["kit", "arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
+
+        freeDevice: false,
+        buyNowUrl: "https://wa.link/zfyhih",
     },
     {
         name: "G-Bot Nomo",
@@ -333,6 +345,9 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["kit", "arduino"],
         helpLink: "https://www.weeemake.com/",
+        freeDevice: false,
+        buyNowUrl:
+            "https://tokopedia.com/instareducation/g-bot-nomo-std-u-v1-0?extParam=src%3Dshop%26whid%3D13462131",
     },
     // {
     //     name: 'Arduino Leonardo',
@@ -445,6 +460,7 @@ const deviceData = [
         tags: ["arduino"],
         helpLink:
             "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
+        freeDevice: true,
     },
     {
         name: "ESP32-CAM",
@@ -483,6 +499,47 @@ const deviceData = [
         tags: ["arduino"],
         helpLink:
             "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
+        freeDevice: true,
+    },
+    {
+        name: "Add-On ESP32-CAM",
+        deviceId: "arduinoEsp32CamAddOn",
+        manufactor: "espressif",
+        learnMore: "https:www.espressif.com/",
+        type: DeviceType.arduino,
+        iconURL: esp32CamIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="The ESP32-CAM is a small size, low power consumption camera module based on ESP32. It comes with an OV2640 camera and provides onboard TF card slot"
+                description="Description for the arduinoEsp32Cam device"
+                id="gui.device.arduinoEsp32CamAddOn.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "115200",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: esp32CamConnectionIconURLL,
+        connectionSmallIconURL: esp32CamConnectionSmallIconURL,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their esp32."
+                id="gui.device.arduinoEsp32CamAddOn.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
+        helpLink:
+            "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
+        freeDevice: false,
+        buyNowUrl: "https://wa.link/zfyhih",
     },
     {
         name: "Arduino Nano 33 BLE Sense",
@@ -522,6 +579,7 @@ const deviceData = [
         tags: ["arduino"],
         helpLink:
             "https://store-usa.arduino.cc/products/nano-33-ble-sense-rev2",
+        freeDevice: true,
     },
     {
         name: "NodeMCU",
@@ -560,6 +618,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https:arduino-esp8266.readthedocs.io/en/3.0.0/index.html",
+        freeDevice: true,
     },
     {
         name: "Nomo Bot Starter Kit",
@@ -598,6 +657,9 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino", "kit"],
         helpLink: "https:nomo-kit.com",
+        freeDevice: false,
+        buyNowUrl: "https://wa.link/zfyhih",
+        // active: false,
     },
     {
         name: "NOMOBOT Basic Kit",
@@ -635,6 +697,48 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino", "kit"],
         helpLink: "https:nomo-kit.com",
+        buyNowUrl: "https://wa.link/zfyhih",
+    },
+    {
+        name: "Nobot AI",
+        deviceId: "nobotAi",
+        manufactor: "Instar Education",
+        learnMore: "https:www.nodemcu.com",
+        type: DeviceType.arduino,
+        iconURL: nobotAIIconUrl,
+        description: (
+            <FormattedMessage
+                defaultMessage="This robot is an educational robot designed to support learning through the STEAM method (Science, Technology, Engineering, Art, and Math)."
+                description="Description for the Nobot AI device"
+                id="gui.device.nobotAi.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "76800",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: nobotAISmallIconUrl,
+        connectionSmallIconURL: nobotAIConnectionSmallIconUrl,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their device."
+                id="gui.device.nobotAi.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino", "kit"],
+        helpLink: "https:nomo-kit.com",
+        freeDevice: false,
+        buyNowUrl:
+            "https://www.tokopedia.com/instareducation/robot-edukasi-steam-nobot-ai-1-0-akses-nomo-pro-tanpa-batas-waktu?extParam=src%3Dshop%26whid%3D13462131",
+        // active: false,
     },
     // {
     //     name: 'MaixDock',
@@ -820,6 +924,7 @@ const deviceData = [
         programLanguage: ["block", "microPython"],
         tags: ["microPython"],
         helpLink: "https://microbit.org/get-started/first-steps/introduction/",
+        freeDevice: true,
     },
     // {
     //     name: 'Makey Makey',
