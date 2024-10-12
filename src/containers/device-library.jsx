@@ -51,6 +51,8 @@ const MICROPYTHON_TAG = {
 };
 const KIT_TAG = { tag: "Kit", intlLabel: messages.kitTag };
 const tagListPrefix = [ARDUINO_TAG, MICROPYTHON_TAG, KIT_TAG];
+// const API_URL = "https://staging-nomokit.sonajaya.com";
+const API_URL = "https://nomo-kit.com";
 
 class DeviceLibrary extends React.PureComponent {
     constructor(props) {
@@ -62,10 +64,8 @@ class DeviceLibrary extends React.PureComponent {
         bindAll(this, ["handleItemSelect", "requestLoadDevice"]);
     }
     componentDidMount() {
-        const apiUrl = process.env.API_URL;
-
         const userId = Cookies.get("user_id");
-        fetch(`${apiUrl}/api/user/${userId}/kits`)
+        fetch(`${API_URL}/api/user/${userId}/kits`)
             .then((response) => response.json())
             .then((data) => {
                 this.setState({
