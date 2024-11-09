@@ -43,12 +43,16 @@ class LibraryItem extends React.PureComponent {
         this.handleMouseLeave(id);
     }
     handleClick(e) {
+        const isSpriteAndBackdrop =
+            this.props.extensionId == undefined &&
+            this.props.deviceId == undefined;
         if (
             !this.props.disabled &&
             (this.props.available ||
                 this.props.freeDevice ||
                 (this.props.deviceId == undefined &&
-                    this.props.extensionId != undefined))
+                    this.props.extensionId != undefined) ||
+                isSpriteAndBackdrop)
         ) {
             if (!this.state.isProcessing) {
                 console.log("isProcessing");

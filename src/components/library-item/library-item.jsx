@@ -35,7 +35,8 @@ class LibraryItemComponent extends React.PureComponent {
                             (!this.props.available &&
                                 !this.props.freeDevice &&
                                 this.props.extensionId === undefined &&
-                                this.props.deviceId !== undefined),
+                                this.props.deviceId !== undefined &&
+                                this.props.isUnloadble),
                     },
                     this.props.extensionId || this.props.deviceId
                         ? styles.libraryItemExtension

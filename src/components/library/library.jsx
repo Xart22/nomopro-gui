@@ -71,7 +71,12 @@ class LibraryComponent extends React.Component {
         const available = this.getFilteredData()[id].available;
         const freeDevice = this.getFilteredData()[id].freeDevice;
         const isExtension = this.getFilteredData()[id].extensionId != undefined;
-        if (available || freeDevice || isExtension) {
+        const isSpritOrBackDrop =
+            this.getFilteredData()[id].extensionId == undefined &&
+            this.getFilteredData()[id].deviceId == undefined;
+        console.log(isSpritOrBackDrop);
+        if (available || freeDevice || isExtension || isSpritOrBackDrop) {
+            console.log("selected");
             if (this.props.autoClose) {
                 this.handleClose();
             }
