@@ -200,6 +200,7 @@ class LibraryItem extends React.PureComponent {
                 available={this.props.available}
                 buyNowUrl={this.props.buyNowUrl}
                 onClickBuyNow={this.handleClickBuyNow}
+                nomoproSubsItem={this.props.nomoproSubsItem}
             />
         );
     }
@@ -245,6 +246,7 @@ LibraryItem.propTypes = {
     freeDevice: PropTypes.bool,
     available: PropTypes.bool,
     buyNowUrl: PropTypes.string,
+    nomoproSubsItem: PropTypes.bool,
 };
 
 LibraryItem.defaultProps = {

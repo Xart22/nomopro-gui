@@ -303,6 +303,7 @@ class LibraryComponent extends React.Component {
                                 freeDevice={dataItem.freeDevice}
                                 available={dataItem.available}
                                 buyNowUrl={dataItem.buyNowUrl}
+                                nomoproSubsItem={dataItem.nomoproSubsItem}
                             />
                         ))
                     ) : (

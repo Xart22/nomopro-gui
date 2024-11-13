@@ -116,6 +116,7 @@ const deviceData = [
         programLanguage: ["block"],
         tags: ["realtime"],
         freeDevice: true,
+        nomoproSubsItem: false,
     },
     {
         name: "Arduino Uno",
@@ -154,6 +155,7 @@ const deviceData = [
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-uno-rev3",
         freeDevice: true,
+        nomoproSubsItem: false,
     },
     {
         name: "Arduino Uno R4 Wifi",
@@ -191,7 +193,8 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/products/uno-r4-wifi",
-        freeDevice: true,
+        freeDevice: false,
+        nomoproSubsItem: true,
     },
     {
         name: "Arduino Nano",
@@ -230,6 +233,7 @@ const deviceData = [
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
         freeDevice: true,
+        nomoproSubsItem: false,
     },
     {
         name: "Arduino Nano 2",
@@ -268,6 +272,7 @@ const deviceData = [
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
         freeDevice: true,
+        nomoproSubsItem: false,
     },
     {
         name: "NoBot Base",
@@ -305,7 +310,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["kit", "arduino"],
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
-
+        nomoproSubsItem: false,
         freeDevice: false,
         buyNowUrl: "https://wa.link/zfyhih",
     },
@@ -348,7 +353,410 @@ const deviceData = [
         freeDevice: false,
         buyNowUrl:
             "https://tokopedia.com/instareducation/g-bot-nomo-std-u-v1-0?extParam=src%3Dshop%26whid%3D13462131",
+        nomoproSubsItem: false,
     },
+    {
+        name: "ESP32",
+        deviceId: "arduinoEsp32",
+        manufactor: "espressif",
+        learnMore: "https:www.espressif.com/",
+        type: DeviceType.arduino,
+        iconURL: esp32IconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Wi-Fi & Bluetooth control board with rich functions."
+                description="Description for the esp32 device"
+                id="gui.device.esp32.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "115200",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: esp32ConnectionIconURLL,
+        connectionSmallIconURL: esp32ConnectionSmallIconURL,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their esp32."
+                id="gui.device.esp32.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["realtime", "upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
+        helpLink:
+            "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
+        freeDevice: false,
+        nomoproSubsItem: true,
+    },
+    {
+        name: "ESP32-CAM",
+        deviceId: "arduinoEsp32Cam",
+        manufactor: "espressif",
+        learnMore: "https:www.espressif.com/",
+        type: DeviceType.arduino,
+        iconURL: esp32CamIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="The ESP32-CAM is a small size, low power consumption camera module based on ESP32. It comes with an OV2640 camera and provides onboard TF card slot"
+                description="Description for the arduinoEsp32Cam device"
+                id="gui.device.arduinoEsp32Cam.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "115200",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: esp32CamConnectionIconURLL,
+        connectionSmallIconURL: esp32CamConnectionSmallIconURL,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their esp32."
+                id="gui.device.arduinoEsp32Cam.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
+        helpLink:
+            "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
+        freeDevice: false,
+        nomoproSubsItem: true,
+    },
+    {
+        name: "Add-On ESP32-CAM",
+        deviceId: "arduinoEsp32CamAddOn",
+        manufactor: "espressif",
+        learnMore: "https:www.espressif.com/",
+        type: DeviceType.arduino,
+        iconURL: esp32CamIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="The ESP32-CAM is a small size, low power consumption camera module based on ESP32. It comes with an OV2640 camera and provides onboard TF card slot"
+                description="Description for the arduinoEsp32Cam device"
+                id="gui.device.arduinoEsp32CamAddOn.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "115200",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: esp32CamConnectionIconURLL,
+        connectionSmallIconURL: esp32CamConnectionSmallIconURL,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their esp32."
+                id="gui.device.arduinoEsp32CamAddOn.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
+        helpLink:
+            "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
+        freeDevice: false,
+        buyNowUrl: "https://wa.link/zfyhih",
+        nomoproSubsItem: false,
+    },
+    {
+        name: "Arduino Nano 33 BLE Sense",
+        deviceId: "arduinoNano33BleSense",
+        manufactor: "arduino.cc",
+        learnMore:
+            "https://store-usa.arduino.cc/products/nano-33-ble-sense-rev2",
+        type: DeviceType.arduino,
+        iconURL: arduinoNano33IconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="An AI enabled board in the shape of the classic Nano board, with all the sensors to start building your next project right away."
+                description="Description for the arduinoNano33BleSense device"
+                id="gui.device.arduinoNano33BleSense.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "115200",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: arduinoNano33ConnectionIconURLL,
+        connectionSmallIconURL: arduinoNano33ConnectionSmallIconURL,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their esp32."
+                id="gui.device.arduinoNano33BleSense.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
+        helpLink:
+            "https://store-usa.arduino.cc/products/nano-33-ble-sense-rev2",
+        freeDevice: false,
+        nomoproSubsItem: true,
+    },
+    {
+        name: "NodeMCU",
+        deviceId: "arduinoEsp8266NodeMCU",
+        manufactor: "espressif",
+        learnMore: "https:www.nodemcu.com",
+        type: DeviceType.arduino,
+        iconURL: esp8266NodeMCUIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Low-cost Wi-Fi SOC control board."
+                description="Description for the esp8266 NodeMCU device"
+                id="gui.device.esp8266NodeMCU.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "76800",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: esp8266NodeMCUConnectionIconURL,
+        connectionSmallIconURL: esp8266NodeMCUConnectionSmallIconURL,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their device."
+                id="gui.device.esp8266NodeMCU.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        deviceExtensionsCompatible: "arduinoEsp8266",
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
+        helpLink: "https:arduino-esp8266.readthedocs.io/en/3.0.0/index.html",
+        freeDevice: false,
+        nomoproSubsItem: true,
+    },
+    {
+        name: "Nomo Bot Starter Kit",
+        deviceId: "nomoBotStarterKit",
+        manufactor: "IDN Boarding School & Instar Education",
+        learnMore: "https:www.nodemcu.com",
+        type: DeviceType.arduino,
+        iconURL: nomobotStarterKitIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Low-cost Robot Kit based on ESP8266 board for build and learn about robotics, IoT, etc."
+                description="Description for the Nomo Bot Starter Kit device"
+                id="gui.device.nomoBotStarterKit.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "76800",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: nomoBotStarterKitSmallIconUrl,
+        connectionSmallIconURL: nomobotStarterKitConnectionSmallIconUrl,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their device."
+                id="gui.device.nomoBotStarterKit.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        deviceExtensionsCompatible: "arduinoEsp8266",
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino", "kit"],
+        helpLink: "https:nomo-kit.com",
+        freeDevice: false,
+        buyNowUrl: "https://wa.link/zfyhih",
+        // active: false,
+        nomoproSubsItem: false,
+    },
+    {
+        name: "NOMOBOT Basic Kit",
+        deviceId: "arduinoEsp32Nomobot",
+        manufactor: "Instar Education",
+        learnMore: "https:www.esp32.com",
+        type: DeviceType.arduino,
+        iconURL: nomobotBasicKitIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Low-cost Robot Kit based on ESP32 board for build and learn about robotics, IoT, AI, etc."
+                description="Description for the Nomo Bot Starter Kit ESP32 device"
+                id="gui.device.arduinoEsp32Nomobot.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "76800",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: nomoBotBasicKitSmallIconUrl,
+        connectionSmallIconURL: nomobotBasicKitConnectionSmallIconUrl,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their device."
+                id="gui.device.arduinoEsp32Nomobot.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["realtime", "upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino", "kit"],
+        helpLink: "https:nomo-kit.com",
+        buyNowUrl: "https://wa.link/zfyhih",
+        nomoproSubsItem: false,
+    },
+    {
+        name: "Nobot AI",
+        deviceId: "nobotAi",
+        manufactor: "Instar Education",
+        learnMore: "https:www.nodemcu.com",
+        type: DeviceType.arduino,
+        iconURL: nobotAIIconUrl,
+        description: (
+            <FormattedMessage
+                defaultMessage="This robot is an educational robot designed to support learning through the STEAM method (Science, Technology, Engineering, Art, and Math)."
+                description="Description for the Nobot AI device"
+                id="gui.device.nobotAi.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "76800",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: nobotAISmallIconUrl,
+        connectionSmallIconURL: nobotAIConnectionSmallIconUrl,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their device."
+                id="gui.device.nobotAi.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino", "kit"],
+        helpLink: "https:nomo-kit.com",
+        freeDevice: false,
+        buyNowUrl:
+            "https://www.tokopedia.com/instareducation/robot-edukasi-steam-nobot-ai-1-0-akses-nomo-pro-tanpa-batas-waktu?extParam=src%3Dshop%26whid%3D13462131",
+        // active: false,
+        nomoproSubsItem: false,
+    },
+
+    {
+        name: "Micro:bit V2",
+        deviceId: "microbitV2",
+        manufactor: "microbit.org",
+        learnMore: "https://microbit.org/",
+        type: DeviceType.microbit,
+        iconURL: microbitV2IconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Upgraded processor, built-In speaker and microphone, touch sensitive logo."
+                description="Description for the micro:bit V2 device"
+                id="gui.device.microbitV2.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "115200",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: microbitV2ConnectionIconURLL,
+        connectionSmallIconURL: microbitV2ConnectionSmallIconURL,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their device."
+                id="gui.device.microbitV2.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: microbitBaseToolBox,
+        programMode: ["realtime", "upload"],
+        programLanguage: ["block", "microPython"],
+        tags: ["microPython"],
+        helpLink: "https://microbit.org/get-started/first-steps/introduction/",
+        freeDevice: true,
+        nomoproSubsItem: false,
+    },
+    // {
+    //     name: 'Makey Makey',
+    //     deviceId: 'makeyMakey',
+    //     manufactor: 'makeymakey.com',
+    //     learnMore: 'https://makeymakey.com/',
+    //     type: DeviceType.arduino,
+    //     iconURL: makeymakeyIconURL,
+    //     description: (
+    //         <FormattedMessage
+    //             defaultMessage="Make anything into a key."
+    //             description="Description for the Makey Makey device"
+    //             id="gui.device.makeymakey.description"
+    //         />
+    //     ),
+    //     featured: true,
+    //     disabled: false,
+    //     bluetoothRequired: false,
+    //     serialportRequired: true,
+    //     defaultBaudRate: '115200',
+    //     internetConnectionRequired: false,
+    //     launchPeripheralConnectionFlow: true,
+    //     useAutoScan: false,
+    //     connectionIconURL: makeymakeyConnectionIconURL,
+    //     connectionSmallIconURL: makeymakeyConnectionSmallIconURL,
+    //     connectingMessage: (
+    //         <FormattedMessage
+    //             defaultMessage="Connecting"
+    //             description="Message to help people connect to their device."
+    //             id="gui.device.makeyMakey.connectingMessage"
+    //         />
+    //     ),
+    //     baseToolBoxXml: arduinoBaseToolBox,
+    //     programMode: ['upload'],
+    //     programLanguage: ['block', 'c', 'cpp'],
+    //     tags: ['arduino'],
+    //     helpLink: 'https://makeymakey.com'
+    // },
     // {
     //     name: 'Arduino Leonardo',
     //     deviceId: 'arduinoLeonardo',
@@ -423,323 +831,6 @@ const deviceData = [
     //     tags: ["arduino"],
     //     helpLink: "https:store.arduino.cc/usa/mega-2560-r3",
     // },
-    {
-        name: "ESP32",
-        deviceId: "arduinoEsp32",
-        manufactor: "espressif",
-        learnMore: "https:www.espressif.com/",
-        type: DeviceType.arduino,
-        iconURL: esp32IconURL,
-        description: (
-            <FormattedMessage
-                defaultMessage="Wi-Fi & Bluetooth control board with rich functions."
-                description="Description for the esp32 device"
-                id="gui.device.esp32.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: false,
-        serialportRequired: true,
-        defaultBaudRate: "115200",
-        internetConnectionRequired: false,
-        launchPeripheralConnectionFlow: true,
-        useAutoScan: false,
-        connectionIconURL: esp32ConnectionIconURLL,
-        connectionSmallIconURL: esp32ConnectionSmallIconURL,
-        connectingMessage: (
-            <FormattedMessage
-                defaultMessage="Connecting"
-                description="Message to help people connect to their esp32."
-                id="gui.device.esp32.connectingMessage"
-            />
-        ),
-        baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ["realtime", "upload"],
-        programLanguage: ["block", "c", "cpp"],
-        tags: ["arduino"],
-        helpLink:
-            "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
-        freeDevice: true,
-    },
-    {
-        name: "ESP32-CAM",
-        deviceId: "arduinoEsp32Cam",
-        manufactor: "espressif",
-        learnMore: "https:www.espressif.com/",
-        type: DeviceType.arduino,
-        iconURL: esp32CamIconURL,
-        description: (
-            <FormattedMessage
-                defaultMessage="The ESP32-CAM is a small size, low power consumption camera module based on ESP32. It comes with an OV2640 camera and provides onboard TF card slot"
-                description="Description for the arduinoEsp32Cam device"
-                id="gui.device.arduinoEsp32Cam.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: false,
-        serialportRequired: true,
-        defaultBaudRate: "115200",
-        internetConnectionRequired: false,
-        launchPeripheralConnectionFlow: true,
-        useAutoScan: false,
-        connectionIconURL: esp32CamConnectionIconURLL,
-        connectionSmallIconURL: esp32CamConnectionSmallIconURL,
-        connectingMessage: (
-            <FormattedMessage
-                defaultMessage="Connecting"
-                description="Message to help people connect to their esp32."
-                id="gui.device.arduinoEsp32Cam.connectingMessage"
-            />
-        ),
-        baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ["upload"],
-        programLanguage: ["block", "c", "cpp"],
-        tags: ["arduino"],
-        helpLink:
-            "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
-        freeDevice: true,
-    },
-    {
-        name: "Add-On ESP32-CAM",
-        deviceId: "arduinoEsp32CamAddOn",
-        manufactor: "espressif",
-        learnMore: "https:www.espressif.com/",
-        type: DeviceType.arduino,
-        iconURL: esp32CamIconURL,
-        description: (
-            <FormattedMessage
-                defaultMessage="The ESP32-CAM is a small size, low power consumption camera module based on ESP32. It comes with an OV2640 camera and provides onboard TF card slot"
-                description="Description for the arduinoEsp32Cam device"
-                id="gui.device.arduinoEsp32CamAddOn.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: false,
-        serialportRequired: true,
-        defaultBaudRate: "115200",
-        internetConnectionRequired: false,
-        launchPeripheralConnectionFlow: true,
-        useAutoScan: false,
-        connectionIconURL: esp32CamConnectionIconURLL,
-        connectionSmallIconURL: esp32CamConnectionSmallIconURL,
-        connectingMessage: (
-            <FormattedMessage
-                defaultMessage="Connecting"
-                description="Message to help people connect to their esp32."
-                id="gui.device.arduinoEsp32CamAddOn.connectingMessage"
-            />
-        ),
-        baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ["upload"],
-        programLanguage: ["block", "c", "cpp"],
-        tags: ["arduino"],
-        helpLink:
-            "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
-        freeDevice: false,
-        buyNowUrl: "https://wa.link/zfyhih",
-    },
-    {
-        name: "Arduino Nano 33 BLE Sense",
-        deviceId: "arduinoNano33BleSense",
-        manufactor: "arduino.cc",
-        learnMore:
-            "https://store-usa.arduino.cc/products/nano-33-ble-sense-rev2",
-        type: DeviceType.arduino,
-        iconURL: arduinoNano33IconURL,
-        description: (
-            <FormattedMessage
-                defaultMessage="An AI enabled board in the shape of the classic Nano board, with all the sensors to start building your next project right away."
-                description="Description for the arduinoNano33BleSense device"
-                id="gui.device.arduinoNano33BleSense.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: false,
-        serialportRequired: true,
-        defaultBaudRate: "115200",
-        internetConnectionRequired: false,
-        launchPeripheralConnectionFlow: true,
-        useAutoScan: false,
-        connectionIconURL: arduinoNano33ConnectionIconURLL,
-        connectionSmallIconURL: arduinoNano33ConnectionSmallIconURL,
-        connectingMessage: (
-            <FormattedMessage
-                defaultMessage="Connecting"
-                description="Message to help people connect to their esp32."
-                id="gui.device.arduinoNano33BleSense.connectingMessage"
-            />
-        ),
-        baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ["upload"],
-        programLanguage: ["block", "c", "cpp"],
-        tags: ["arduino"],
-        helpLink:
-            "https://store-usa.arduino.cc/products/nano-33-ble-sense-rev2",
-        freeDevice: true,
-    },
-    {
-        name: "NodeMCU",
-        deviceId: "arduinoEsp8266NodeMCU",
-        manufactor: "espressif",
-        learnMore: "https:www.nodemcu.com",
-        type: DeviceType.arduino,
-        iconURL: esp8266NodeMCUIconURL,
-        description: (
-            <FormattedMessage
-                defaultMessage="Low-cost Wi-Fi SOC control board."
-                description="Description for the esp8266 NodeMCU device"
-                id="gui.device.esp8266NodeMCU.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: false,
-        serialportRequired: true,
-        defaultBaudRate: "76800",
-        internetConnectionRequired: false,
-        launchPeripheralConnectionFlow: true,
-        useAutoScan: false,
-        connectionIconURL: esp8266NodeMCUConnectionIconURL,
-        connectionSmallIconURL: esp8266NodeMCUConnectionSmallIconURL,
-        connectingMessage: (
-            <FormattedMessage
-                defaultMessage="Connecting"
-                description="Message to help people connect to their device."
-                id="gui.device.esp8266NodeMCU.connectingMessage"
-            />
-        ),
-        baseToolBoxXml: arduinoBaseToolBox,
-        deviceExtensionsCompatible: "arduinoEsp8266",
-        programMode: ["upload"],
-        programLanguage: ["block", "c", "cpp"],
-        tags: ["arduino"],
-        helpLink: "https:arduino-esp8266.readthedocs.io/en/3.0.0/index.html",
-        freeDevice: true,
-    },
-    {
-        name: "Nomo Bot Starter Kit",
-        deviceId: "nomoBotStarterKit",
-        manufactor: "IDN Boarding School & Instar Education",
-        learnMore: "https:www.nodemcu.com",
-        type: DeviceType.arduino,
-        iconURL: nomobotStarterKitIconURL,
-        description: (
-            <FormattedMessage
-                defaultMessage="Low-cost Robot Kit based on ESP8266 board for build and learn about robotics, IoT, etc."
-                description="Description for the Nomo Bot Starter Kit device"
-                id="gui.device.nomoBotStarterKit.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: false,
-        serialportRequired: true,
-        defaultBaudRate: "76800",
-        internetConnectionRequired: false,
-        launchPeripheralConnectionFlow: true,
-        useAutoScan: false,
-        connectionIconURL: nomoBotStarterKitSmallIconUrl,
-        connectionSmallIconURL: nomobotStarterKitConnectionSmallIconUrl,
-        connectingMessage: (
-            <FormattedMessage
-                defaultMessage="Connecting"
-                description="Message to help people connect to their device."
-                id="gui.device.nomoBotStarterKit.connectingMessage"
-            />
-        ),
-        baseToolBoxXml: arduinoBaseToolBox,
-        deviceExtensionsCompatible: "arduinoEsp8266",
-        programMode: ["upload"],
-        programLanguage: ["block", "c", "cpp"],
-        tags: ["arduino", "kit"],
-        helpLink: "https:nomo-kit.com",
-        freeDevice: false,
-        buyNowUrl: "https://wa.link/zfyhih",
-        // active: false,
-    },
-    {
-        name: "NOMOBOT Basic Kit",
-        deviceId: "arduinoEsp32Nomobot",
-        manufactor: "Instar Education",
-        learnMore: "https:www.esp32.com",
-        type: DeviceType.arduino,
-        iconURL: nomobotBasicKitIconURL,
-        description: (
-            <FormattedMessage
-                defaultMessage="Low-cost Robot Kit based on ESP32 board for build and learn about robotics, IoT, AI, etc."
-                description="Description for the Nomo Bot Starter Kit ESP32 device"
-                id="gui.device.arduinoEsp32Nomobot.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: false,
-        serialportRequired: true,
-        defaultBaudRate: "76800",
-        internetConnectionRequired: false,
-        launchPeripheralConnectionFlow: true,
-        useAutoScan: false,
-        connectionIconURL: nomoBotBasicKitSmallIconUrl,
-        connectionSmallIconURL: nomobotBasicKitConnectionSmallIconUrl,
-        connectingMessage: (
-            <FormattedMessage
-                defaultMessage="Connecting"
-                description="Message to help people connect to their device."
-                id="gui.device.arduinoEsp32Nomobot.connectingMessage"
-            />
-        ),
-        baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ["realtime", "upload"],
-        programLanguage: ["block", "c", "cpp"],
-        tags: ["arduino", "kit"],
-        helpLink: "https:nomo-kit.com",
-        buyNowUrl: "https://wa.link/zfyhih",
-    },
-    {
-        name: "Nobot AI",
-        deviceId: "nobotAi",
-        manufactor: "Instar Education",
-        learnMore: "https:www.nodemcu.com",
-        type: DeviceType.arduino,
-        iconURL: nobotAIIconUrl,
-        description: (
-            <FormattedMessage
-                defaultMessage="This robot is an educational robot designed to support learning through the STEAM method (Science, Technology, Engineering, Art, and Math)."
-                description="Description for the Nobot AI device"
-                id="gui.device.nobotAi.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: false,
-        serialportRequired: true,
-        defaultBaudRate: "76800",
-        internetConnectionRequired: false,
-        launchPeripheralConnectionFlow: true,
-        useAutoScan: false,
-        connectionIconURL: nobotAISmallIconUrl,
-        connectionSmallIconURL: nobotAIConnectionSmallIconUrl,
-        connectingMessage: (
-            <FormattedMessage
-                defaultMessage="Connecting"
-                description="Message to help people connect to their device."
-                id="gui.device.nobotAi.connectingMessage"
-            />
-        ),
-        baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ["upload"],
-        programLanguage: ["block", "c", "cpp"],
-        tags: ["arduino", "kit"],
-        helpLink: "https:nomo-kit.com",
-        freeDevice: false,
-        buyNowUrl:
-            "https://www.tokopedia.com/instareducation/robot-edukasi-steam-nobot-ai-1-0-akses-nomo-pro-tanpa-batas-waktu?extParam=src%3Dshop%26whid%3D13462131",
-        // active: false,
-    },
     // {
     //     name: 'MaixDock',
     //     deviceId: 'arduinoK210MaixDock',
@@ -887,81 +978,6 @@ const deviceData = [
     //     programLanguage: ["block", "microPython"],
     //     tags: ["microPython"],
     //     helpLink: "https://microbit.org/get-started/first-steps/introduction/",
-    // },
-    {
-        name: "Micro:bit V2",
-        deviceId: "microbitV2",
-        manufactor: "microbit.org",
-        learnMore: "https://microbit.org/",
-        type: DeviceType.microbit,
-        iconURL: microbitV2IconURL,
-        description: (
-            <FormattedMessage
-                defaultMessage="Upgraded processor, built-In speaker and microphone, touch sensitive logo."
-                description="Description for the micro:bit V2 device"
-                id="gui.device.microbitV2.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: false,
-        serialportRequired: true,
-        defaultBaudRate: "115200",
-        internetConnectionRequired: false,
-        launchPeripheralConnectionFlow: true,
-        useAutoScan: false,
-        connectionIconURL: microbitV2ConnectionIconURLL,
-        connectionSmallIconURL: microbitV2ConnectionSmallIconURL,
-        connectingMessage: (
-            <FormattedMessage
-                defaultMessage="Connecting"
-                description="Message to help people connect to their device."
-                id="gui.device.microbitV2.connectingMessage"
-            />
-        ),
-        baseToolBoxXml: microbitBaseToolBox,
-        programMode: ["realtime", "upload"],
-        programLanguage: ["block", "microPython"],
-        tags: ["microPython"],
-        helpLink: "https://microbit.org/get-started/first-steps/introduction/",
-        freeDevice: true,
-    },
-    // {
-    //     name: 'Makey Makey',
-    //     deviceId: 'makeyMakey',
-    //     manufactor: 'makeymakey.com',
-    //     learnMore: 'https://makeymakey.com/',
-    //     type: DeviceType.arduino,
-    //     iconURL: makeymakeyIconURL,
-    //     description: (
-    //         <FormattedMessage
-    //             defaultMessage="Make anything into a key."
-    //             description="Description for the Makey Makey device"
-    //             id="gui.device.makeymakey.description"
-    //         />
-    //     ),
-    //     featured: true,
-    //     disabled: false,
-    //     bluetoothRequired: false,
-    //     serialportRequired: true,
-    //     defaultBaudRate: '115200',
-    //     internetConnectionRequired: false,
-    //     launchPeripheralConnectionFlow: true,
-    //     useAutoScan: false,
-    //     connectionIconURL: makeymakeyConnectionIconURL,
-    //     connectionSmallIconURL: makeymakeyConnectionSmallIconURL,
-    //     connectingMessage: (
-    //         <FormattedMessage
-    //             defaultMessage="Connecting"
-    //             description="Message to help people connect to their device."
-    //             id="gui.device.makeyMakey.connectingMessage"
-    //         />
-    //     ),
-    //     baseToolBoxXml: arduinoBaseToolBox,
-    //     programMode: ['upload'],
-    //     programLanguage: ['block', 'c', 'cpp'],
-    //     tags: ['arduino'],
-    //     helpLink: 'https://makeymakey.com'
     // },
     /**
      * For those parent devices that exist in VM but are not displayed in GUI

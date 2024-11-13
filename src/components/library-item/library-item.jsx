@@ -23,7 +23,19 @@ import programLanguageMicroPythonIconURL from "./program-language-microPython.sv
 /* eslint-disable react/prefer-stateless-function */
 class LibraryItemComponent extends React.PureComponent {
     render() {
-        console.log(this.props);
+        const needToBuyStyle =
+            !this.props.available &&
+            !this.props.freeDevice &&
+            this.props.extensionId === undefined &&
+            this.props.deviceId !== undefined &&
+            !this.props.nomoproSubsItem;
+
+        const nomoproSubsItem =
+            !this.props.available &&
+            !this.props.freeDevice &&
+            this.props.extensionId === undefined &&
+            this.props.deviceId !== undefined &&
+            this.props.nomoproSubsItem;
         return this.props.featured ? (
             <div
                 className={classNames(
@@ -32,11 +44,8 @@ class LibraryItemComponent extends React.PureComponent {
                     {
                         [styles.disabled]:
                             this.props.disabled ||
-                            (!this.props.available &&
-                                !this.props.freeDevice &&
-                                this.props.extensionId === undefined &&
-                                this.props.deviceId !== undefined &&
-                                this.props.isUnloadble),
+                            needToBuyStyle ||
+                            nomoproSubsItem,
                     },
                     this.props.extensionId || this.props.deviceId
                         ? styles.libraryItemExtension
@@ -45,11 +54,17 @@ class LibraryItemComponent extends React.PureComponent {
                 )}
                 onClick={this.props.onClick}
             >
-                {!this.props.available &&
-                !this.props.freeDevice &&
-                this.props.extensionId === undefined &&
-                this.props.deviceId !== undefined ? (
-                    <div className={styles.buyNowText}>
+                <div className={styles.featuredImageContainer}>
+                    {this.props.disabled ? (
+                        <div className={styles.comingSoonText}>
+                            <FormattedMessage
+                                defaultMessage="Coming Soon"
+                                description="Label for extensions that are not yet implemented"
+                                id="gui.extensionLibrary.comingSoon"
+                            />
+                        </div>
+                    ) : null}
+                    {needToBuyStyle ? (
                         <a
                             className={styles.libraryItemName}
                             href={this.props.buyNowUrl}
@@ -61,25 +76,6 @@ class LibraryItemComponent extends React.PureComponent {
                                     : null
                             }
                         >
-                            <FormattedMessage
-                                defaultMessage="Buy Now"
-                                description="Label for extensions that are not yet implemented"
-                                id="gui.extensionLibrary.buyNow"
-                            />
-                        </a>
-                    </div>
-                ) : null}
-                <div className={styles.featuredImageContainer}>
-                    {this.props.disabled ? (
-                        <div className={styles.comingSoonText}>
-                            <FormattedMessage
-                                defaultMessage="Coming Soon"
-                                description="Label for extensions that are not yet implemented"
-                                id="gui.extensionLibrary.comingSoon"
-                            />
-                        </div>
-                    ) : null}
-                    {/* {!this.props.available && !this.props.freeDevice ? (
                             <div className={styles.buyNowText}>
                                 <FormattedMessage
                                     defaultMessage="Buy Now"
@@ -87,7 +83,29 @@ class LibraryItemComponent extends React.PureComponent {
                                     id="gui.extensionLibrary.buyNow"
                                 />
                             </div>
-                        ) : null} */}
+                        </a>
+                    ) : null}
+                    {nomoproSubsItem ? (
+                        <a
+                            className={styles.libraryItemName}
+                            href={"https://nomo-kit.com/payment"}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            onClick={
+                                this.props.onClickBuyNow
+                                    ? this.props.onClickBuyNow
+                                    : null
+                            }
+                        >
+                            <div className={styles.buyNowText}>
+                                <FormattedMessage
+                                    defaultMessage="Subscribe Now"
+                                    description="Label for extensions that are not yet implemented and user don't subs"
+                                    id="gui.extensionLibrary.subsNow"
+                                />
+                            </div>
+                        </a>
+                    ) : null}
                     <img
                         className={styles.featuredImage}
                         src={this.props.iconURL}

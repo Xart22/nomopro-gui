@@ -51,13 +51,15 @@ const MICROPYTHON_TAG = {
 };
 const KIT_TAG = { tag: "Kit", intlLabel: messages.kitTag };
 const tagListPrefix = [ARDUINO_TAG, MICROPYTHON_TAG, KIT_TAG];
-// const API_URL = "https://staging-nomokit.sonajaya.com";
-const API_URL = "https://nomo-kit.com";
+const API_URL = "https://staging-nomokit.sonajaya.com";
+// const API_URL = "https://nomo-kit.com";
+// const API_URL = "http://localhost:8000";
 
 class DeviceLibrary extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
+            nomoproSubStatus: false,
             externalUserKitData: [],
             isLoading: true,
         };
@@ -69,12 +71,12 @@ class DeviceLibrary extends React.PureComponent {
             .then((response) => response.json())
             .then((data) => {
                 this.setState({
+                    nomoproSubStatus: data.is_active_subs,
                     externalUserKitData: data.kit_external_id,
                     isLoading: false,
                 });
             })
             .catch((error) => console.error(error));
-        // console.log(externalUserKitData);
         this.props.vm.extensionManager
             .getDeviceList()
             .then((data) => {
@@ -130,16 +132,18 @@ class DeviceLibrary extends React.PureComponent {
             // Render loading or placeholder component
             return <LoaderComponent messageId={"gui.loader.headlineDevice"} />;
         }
-        console.log(externalUserKitData);
         const deviceLibraryThumbnailData2 = this.props.deviceData.map(
             (device) => {
                 // Check if device's deviceId exists in fetchedData
                 const deviceExists =
-                    Array.isArray(this.state.externalUserKitData) &&
-                    this.state.externalUserKitData.some(
-                        (externalDevice) =>
-                            externalDevice.kit_external_id === device.deviceId
-                    );
+                    (Array.isArray(this.state.externalUserKitData) &&
+                        this.state.externalUserKitData.some(
+                            (externalDevice) =>
+                                externalDevice.kit_external_id ===
+                                device.deviceId
+                        )) ||
+                    (this.state.nomoproSubStatus == true &&
+                        device.nomoproSubsItem);
 
                 return {
                     rawURL: device.iconURL || deviceIcon,
