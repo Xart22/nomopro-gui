@@ -69,7 +69,7 @@ import esp8266NodeMCUConnectionSmallIconURL from "./esp8266NodeMCU/esp8266NodeMC
 // import makeymakeyConnectionIconURL from "./makeymakey/makeymakey-illustration.svg";
 // import makeymakeyConnectionSmallIconURL from "./makeymakey/makeymakey-small.svg";
 
-import nobotIconUrl from "./nobot/nobot.png";
+import nobotIconUrl from "./nobot/nobot-new.png";
 import nobotSmallIconUrl from "./nobot/nobot40.svg";
 import nobotConnectionSmallIconUrl from "./nobot/nobot108-small.svg";
 
@@ -283,7 +283,7 @@ const deviceData = [
         iconURL: nobotIconUrl,
         description: (
             <FormattedMessage
-                defaultMessage="Build : Robot Avoider , Robot Line Follower ,Robot Light Follower , Robot Object Following,Robot Soccer, Robot Sumo."
+                defaultMessage="Build : Robot Soccer, Robot Sumo, Robot Sumo Soccer."
                 description="Description for the Nobot Base Kit device"
                 id="gui.device.arduinoNanoNobot.description"
             />
