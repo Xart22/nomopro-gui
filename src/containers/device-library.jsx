@@ -51,10 +51,10 @@ const MICROPYTHON_TAG = {
 };
 const KIT_TAG = { tag: "Kit", intlLabel: messages.kitTag };
 const tagListPrefix = [ARDUINO_TAG, MICROPYTHON_TAG, KIT_TAG];
-const API_URL = "https://staging-nomokit.sonajaya.com";
-// const API_URL = "https://nomo-kit.com";
+// const API_URL = "https://staging-nomokit.sonajaya.com";
+const API_URL = "https://nomo-kit.com";
 // const API_URL = "http://localhost:8000";
-
+const { electronAPI } = window;
 class DeviceLibrary extends React.PureComponent {
     constructor(props) {
         super(props);
@@ -65,8 +65,44 @@ class DeviceLibrary extends React.PureComponent {
         };
         bindAll(this, ["handleItemSelect", "requestLoadDevice"]);
     }
+
+    getData() {
+        // Send the event to get the data
+        if (typeof electronAPI !== "undefined" && electronAPI.getUserData) {
+            electronAPI.getUserData(""); // Send the event to get the data
+        } else {
+            console.log("Electron API is not available in the browser");
+        }
+    }
     componentDidMount() {
-        const userId = Cookies.get("user_id");
+        this.getData();
+
+        if (typeof electronAPI !== "undefined" && electronAPI.getUserData) {
+            electronAPI.on("responseUserData", (event, userData) => {
+                this.fetchUserData(userData.id); // Proceed after getting userId from Electron
+            });
+        } else {
+            const userId = Cookies.get("user_id"); // Fallback to user_id from cookies
+            this.fetchUserData(userId);
+        }
+
+        this.props.vm.extensionManager
+            .getDeviceList()
+            .then((data) => {
+                this.props.onSetDeviceData(makeDeviceLibrary(data));
+            })
+            .catch(() => {
+                this.props.onSetDeviceData(makeDeviceLibrary());
+            });
+    }
+
+    fetchUserData(userId) {
+        if (!userId) {
+            console.error("User ID is undefined. Cannot fetch user data.");
+            this.setState({ isLoading: false });
+            return;
+        }
+
         fetch(`${API_URL}/api/user/${userId}/kits`)
             .then((response) => response.json())
             .then((data) => {
@@ -76,14 +112,9 @@ class DeviceLibrary extends React.PureComponent {
                     isLoading: false,
                 });
             })
-            .catch((error) => console.error(error));
-        this.props.vm.extensionManager
-            .getDeviceList()
-            .then((data) => {
-                this.props.onSetDeviceData(makeDeviceLibrary(data));
-            })
-            .catch(() => {
-                this.props.onSetDeviceData(makeDeviceLibrary());
+            .catch((error) => {
+                console.error("Error fetching user data:", error);
+                this.setState({ isLoading: false });
             });
     }
 

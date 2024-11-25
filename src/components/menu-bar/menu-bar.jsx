@@ -207,6 +207,14 @@ AboutButton.propTypes = {
     onClick: PropTypes.func.isRequired,
 };
 
+const { electronAPI } = window;
+
+function isBrowser() {
+    return (
+        typeof window !== "undefined" && typeof window.document !== "undefined"
+    );
+}
+
 class MenuBar extends React.Component {
     constructor(props) {
         super(props);
@@ -335,14 +343,21 @@ class MenuBar extends React.Component {
         }
     }
     handleClickOpenCommunity() {
-        window.open("https://nomo-kit.com/community");
+        if (isBrowser()) {
+            window.open("https://nomo-kit.com/community");
+        }
     }
+
     handleClickOpenWiki() {
-        window.open("https://nomo-kit.com");
+        if (isBrowser()) {
+            window.open("https://nomo-kit.com");
+        }
     }
 
     handleClickOpenNomoTutorials() {
-        window.open("https://instareducation.com/education-resources/");
+        if (isBrowser()) {
+            window.open("https://instareducation.com/education-resources/");
+        }
     }
     restoreOptionMessage(deletedItem) {
         switch (deletedItem) {
