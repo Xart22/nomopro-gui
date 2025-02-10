@@ -312,7 +312,7 @@ const deviceData = [
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
         nomoproSubsItem: false,
         freeDevice: false,
-        buyNowUrl: "https://wa.link/zfyhih",
+        buyNowUrl: "https://instareducation.com/kit-robot/",
     },
     {
         name: "G-Bot Nomo",
@@ -351,8 +351,7 @@ const deviceData = [
         tags: ["kit", "arduino"],
         helpLink: "https://www.weeemake.com/",
         freeDevice: false,
-        buyNowUrl:
-            "https://tokopedia.com/instareducation/g-bot-nomo-std-u-v1-0?extParam=src%3Dshop%26whid%3D13462131",
+        buyNowUrl: "https://instareducation.com/kit-robot/",
         nomoproSubsItem: false,
     },
     {
@@ -392,8 +391,8 @@ const deviceData = [
         tags: ["arduino"],
         helpLink:
             "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
-        freeDevice: false,
-        nomoproSubsItem: true,
+        freeDevice: true,
+        nomoproSubsItem: false,
     },
     {
         name: "ESP32-CAM",
@@ -473,7 +472,7 @@ const deviceData = [
         helpLink:
             "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
         freeDevice: false,
-        buyNowUrl: "https://wa.link/zfyhih",
+        buyNowUrl: "https://instareducation.com/kit-robot/",
         nomoproSubsItem: false,
     },
     {
@@ -554,8 +553,8 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https:arduino-esp8266.readthedocs.io/en/3.0.0/index.html",
-        freeDevice: false,
-        nomoproSubsItem: true,
+        freeDevice: true,
+        nomoproSubsItem: false,
     },
     {
         name: "Nomo Bot Starter Kit",
@@ -595,7 +594,7 @@ const deviceData = [
         tags: ["arduino", "kit"],
         helpLink: "https:nomo-kit.com",
         freeDevice: false,
-        buyNowUrl: "https://wa.link/zfyhih",
+        buyNowUrl: "https://instareducation.com/kit-robot/",
         // active: false,
         nomoproSubsItem: false,
     },
@@ -635,7 +634,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino", "kit"],
         helpLink: "https:nomo-kit.com",
-        buyNowUrl: "https://wa.link/zfyhih",
+        buyNowUrl: "https://instareducation.com/kit-robot/",
         nomoproSubsItem: false,
     },
     {
@@ -675,8 +674,7 @@ const deviceData = [
         tags: ["arduino", "kit"],
         helpLink: "https:nomo-kit.com",
         freeDevice: false,
-        buyNowUrl:
-            "https://www.tokopedia.com/instareducation/robot-edukasi-steam-nobot-ai-1-0-akses-nomo-pro-tanpa-batas-waktu?extParam=src%3Dshop%26whid%3D13462131",
+        buyNowUrl: "https://instareducation.com/kit-robot/",
         // active: false,
         nomoproSubsItem: false,
     },
