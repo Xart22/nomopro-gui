@@ -85,10 +85,6 @@ import nomobotBasicKitIconURL from "./esp32NomobotBasicKit/nomobot-basicKit.png"
 import nomoBotBasicKitSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-illustration.png";
 import nomobotBasicKitConnectionSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-small.png";
 
-import nobotAIIconUrl from "./nobotAI/nobotAi.png";
-import nobotAISmallIconUrl from "./nobotAI/nobotAi_illustration.png";
-import nobotAIConnectionSmallIconUrl from "./nobotAI/nobotAi_small.png";
-
 const deviceData = [
     /**
      * Unselect the deivce back to pure scratch mode
@@ -273,46 +269,6 @@ const deviceData = [
         helpLink: "https://store.arduino.cc/usa/arduino-nano",
         freeDevice: true,
         nomoproSubsItem: false,
-    },
-    {
-        name: "NoBot Base",
-        deviceId: "arduinoNanoNobot",
-        manufactor: "arduino.cc",
-        learnMore: "https://store.arduino.cc/usa/arduino-nano",
-        type: DeviceType.arduino,
-        iconURL: nobotIconUrl,
-        description: (
-            <FormattedMessage
-                defaultMessage="Build : Robot Soccer, Robot Sumo, Robot Sumo Soccer."
-                description="Description for the Nobot Base Kit device"
-                id="gui.device.arduinoNanoNobot.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: false,
-        serialportRequired: true,
-        defaultBaudRate: "9600",
-        internetConnectionRequired: false,
-        launchPeripheralConnectionFlow: true,
-        useAutoScan: false,
-        connectionIconURL: nobotSmallIconUrl,
-        connectionSmallIconURL: nobotConnectionSmallIconUrl,
-        connectingMessage: (
-            <FormattedMessage
-                defaultMessage="Connecting"
-                description="Message to help people connect to their device."
-                id="gui.device.arduinoNanoNobot.connectingMessage"
-            />
-        ),
-        baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ["realtime", "upload"],
-        programLanguage: ["block", "c", "cpp"],
-        tags: ["kit", "arduino"],
-        helpLink: "https://store.arduino.cc/usa/arduino-nano",
-        nomoproSubsItem: false,
-        freeDevice: false,
-        buyNowUrl: "https://instareducation.com/kit-robot/",
     },
     {
         name: "G-Bot Nomo",
@@ -637,48 +593,6 @@ const deviceData = [
         buyNowUrl: "https://instareducation.com/kit-robot/",
         nomoproSubsItem: false,
     },
-    {
-        name: "Nobot AI",
-        deviceId: "nobotAi",
-        manufactor: "Instar Education",
-        learnMore: "https:www.nodemcu.com",
-        type: DeviceType.arduino,
-        iconURL: nobotAIIconUrl,
-        description: (
-            <FormattedMessage
-                defaultMessage="This robot is an educational robot designed to support learning through the STEAM method (Science, Technology, Engineering, Art, and Math)."
-                description="Description for the Nobot AI device"
-                id="gui.device.nobotAi.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: false,
-        serialportRequired: true,
-        defaultBaudRate: "76800",
-        internetConnectionRequired: false,
-        launchPeripheralConnectionFlow: true,
-        useAutoScan: false,
-        connectionIconURL: nobotAISmallIconUrl,
-        connectionSmallIconURL: nobotAIConnectionSmallIconUrl,
-        connectingMessage: (
-            <FormattedMessage
-                defaultMessage="Connecting"
-                description="Message to help people connect to their device."
-                id="gui.device.nobotAi.connectingMessage"
-            />
-        ),
-        baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ["upload"],
-        programLanguage: ["block", "c", "cpp"],
-        tags: ["arduino", "kit"],
-        helpLink: "https:nomo-kit.com",
-        freeDevice: false,
-        buyNowUrl: "https://instareducation.com/kit-robot/",
-        // active: false,
-        nomoproSubsItem: false,
-    },
-
     {
         name: "Micro:bit V2",
         deviceId: "microbitV2",
