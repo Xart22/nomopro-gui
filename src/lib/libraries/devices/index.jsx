@@ -641,7 +641,7 @@ const deviceData = [
         iconURL: weeemakeELFUnoIconURL,
         description: (
             <FormattedMessage
-                defaultMessage="G-Bot Nomo is a metal educational robot DIY platform for kids 8+ to professional level to learn robotics, programming, AI, IoT, etc."
+                defaultMessage="G-Bot Nomo (ESP32) is a metal educational robot DIY platform for kids 8+ to professional level to learn robotics, programming, AI, IoT, etc."
                 description="Description for the Arduino Uno device"
                 id="gui.device.arduinoELFUno.description"
             />
