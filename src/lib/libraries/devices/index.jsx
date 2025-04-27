@@ -668,7 +668,7 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["kit", "arduino"],
         helpLink: "https://www.weeemake.com/",
-        freeDevice: true,
+        freeDevice: false,
         buyNowUrl: "https://instareducation.com/kit-robot/",
         nomoproSubsItem: false,
     },
