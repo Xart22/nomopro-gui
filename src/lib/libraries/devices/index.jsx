@@ -632,6 +632,46 @@ const deviceData = [
         freeDevice: true,
         nomoproSubsItem: false,
     },
+    {
+        name: "G-Bot Nomo ESP32",
+        deviceId: "arduinoEsp32Gbot",
+        manufactor: "arduino.cc",
+        learnMore: "https://www.nomo-kit.com/",
+        type: DeviceType.arduino,
+        iconURL: weeemakeELFUnoIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="G-Bot Nomo is a metal educational robot DIY platform for kids 8+ to professional level to learn robotics, programming, AI, IoT, etc."
+                description="Description for the Arduino Uno device"
+                id="gui.device.arduinoELFUno.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        serialportRequired: true,
+        defaultBaudRate: "9600",
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: weeemakeELFUnoSmallIconURL,
+        connectionSmallIconURL: weeemakeELFUnoConnectionSmallIconUrl,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their device."
+                id="gui.device.arduinoELFUno.connectingMessage"
+            />
+        ),
+        baseToolBoxXml: arduinoBaseToolBox,
+        programMode: ["realtime", "upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["kit", "arduino"],
+        helpLink: "https://www.weeemake.com/",
+        freeDevice: true,
+        buyNowUrl: "https://instareducation.com/kit-robot/",
+        nomoproSubsItem: false,
+    },
     // {
     //     name: 'Makey Makey',
     //     deviceId: 'makeyMakey',
