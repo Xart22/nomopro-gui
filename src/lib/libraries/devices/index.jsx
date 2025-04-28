@@ -643,7 +643,7 @@ const deviceData = [
             <FormattedMessage
                 defaultMessage="G-Bot Nomo (ESP32) is a metal educational robot DIY platform for kids 8+ to professional level to learn robotics, programming, AI, IoT, etc."
                 description="Description for the Arduino Uno device"
-                id="gui.device.arduinoELFUno.description"
+                id="gui.device.arduinoEsp32Gbot.description"
             />
         ),
         featured: true,
@@ -660,7 +660,7 @@ const deviceData = [
             <FormattedMessage
                 defaultMessage="Connecting"
                 description="Message to help people connect to their device."
-                id="gui.device.arduinoELFUno.connectingMessage"
+                id="gui.device.arduinoEsp32Gbot.connectingMessage"
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
