@@ -189,8 +189,8 @@ const deviceData = [
         programLanguage: ["block", "c", "cpp"],
         tags: ["arduino"],
         helpLink: "https://store.arduino.cc/products/uno-r4-wifi",
-        freeDevice: false,
-        nomoproSubsItem: true,
+        freeDevice: true,
+        nomoproSubsItem: false,
     },
     {
         name: "Arduino Nano",
@@ -387,8 +387,8 @@ const deviceData = [
         tags: ["arduino"],
         helpLink:
             "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
-        freeDevice: false,
-        nomoproSubsItem: true,
+        freeDevice: true,
+        nomoproSubsItem: false,
     },
     {
         name: "Add-On ESP32-CAM",
@@ -469,8 +469,8 @@ const deviceData = [
         tags: ["arduino"],
         helpLink:
             "https://store-usa.arduino.cc/products/nano-33-ble-sense-rev2",
-        freeDevice: false,
-        nomoproSubsItem: true,
+        freeDevice: true,
+        nomoproSubsItem: false,
     },
     {
         name: "NodeMCU",
