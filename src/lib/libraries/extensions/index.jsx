@@ -1,41 +1,41 @@
-import React from "react";
-import { FormattedMessage } from "react-intl";
+import React from 'react';
+import {FormattedMessage} from 'react-intl';
 
-import musicIconURL from "./music/music.png";
-import musicInsetIconURL from "./music/music-small.svg";
+import musicIconURL from './music/music.png';
+import musicInsetIconURL from './music/music-small.svg';
 
-import penIconURL from "./pen/pen.png";
-import penInsetIconURL from "./pen/pen-small.svg";
+import penIconURL from './pen/pen.png';
+import penInsetIconURL from './pen/pen-small.svg';
 
-import videoSensingIconURL from "./videoSensing/video-sensing.png";
-import videoSensingInsetIconURL from "./videoSensing/video-sensing-small.svg";
+import videoSensingIconURL from './videoSensing/video-sensing.png';
+import videoSensingInsetIconURL from './videoSensing/video-sensing-small.svg';
 
-import text2speechIconURL from "./text2speech/text2speech.png";
-import text2speechInsetIconURL from "./text2speech/text2speech-small.svg";
+import text2speechIconURL from './text2speech/text2speech.png';
+import text2speechInsetIconURL from './text2speech/text2speech-small.svg';
 
-import translateIconURL from "./translate/translate.png";
-import translateInsetIconURL from "./translate/translate-small.png";
+import translateIconURL from './translate/translate.png';
+import translateInsetIconURL from './translate/translate-small.png';
 
-import makeymakeyIconURL from "./makeymakey/makeymakey.png";
-import makeymakeyInsetIconURL from "./makeymakey/makeymakey-small.svg";
+import makeymakeyIconURL from './makeymakey/makeymakey.png';
+import makeymakeyInsetIconURL from './makeymakey/makeymakey-small.svg';
 
-import mlIconUrl from "./ml/ml.png";
-import mlInsetIconURL from "./ml/ml-small.png";
+import mlIconUrl from './ml/ml.png';
+import mlInsetIconURL from './ml/ml-small.png';
 
-import speechIconUrl from "./speech/speech.png";
-import speechInsetIconURL from "./speech/voice.png";
+import speechIconUrl from './speech/speech.png';
+import speechInsetIconURL from './speech/voice.png';
 
-import tm2scratchIconUrl from "./tm2scratch/tm.png";
-import tm2scratchInsetIconURL from "./tm2scratch/tm-small.png";
+import tm2scratchIconUrl from './tm2scratch/tm.png';
+import tm2scratchInsetIconURL from './tm2scratch/tm-small.png';
 
-import ob2scratchIconUrl from "./ob2scratch/ob.png";
-import ob2scratchInsetIconURL from "./ob2scratch/ob-small.png";
+import ob2scratchIconUrl from './ob2scratch/ob.png';
+import ob2scratchInsetIconURL from './ob2scratch/ob-small.png';
 
-import handposeIconUrl from "./handpose/handpose2scratch.png";
-import handposeInsetIconURL from "./handpose/handpose2scratch-small.png";
+import handposeIconUrl from './handpose/handpose2scratch.png';
+import handposeInsetIconURL from './handpose/handpose2scratch-small.png';
 
-import tmPoseIconUrl from "./tmpose/tmpose2scratch.png";
-import tmPoseInsetIconURL from "./tmpose/tmpose2scratch-small.png";
+import tmPoseIconUrl from './tmpose/tmpose2scratch.png';
+import tmPoseInsetIconURL from './tmpose/tmpose2scratch-small.png';
 
 // import ev3IconURL from './ev3/ev3.png';
 // import ev3InsetIconURL from './ev3/ev3-small.svg';
@@ -68,7 +68,7 @@ export default [
                 id="gui.extension.speech.name"
             />
         ),
-        extensionId: "speech",
+        extensionId: 'speech',
         iconURL: speechIconUrl,
         insetIconURL: speechInsetIconURL,
         description: (
@@ -81,7 +81,7 @@ export default [
         featured: true,
         disabled: false,
         bluetoothRequired: false,
-        internetConnectionRequired: true,
+        internetConnectionRequired: true
     },
     {
         name: (
@@ -91,7 +91,7 @@ export default [
                 id="gui.extension.ml.name"
             />
         ),
-        extensionId: "ml",
+        extensionId: 'ml',
         iconURL: mlIconUrl,
         insetIconURL: mlInsetIconURL,
         description: (
@@ -104,7 +104,7 @@ export default [
         featured: true,
         disabled: false,
         bluetoothRequired: false,
-        internetConnectionRequired: true,
+        internetConnectionRequired: true
     },
     {
         name: (
@@ -114,7 +114,7 @@ export default [
                 id="gui.extension.tm2scratch.name"
             />
         ),
-        extensionId: "tm2scratch",
+        extensionId: 'tm2scratch',
         iconURL: tm2scratchIconUrl,
         insetIconURL: tm2scratchInsetIconURL,
         description: (
@@ -127,7 +127,7 @@ export default [
         featured: true,
         disabled: false,
         bluetoothRequired: false,
-        internetConnectionRequired: true,
+        internetConnectionRequired: true
     },
     {
         name: (
@@ -137,7 +137,7 @@ export default [
                 id="gui.extension.ob2scratch.name"
             />
         ),
-        extensionId: "ob2scratch",
+        extensionId: 'ob2scratch',
         iconURL: ob2scratchIconUrl,
         insetIconURL: ob2scratchInsetIconURL,
         description: (
@@ -150,7 +150,7 @@ export default [
         featured: true,
         disabled: false,
         bluetoothRequired: false,
-        internetConnectionRequired: true,
+        internetConnectionRequired: true
     },
     {
         name: (
@@ -160,7 +160,7 @@ export default [
                 id="gui.extension.tmpose2scratch.name"
             />
         ),
-        extensionId: "tmpose2scratch",
+        extensionId: 'tmpose2scratch',
         iconURL: tmPoseIconUrl,
         insetIconURL: tmPoseInsetIconURL,
         description: (
@@ -173,7 +173,7 @@ export default [
         featured: true,
         disabled: false,
         bluetoothRequired: false,
-        internetConnectionRequired: true,
+        internetConnectionRequired: true
     },
     {
         name: (
@@ -183,7 +183,7 @@ export default [
                 id="gui.extension.handpose2scratch.name"
             />
         ),
-        extensionId: "handpose2scratch",
+        extensionId: 'handpose2scratch',
         iconURL: handposeIconUrl,
         insetIconURL: handposeInsetIconURL,
         description: (
@@ -196,7 +196,7 @@ export default [
         featured: true,
         disabled: false,
         bluetoothRequired: false,
-        internetConnectionRequired: true,
+        internetConnectionRequired: true
     },
     {
         name: (
@@ -206,7 +206,7 @@ export default [
                 id="gui.extension.music.name"
             />
         ),
-        extensionId: "music",
+        extensionId: 'music',
         iconURL: musicIconURL,
         insetIconURL: musicInsetIconURL,
         description: (
@@ -216,7 +216,7 @@ export default [
                 id="gui.extension.music.description"
             />
         ),
-        featured: true,
+        featured: true
     },
     {
         name: (
@@ -226,7 +226,7 @@ export default [
                 id="gui.extension.pen.name"
             />
         ),
-        extensionId: "pen",
+        extensionId: 'pen',
         iconURL: penIconURL,
         insetIconURL: penInsetIconURL,
         description: (
@@ -236,7 +236,7 @@ export default [
                 id="gui.extension.pen.description"
             />
         ),
-        featured: true,
+        featured: true
     },
     {
         name: (
@@ -246,7 +246,7 @@ export default [
                 id="gui.extension.videosensing.name"
             />
         ),
-        extensionId: "videoSensing",
+        extensionId: 'videoSensing',
         iconURL: videoSensingIconURL,
         insetIconURL: videoSensingInsetIconURL,
         description: (
@@ -256,7 +256,7 @@ export default [
                 id="gui.extension.videosensing.description"
             />
         ),
-        featured: true,
+        featured: true
     },
     {
         name: (
@@ -266,8 +266,8 @@ export default [
                 id="gui.extension.text2speech.name"
             />
         ),
-        extensionId: "text2speech",
-        collaborator: "Amazon Web Services",
+        extensionId: 'text2speech',
+        collaborator: 'Amazon Web Services',
         iconURL: text2speechIconURL,
         insetIconURL: text2speechInsetIconURL,
         description: (
@@ -278,7 +278,7 @@ export default [
             />
         ),
         featured: true,
-        internetConnectionRequired: true,
+        internetConnectionRequired: true
     },
     {
         name: (
@@ -288,8 +288,8 @@ export default [
                 id="gui.extension.translate.name"
             />
         ),
-        extensionId: "translate",
-        collaborator: "Google",
+        extensionId: 'translate',
+        collaborator: 'Google',
         iconURL: translateIconURL,
         insetIconURL: translateInsetIconURL,
         description: (
@@ -300,7 +300,7 @@ export default [
             />
         ),
         featured: true,
-        internetConnectionRequired: true,
+        internetConnectionRequired: true
     },
     {
         name: (
@@ -310,8 +310,8 @@ export default [
                 id="gui.extension.makeymakey.name"
             />
         ),
-        extensionId: "makeymakey",
-        collaborator: "JoyLabz",
+        extensionId: 'makeymakey',
+        collaborator: 'JoyLabz',
         iconURL: makeymakeyIconURL,
         insetIconURL: makeymakeyInsetIconURL,
         description: (
@@ -321,8 +321,8 @@ export default [
                 id="gui.extension.makeymakey.description"
             />
         ),
-        featured: true,
-    },
+        featured: true
+    }
     // {
     //     name: 'LEGO MINDSTORMS EV3',
     //     extensionId: 'ev3',

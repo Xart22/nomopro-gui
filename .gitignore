@@ -21,3 +21,5 @@ npm-*
 .env.development
 .env.production
 .env.local
+
+static/python/__pycache__/

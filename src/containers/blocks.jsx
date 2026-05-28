@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import VMScratchBlocks from '../lib/blocks';
 import VM from 'openblock-vm';
+import MessageBoxType from '../lib/message-box.js';
 
 import log from '../lib/log.js';
 import Prompt from './prompt.jsx';
@@ -15,7 +16,10 @@ import DeviceLibrary from './device-library.jsx';
 import extensionData from '../lib/libraries/extensions/index.jsx';
 import CustomProcedures from './custom-procedures.jsx';
 import errorBoundaryHOC from '../lib/error-boundary-hoc.jsx';
-import {BLOCKS_DEFAULT_SCALE, STAGE_DISPLAY_SIZES} from '../lib/layout-constants';
+import {
+    BLOCKS_DEFAULT_SCALE,
+    STAGE_DISPLAY_SIZES
+} from '../lib/layout-constants';
 import DropAreaHOC from '../lib/drop-area-hoc.jsx';
 import DragConstants from '../lib/drag-constants';
 import defineDynamicBlock from '../lib/define-dynamic-block';
@@ -25,18 +29,24 @@ import {connect} from 'react-redux';
 import {updateToolbox, setIsUpdating} from '../reducers/toolbox';
 import {showAlertWithTimeout} from '../reducers/alerts';
 import {activateColorPicker} from '../reducers/color-picker';
-import {closeExtensionLibrary, openSoundRecorder, openConnectionModal, closeDeviceLibrary} from '../reducers/modals';
-import {activateCustomProcedures, deactivateCustomProcedures} from '../reducers/custom-procedures';
+import {
+    closeExtensionLibrary,
+    openSoundRecorder,
+    openConnectionModal,
+    closeDeviceLibrary
+} from '../reducers/modals';
+import {
+    activateCustomProcedures,
+    deactivateCustomProcedures
+} from '../reducers/custom-procedures';
 import {updateMetrics} from '../reducers/workspace-metrics';
 import {setCodeEditorValue} from '../reducers/code';
+import {updateTargetCode} from '../reducers/python-ide';
 import {setDeviceId, setDeviceName, setDeviceType} from '../reducers/device';
 import {setSupportSwitchMode} from '../reducers/program-mode';
 import {setBaudrate} from '../reducers/hardware-console';
 
-import {
-    activateTab,
-    SOUNDS_TAB_INDEX
-} from '../reducers/editor-tab';
+import {activateTab, SOUNDS_TAB_INDEX} from '../reducers/editor-tab';
 
 const addFunctionListener = (object, property, callback) => {
     const oldFn = object[property];
@@ -47,9 +57,9 @@ const addFunctionListener = (object, property, callback) => {
     };
 };
 
-const DroppableBlocks = DropAreaHOC([
-    DragConstants.BACKPACK_CODE
-])(BlocksComponent);
+const DroppableBlocks = DropAreaHOC([DragConstants.BACKPACK_CODE])(
+    BlocksComponent,
+);
 
 class Blocks extends React.Component {
     constructor (props) {
@@ -91,8 +101,12 @@ class Blocks extends React.Component {
             'workspaceToCode'
         ]);
         this.ScratchBlocks.prompt = this.handlePromptStart;
-        this.ScratchBlocks.statusButtonCallback = this.handleConnectionModalStart;
+        this.ScratchBlocks.statusButtonCallback =
+            this.handleConnectionModalStart;
         this.ScratchBlocks.recordSoundCallback = this.handleOpenSoundRecorder;
+        this.ScratchBlocks.alert = message => {
+            this.props.onShowMessageBox(MessageBoxType.alert, message);
+        };
 
         this.state = {
             prompt: null
@@ -101,31 +115,52 @@ class Blocks extends React.Component {
         this.toolboxUpdateQueue = [];
     }
     componentDidMount () {
-        this.ScratchBlocks.FieldColourSlider.activateEyedropper_ = this.onActivateColorPicker;
-        this.ScratchBlocks.Procedures.externalProcedureDefCallback = this.props.onActivateCustomProcedures;
+        this.ScratchBlocks.FieldColourSlider.activateEyedropper_ =
+            this.onActivateColorPicker;
+        this.ScratchBlocks.Procedures.externalProcedureDefCallback =
+            this.props.onActivateCustomProcedures;
         this.ScratchBlocks.ScratchMsgs.setLocale(this.props.locale);
 
-        const workspaceConfig = defaultsDeep({},
+        const workspaceConfig = defaultsDeep(
+            {},
             Blocks.defaultOptions,
             this.props.options,
-            {rtl: this.props.isRtl, toolbox: this.props.toolboxXML}
+            {rtl: this.props.isRtl, toolbox: this.props.toolboxXML},
         );
-        this.workspace = this.ScratchBlocks.inject(this.blocks, workspaceConfig);
+        this.workspace = this.ScratchBlocks.inject(
+            this.blocks,
+            workspaceConfig,
+        );
 
         // Register buttons under new callback keys for creating variables,
         // lists, and procedures from extensions.
 
         const toolboxWorkspace = this.workspace.getFlyout().getWorkspace();
 
-        const varListButtonCallback = type =>
-            (() => this.ScratchBlocks.Variables.createVariable(this.workspace, null, type));
+        const varListButtonCallback = type => () =>
+            this.ScratchBlocks.Variables.createVariable(
+                this.workspace,
+                null,
+                type,
+            );
         const procButtonCallback = () => {
-            this.ScratchBlocks.Procedures.createProcedureDefCallback_(this.workspace);
+            this.ScratchBlocks.Procedures.createProcedureDefCallback_(
+                this.workspace,
+            );
         };
 
-        toolboxWorkspace.registerButtonCallback('MAKE_A_VARIABLE', varListButtonCallback(''));
-        toolboxWorkspace.registerButtonCallback('MAKE_A_LIST', varListButtonCallback('list'));
-        toolboxWorkspace.registerButtonCallback('MAKE_A_PROCEDURE', procButtonCallback);
+        toolboxWorkspace.registerButtonCallback(
+            'MAKE_A_VARIABLE',
+            varListButtonCallback(''),
+        );
+        toolboxWorkspace.registerButtonCallback(
+            'MAKE_A_LIST',
+            varListButtonCallback('list'),
+        );
+        toolboxWorkspace.registerButtonCallback(
+            'MAKE_A_PROCEDURE',
+            procButtonCallback,
+        );
 
         // Store the xml of the toolbox that is actually rendered.
         // This is used in componentDidUpdate instead of prevProps, because
@@ -145,14 +180,23 @@ class Blocks extends React.Component {
         // we actually never want the workspace to enable "refresh toolbox" - this basically re-renders the
         // entire toolbox every time we reset the workspace.  We call updateToolbox as a part of
         // componentDidUpdate so the toolbox will still correctly be updated
-        this.setToolboxRefreshEnabled = this.workspace.setToolboxRefreshEnabled.bind(this.workspace);
+        this.setToolboxRefreshEnabled =
+            this.workspace.setToolboxRefreshEnabled.bind(this.workspace);
         this.workspace.setToolboxRefreshEnabled = () => {
             this.setToolboxRefreshEnabled(false);
         };
 
         // @todo change this when blockly supports UI events
-        addFunctionListener(this.workspace, 'translate', this.onWorkspaceMetricsChange);
-        addFunctionListener(this.workspace, 'zoom', this.onWorkspaceMetricsChange);
+        addFunctionListener(
+            this.workspace,
+            'translate',
+            this.onWorkspaceMetricsChange,
+        );
+        addFunctionListener(
+            this.workspace,
+            'zoom',
+            this.onWorkspaceMetricsChange,
+        );
 
         this.attachVM();
         // Only update blocks/vm locale when visible to avoid sizing issues
@@ -166,8 +210,10 @@ class Blocks extends React.Component {
             this.state.prompt !== nextState.prompt ||
             this.props.isVisible !== nextProps.isVisible ||
             this._renderedToolboxXML !== nextProps.toolboxXML ||
-            this.props.extensionLibraryVisible !== nextProps.extensionLibraryVisible ||
-            this.props.customProceduresVisible !== nextProps.customProceduresVisible ||
+            this.props.extensionLibraryVisible !==
+                nextProps.extensionLibraryVisible ||
+            this.props.customProceduresVisible !==
+                nextProps.customProceduresVisible ||
             this.props.locale !== nextProps.locale ||
             this.props.anyModalVisible !== nextProps.anyModalVisible ||
             this.props.stageSize !== nextProps.stageSize ||
@@ -191,11 +237,17 @@ class Blocks extends React.Component {
         // Only rerender the toolbox when the blocks are visible and the xml is
         // different from the previously rendered toolbox xml.
         // Do not check against prevProps.toolboxXML because that may not have been rendered.
-        if (this.props.isVisible && this.props.toolboxXML !== this._renderedToolboxXML) {
+        if (
+            this.props.isVisible &&
+            this.props.toolboxXML !== this._renderedToolboxXML
+        ) {
             this.requestToolboxUpdate();
         }
 
-        if (this.props.isCodeEditorLocked && this.props.isCodeEditorLocked !== prevProps.isCodeEditorLocked) {
+        if (
+            this.props.isCodeEditorLocked &&
+            this.props.isCodeEditorLocked !== prevProps.isCodeEditorLocked
+        ) {
             this.onCodeNeedUpdate();
         }
 
@@ -208,9 +260,13 @@ class Blocks extends React.Component {
         }
         // @todo hack to resize blockly manually in case resize happened while hidden
         // @todo hack to reload the workspace due to gui bug #413
-        if (this.props.isVisible) { // Scripts tab
+        if (this.props.isVisible) {
+            // Scripts tab
             this.workspace.setVisible(true);
-            if (prevProps.locale !== this.props.locale || this.props.locale !== this.props.vm.getLocale()) {
+            if (
+                prevProps.locale !== this.props.locale ||
+                this.props.locale !== this.props.vm.getLocale()
+            ) {
                 // call setLocale if the locale has changed, or changed while the blocks were hidden.
                 // vm.getLocale() will be out of sync if locale was changed while not visible
                 this.setLocale();
@@ -238,23 +294,43 @@ class Blocks extends React.Component {
     }
     setLocale (refreshWorkspace = true) {
         this.ScratchBlocks.ScratchMsgs.setLocale(this.props.locale);
-        this.props.vm.setLocale(this.props.locale, this.props.messages)
+        this.props.vm
+            .setLocale(this.props.locale, this.props.messages)
             .then(() => {
-                this.workspace.getFlyout().setRecyclingEnabled(false);
+                const workspace = this.workspace;
+                const flyout =
+                    workspace &&
+                    typeof workspace.getFlyout === 'function' &&
+                    workspace.getFlyout();
+                if (!workspace || !flyout) {
+                    return;
+                }
+
+                flyout.setRecyclingEnabled(false);
                 if (refreshWorkspace) {
                     this.props.vm.refreshWorkspace();
                 }
                 this.requestToolboxUpdate();
                 this.withToolboxUpdates(() => {
-                    this.workspace.getFlyout().setRecyclingEnabled(true);
+                    const nextFlyout =
+                        workspace &&
+                        typeof workspace.getFlyout === 'function' &&
+                        workspace.getFlyout();
+                    if (nextFlyout) {
+                        nextFlyout.setRecyclingEnabled(true);
+                    }
                 });
             });
     }
     onProgramModeUpdate () {
         if (this.props.isRealtimeMode) {
-            this.ScratchBlocks.ProgramMode.setProgramMode(this.ScratchBlocks.ProgramMode.REALTIME);
+            this.ScratchBlocks.ProgramMode.setProgramMode(
+                this.ScratchBlocks.ProgramMode.REALTIME,
+            );
         } else {
-            this.ScratchBlocks.ProgramMode.setProgramMode(this.ScratchBlocks.ProgramMode.UPLOAD);
+            this.ScratchBlocks.ProgramMode.setProgramMode(
+                this.ScratchBlocks.ProgramMode.UPLOAD,
+            );
         }
         this._programMode = this.props.isRealtimeMode;
         const toolboxXML = this.getToolboxXML();
@@ -277,10 +353,14 @@ class Blocks extends React.Component {
         // Using the setter function will rerender the entire toolbox which we just rendered.
         this.workspace.toolboxRefreshEnabled_ = true;
 
-        const currentCategoryPos = this.workspace.toolbox_.getCategoryPositionById(categoryId);
-        const currentCategoryLen = this.workspace.toolbox_.getCategoryLengthById(categoryId);
+        const currentCategoryPos =
+            this.workspace.toolbox_.getCategoryPositionById(categoryId);
+        const currentCategoryLen =
+            this.workspace.toolbox_.getCategoryLengthById(categoryId);
         if (offset < currentCategoryLen) {
-            this.workspace.toolbox_.setFlyoutScrollPos(currentCategoryPos + offset);
+            this.workspace.toolbox_.setFlyoutScrollPos(
+                currentCategoryPos + offset,
+            );
         } else {
             this.workspace.toolbox_.setFlyoutScrollPos(currentCategoryPos);
         }
@@ -301,11 +381,13 @@ class Blocks extends React.Component {
 
     attachVM () {
         this.workspace.addChangeListener(this.props.vm.blockListener);
-        this.flyoutWorkspace = this.workspace
-            .getFlyout()
-            .getWorkspace();
-        this.flyoutWorkspace.addChangeListener(this.props.vm.flyoutBlockListener);
-        this.flyoutWorkspace.addChangeListener(this.props.vm.monitorBlockListener);
+        this.flyoutWorkspace = this.workspace.getFlyout().getWorkspace();
+        this.flyoutWorkspace.addChangeListener(
+            this.props.vm.flyoutBlockListener,
+        );
+        this.flyoutWorkspace.addChangeListener(
+            this.props.vm.monitorBlockListener,
+        );
         this.props.vm.addListener('SCRIPT_GLOW_ON', this.onScriptGlowOn);
         this.props.vm.addListener('SCRIPT_GLOW_OFF', this.onScriptGlowOff);
         this.props.vm.addListener('BLOCK_GLOW_ON', this.onBlockGlowOn);
@@ -313,15 +395,39 @@ class Blocks extends React.Component {
         this.props.vm.addListener('VISUAL_REPORT', this.onVisualReport);
         this.props.vm.addListener('workspaceUpdate', this.onWorkspaceUpdate);
         this.props.vm.addListener('targetsUpdate', this.onTargetsUpdate);
-        this.props.vm.addListener('SCRATCH_EXTENSION_ADDED', this.handleScratchExtensionAdded);
-        this.props.vm.addListener('SCRATCH_EXTENSION_REMOVED', this.handleScratchExtensionRemoved);
-        this.props.vm.addListener('DEVICE_EXTENSION_ADDED', this.handleDeviceExtensionAdded);
-        this.props.vm.addListener('DEVICE_EXTENSION_REMOVED', this.handleDeviceExtensionRemoved);
-        this.props.vm.addListener('BLOCKSINFO_UPDATE', this.handleBlocksInfoUpdate);
-        this.props.vm.addListener('PERIPHERAL_CONNECTED', this.handleStatusButtonUpdate);
-        this.props.vm.addListener('PERIPHERAL_DISCONNECTED', this.handleStatusButtonUpdate);
+        this.props.vm.addListener(
+            'SCRATCH_EXTENSION_ADDED',
+            this.handleScratchExtensionAdded,
+        );
+        this.props.vm.addListener(
+            'SCRATCH_EXTENSION_REMOVED',
+            this.handleScratchExtensionRemoved,
+        );
+        this.props.vm.addListener(
+            'DEVICE_EXTENSION_ADDED',
+            this.handleDeviceExtensionAdded,
+        );
+        this.props.vm.addListener(
+            'DEVICE_EXTENSION_REMOVED',
+            this.handleDeviceExtensionRemoved,
+        );
+        this.props.vm.addListener(
+            'BLOCKSINFO_UPDATE',
+            this.handleBlocksInfoUpdate,
+        );
+        this.props.vm.addListener(
+            'PERIPHERAL_CONNECTED',
+            this.handleStatusButtonUpdate,
+        );
+        this.props.vm.addListener(
+            'PERIPHERAL_DISCONNECTED',
+            this.handleStatusButtonUpdate,
+        );
         this.props.vm.addListener('CODE_NEED_UPDATE', this.onCodeNeedUpdate);
-        this.props.vm.addListener('TOOLBOX_UPLOAD_FINISH', this.handleToolboxUploadFinish);
+        this.props.vm.addListener(
+            'TOOLBOX_UPLOAD_FINISH',
+            this.handleToolboxUploadFinish,
+        );
     }
     detachVM () {
         this.props.vm.removeListener('SCRIPT_GLOW_ON', this.onScriptGlowOn);
@@ -331,15 +437,39 @@ class Blocks extends React.Component {
         this.props.vm.removeListener('VISUAL_REPORT', this.onVisualReport);
         this.props.vm.removeListener('workspaceUpdate', this.onWorkspaceUpdate);
         this.props.vm.removeListener('targetsUpdate', this.onTargetsUpdate);
-        this.props.vm.removeListener('SCRATCH_EXTENSION_ADDED', this.handleScratchExtensionAdded);
-        this.props.vm.removeListener('SCRATCH_EXTENSION_REMOVED', this.handleScratchExtensionRemoved);
-        this.props.vm.removeListener('DEVICE_EXTENSION_ADDED', this.handleDeviceExtensionAdded);
-        this.props.vm.removeListener('DEVICE_EXTENSION_REMOVED', this.handleDeviceExtensionRemoved);
-        this.props.vm.removeListener('BLOCKSINFO_UPDATE', this.handleBlocksInfoUpdate);
-        this.props.vm.removeListener('PERIPHERAL_CONNECTED', this.handleStatusButtonUpdate);
-        this.props.vm.removeListener('PERIPHERAL_DISCONNECTED', this.handleStatusButtonUpdate);
+        this.props.vm.removeListener(
+            'SCRATCH_EXTENSION_ADDED',
+            this.handleScratchExtensionAdded,
+        );
+        this.props.vm.removeListener(
+            'SCRATCH_EXTENSION_REMOVED',
+            this.handleScratchExtensionRemoved,
+        );
+        this.props.vm.removeListener(
+            'DEVICE_EXTENSION_ADDED',
+            this.handleDeviceExtensionAdded,
+        );
+        this.props.vm.removeListener(
+            'DEVICE_EXTENSION_REMOVED',
+            this.handleDeviceExtensionRemoved,
+        );
+        this.props.vm.removeListener(
+            'BLOCKSINFO_UPDATE',
+            this.handleBlocksInfoUpdate,
+        );
+        this.props.vm.removeListener(
+            'PERIPHERAL_CONNECTED',
+            this.handleStatusButtonUpdate,
+        );
+        this.props.vm.removeListener(
+            'PERIPHERAL_DISCONNECTED',
+            this.handleStatusButtonUpdate,
+        );
         this.props.vm.removeListener('CODE_NEED_UPDATE', this.onCodeNeedUpdate);
-        this.props.vm.removeListener('TOOLBOX_UPLOAD_FINISH', this.handleToolboxUploadFinish);
+        this.props.vm.removeListener(
+            'TOOLBOX_UPLOAD_FINISH',
+            this.handleToolboxUploadFinish,
+        );
     }
 
     updateToolboxBlockValue (id, value) {
@@ -357,8 +487,14 @@ class Blocks extends React.Component {
     onTargetsUpdate () {
         if (this.props.vm.editingTarget && this.workspace.getFlyout()) {
             ['glide', 'move', 'set'].forEach(prefix => {
-                this.updateToolboxBlockValue(`${prefix}x`, Math.round(this.props.vm.editingTarget.x).toString());
-                this.updateToolboxBlockValue(`${prefix}y`, Math.round(this.props.vm.editingTarget.y).toString());
+                this.updateToolboxBlockValue(
+                    `${prefix}x`,
+                    Math.round(this.props.vm.editingTarget.x).toString(),
+                );
+                this.updateToolboxBlockValue(
+                    `${prefix}y`,
+                    Math.round(this.props.vm.editingTarget.y).toString(),
+                );
             });
         }
     }
@@ -412,13 +548,22 @@ class Blocks extends React.Component {
             const targetSounds = target.getSounds();
             const dynamicBlocksXML = this.props.vm.runtime.getBlocksXML(target);
 
-            const device = this.props.deviceData.find(item => item.deviceId === this.props.deviceId);
+            const device = this.props.deviceData.find(
+                item => item.deviceId === this.props.deviceId,
+            );
 
-            return makeToolboxXML(false, device, target.isStage, target.id, dynamicBlocksXML,
+            return makeToolboxXML(
+                false,
+                device,
+                target.isStage,
+                target.id,
+                dynamicBlocksXML,
                 this.props.isRealtimeMode,
                 targetCostumes[targetCostumes.length - 1].name,
                 stageCostumes[stageCostumes.length - 1].name,
-                targetSounds.length > 0 ? targetSounds[targetSounds.length - 1].name : ''
+                targetSounds.length > 0 ?
+                    targetSounds[targetSounds.length - 1].name :
+                    '',
             );
         } catch (error) {
             log.warn(error);
@@ -432,7 +577,10 @@ class Blocks extends React.Component {
             this.props.updateToolboxState(toolboxXML);
         }
 
-        if (this.props.vm.editingTarget && !this.props.workspaceMetrics.targets[this.props.vm.editingTarget.id]) {
+        if (
+            this.props.vm.editingTarget &&
+            !this.props.workspaceMetrics.targets[this.props.vm.editingTarget.id]
+        ) {
             this.onWorkspaceMetricsChange();
         }
 
@@ -440,7 +588,10 @@ class Blocks extends React.Component {
         this.workspace.removeChangeListener(this.props.vm.blockListener);
         const dom = this.ScratchBlocks.Xml.textToDom(data.xml);
         try {
-            this.ScratchBlocks.Xml.clearWorkspaceAndLoadFromXml(dom, this.workspace);
+            this.ScratchBlocks.Xml.clearWorkspaceAndLoadFromXml(
+                dom,
+                this.workspace,
+            );
         } catch (error) {
             // The workspace is likely incomplete. What did update should be
             // functional.
@@ -458,8 +609,14 @@ class Blocks extends React.Component {
         }
         this.workspace.addChangeListener(this.props.vm.blockListener);
 
-        if (this.props.vm.editingTarget && this.props.workspaceMetrics.targets[this.props.vm.editingTarget.id]) {
-            const {scrollX, scrollY, scale} = this.props.workspaceMetrics.targets[this.props.vm.editingTarget.id];
+        if (
+            this.props.vm.editingTarget &&
+            this.props.workspaceMetrics.targets[this.props.vm.editingTarget.id]
+        ) {
+            const {scrollX, scrollY, scale} =
+                this.props.workspaceMetrics.targets[
+                    this.props.vm.editingTarget.id
+                ];
             this.workspace.scrollX = scrollX;
             this.workspace.scrollY = scrollY;
             this.workspace.scale = scale;
@@ -475,7 +632,9 @@ class Blocks extends React.Component {
         const {deviceId, categoryInfoArray} = extensionInfo;
 
         if (deviceId) {
-            const dev = this.props.deviceData.find(ext => ext.deviceId === deviceId);
+            const dev = this.props.deviceData.find(
+                ext => ext.deviceId === deviceId,
+            );
             this.props.onDeviceSelected(dev.deviceId, dev.name, dev.type);
             this.ScratchBlocks.Device.setDevice(dev.deviceId, dev.type);
             if (dev.defaultBaudRate) {
@@ -493,9 +652,10 @@ class Blocks extends React.Component {
                 if (dev.programMode.includes(defaultProgramMode)) {
                     if (defaultProgramMode === 'upload') {
                         this.props.vm.runtime.setRealtimeMode(false);
+                    } else {
+                        this.props.vm.runtime.setRealtimeMode(true);
                     }
                 }
-
             } else {
                 if (supportUploadMode) {
                     this.props.vm.runtime.setRealtimeMode(false);
@@ -526,15 +686,22 @@ class Blocks extends React.Component {
                         // otherwise it's a non-block entry such as '---'
                     });
 
-                    this.ScratchBlocks.defineBlocksWithJsonArray(staticBlocksJson);
+                    this.ScratchBlocks.defineBlocksWithJsonArray(
+                        staticBlocksJson,
+                    );
                     dynamicBlocksInfo.forEach(blockInfo => {
                         // This is creating the block factory / constructor -- NOT a specific instance of the block.
                         // The factory should only know static info about the block: the category info and the opcode.
                         // Anything else will be picked up from the XML attached to the block instance.
                         const extendedOpcode = `${categoryInfo.id}_${blockInfo.info.opcode}`;
-                        const blockDefinition =
-                            defineDynamicBlock(this.ScratchBlocks, categoryInfo, blockInfo, extendedOpcode);
-                        this.ScratchBlocks.Blocks[extendedOpcode] = blockDefinition;
+                        const blockDefinition = defineDynamicBlock(
+                            this.ScratchBlocks,
+                            categoryInfo,
+                            blockInfo,
+                            extendedOpcode,
+                        );
+                        this.ScratchBlocks.Blocks[extendedOpcode] =
+                            blockDefinition;
                     });
                 }
             };
@@ -542,8 +709,12 @@ class Blocks extends React.Component {
             // openblock-blocks implements a menu or custom field as a special kind of block ("shadow" block)
             // these actually define blocks and MUST run regardless of the UI state
             defineBlocks(
-                Object.getOwnPropertyNames(categoryInfo.customFieldTypes)
-                    .map(fieldTypeName => categoryInfo.customFieldTypes[fieldTypeName].scratchBlocksDefinition));
+                Object.getOwnPropertyNames(categoryInfo.customFieldTypes).map(
+                    fieldTypeName =>
+                        categoryInfo.customFieldTypes[fieldTypeName]
+                            .scratchBlocksDefinition,
+                ),
+            );
             defineBlocks(categoryInfo.menus);
             defineBlocks(categoryInfo.blocks);
         });
@@ -552,32 +723,40 @@ class Blocks extends React.Component {
         setTimeout(() => {
             const toolboxXML = this.getToolboxXML();
             if (toolboxXML) {
-                this.props.updateToolboxState(this.deviceFakeToolboxHead + toolboxXML);
+                this.props.updateToolboxState(
+                    this.deviceFakeToolboxHead + toolboxXML,
+                );
             }
         }, 0);
     }
     handleScratchExtensionRemoved (extensionInfo) {
-        const {deviceId} = extensionInfo;
-
-        if (deviceId) {
+        if (extensionInfo && extensionInfo.deviceId) {
             this.props.onDeviceSelected(null, null, null);
             this.props.vm.runtime.setRealtimeMode(true);
             this.props.onSetSupportSwitchMode(false);
         }
         const toolboxXML = this.getToolboxXML();
         if (toolboxXML) {
-            this.props.updateToolboxState(this.deviceFakeToolboxHead + toolboxXML);
+            this.props.updateToolboxState(
+                this.deviceFakeToolboxHead + toolboxXML,
+            );
         }
     }
     handleDeviceExtensionAdded (deviceExtensionsRegister) {
         if (deviceExtensionsRegister.defineMessages) {
-            this.ScratchBlocks = deviceExtensionsRegister.defineMessages(this.ScratchBlocks);
+            this.ScratchBlocks = deviceExtensionsRegister.defineMessages(
+                this.ScratchBlocks,
+            );
         }
         if (deviceExtensionsRegister.defineGenerators) {
-            this.ScratchBlocks = deviceExtensionsRegister.defineGenerators(this.ScratchBlocks);
+            this.ScratchBlocks = deviceExtensionsRegister.defineGenerators(
+                this.ScratchBlocks,
+            );
         }
         if (deviceExtensionsRegister.defineBlocks) {
-            this.ScratchBlocks = deviceExtensionsRegister.defineBlocks(this.ScratchBlocks);
+            this.ScratchBlocks = deviceExtensionsRegister.defineBlocks(
+                this.ScratchBlocks,
+            );
         }
 
         this.setLocale(false);
@@ -598,7 +777,9 @@ class Blocks extends React.Component {
         this.handleScratchExtensionAdded(extensionInfo);
     }
     handleCategorySelected (categoryId) {
-        const extension = extensionData.find(ext => ext.extensionId === categoryId);
+        const extension = extensionData.find(
+            ext => ext.extensionId === categoryId,
+        );
         if (extension && extension.launchPeripheralConnectionFlow) {
             this.handleConnectionModalStart();
         }
@@ -608,7 +789,9 @@ class Blocks extends React.Component {
         });
     }
     handleDeviceSelected (categoryId) {
-        const device = this.props.deviceData.find(ext => ext.deviceId === categoryId);
+        const device = this.props.deviceData.find(
+            ext => ext.deviceId === categoryId,
+        );
 
         if (device && device.launchPeripheralConnectionFlow) {
             this.handleConnectionModalStart();
@@ -623,15 +806,21 @@ class Blocks extends React.Component {
     }
     handlePromptStart (message, defaultValue, callback, optTitle, optVarType) {
         const p = {prompt: {callback, message, defaultValue}};
-        p.prompt.title = optTitle ? optTitle :
+        p.prompt.title = optTitle ?
+            optTitle :
             this.ScratchBlocks.Msg.VARIABLE_MODAL_TITLE;
-        p.prompt.varType = typeof optVarType === 'string' ?
-            optVarType : this.ScratchBlocks.SCALAR_VARIABLE_TYPE;
+        p.prompt.varType =
+            typeof optVarType === 'string' ?
+                optVarType :
+                this.ScratchBlocks.SCALAR_VARIABLE_TYPE;
         p.prompt.showVariableOptions = // This flag means that we should show variable/list options about scope
             optVarType !== this.ScratchBlocks.BROADCAST_MESSAGE_VARIABLE_TYPE &&
-            p.prompt.title !== this.ScratchBlocks.Msg.RENAME_VARIABLE_MODAL_TITLE &&
+            p.prompt.title !==
+                this.ScratchBlocks.Msg.RENAME_VARIABLE_MODAL_TITLE &&
             p.prompt.title !== this.ScratchBlocks.Msg.RENAME_LIST_MODAL_TITLE;
-        p.prompt.showCloudOption = (optVarType === this.ScratchBlocks.SCALAR_VARIABLE_TYPE) && this.props.canUseCloud;
+        p.prompt.showCloudOption =
+            optVarType === this.ScratchBlocks.SCALAR_VARIABLE_TYPE &&
+            this.props.canUseCloud;
         this.setState(p);
     }
     handleConnectionModalStart () {
@@ -643,8 +832,12 @@ class Blocks extends React.Component {
     workspaceToCode () {
         let code;
         try {
-            const generatorName = getGeneratorNameFromDeviceType(this.props.deviceType);
-            code = this.ScratchBlocks[generatorName].workspaceToCode(this.workspace);
+            const generatorName = getGeneratorNameFromDeviceType(
+                this.props.deviceType,
+            );
+            code = this.ScratchBlocks[generatorName].workspaceToCode(
+                this.workspace,
+            );
         } catch (e) {
             code = e.message;
         }
@@ -656,7 +849,9 @@ class Blocks extends React.Component {
     onCodeNeedUpdate () {
         if (this.props.isCodeEditorLocked) {
             if (this.props.isRealtimeMode === false) {
-                this.props.onSetCodeEditorValue(this.workspaceToCode());
+                const code = this.workspaceToCode();
+                this.props.onSetCodeEditorValue(code);
+                // Do NOT sync C++ upload-mode code to the Python IDE.
             }
         } else {
             this.props.onCodeEditorIsUnlocked();
@@ -674,8 +869,11 @@ class Blocks extends React.Component {
     handlePromptCallback (input, variableOptions) {
         this.state.prompt.callback(
             input,
-            this.props.vm.runtime.getAllVarNamesOfType(this.state.prompt.varType),
-            variableOptions);
+            this.props.vm.runtime.getAllVarNamesOfType(
+                this.state.prompt.varType,
+            ),
+            variableOptions,
+        );
         this.handlePromptClose();
     }
     handlePromptClose () {
@@ -690,7 +888,12 @@ class Blocks extends React.Component {
     handleDrop (dragInfo) {
         fetch(dragInfo.payload.bodyUrl)
             .then(response => response.json())
-            .then(blocks => this.props.vm.shareBlocksToTarget(blocks, this.props.vm.editingTarget.id))
+            .then(blocks =>
+                this.props.vm.shareBlocksToTarget(
+                    blocks,
+                    this.props.vm.editingTarget.id,
+                ),
+            )
             .then(() => {
                 this.props.vm.refreshWorkspace();
                 this.updateToolbox(); // To show new variables/custom blocks
@@ -747,10 +950,15 @@ class Blocks extends React.Component {
                     <Prompt
                         defaultValue={this.state.prompt.defaultValue}
                         isStage={vm.runtime.getEditingTarget().isStage}
-                        showListMessage={this.state.prompt.varType === this.ScratchBlocks.LIST_VARIABLE_TYPE}
+                        showListMessage={
+                            this.state.prompt.varType ===
+                            this.ScratchBlocks.LIST_VARIABLE_TYPE
+                        }
                         label={this.state.prompt.message}
                         showCloudOption={this.state.prompt.showCloudOption}
-                        showVariableOptions={this.state.prompt.showVariableOptions}
+                        showVariableOptions={
+                            this.state.prompt.showVariableOptions
+                        }
                         title={this.state.prompt.title}
                         vm={vm}
                         onCancel={this.handlePromptClose}
@@ -791,6 +999,8 @@ Blocks.propTypes = {
     deviceData: PropTypes.instanceOf(Array).isRequired,
     deviceId: PropTypes.string,
     deviceType: PropTypes.string,
+    editingTarget: PropTypes.string,
+    inputMode: PropTypes.string,
     peripheralName: PropTypes.string,
     deviceLibraryVisible: PropTypes.bool,
     extensionLibraryVisible: PropTypes.bool,
@@ -812,6 +1022,7 @@ Blocks.propTypes = {
     onDeviceSelected: PropTypes.func,
     onOpenConnectionModal: PropTypes.func,
     onOpenSoundRecorder: PropTypes.func,
+    onUpdatePythonCode: PropTypes.func,
     onToolboxWillUpdate: PropTypes.func,
     onToolboxDidUpdate: PropTypes.func,
     onRequestCloseCustomProcedures: PropTypes.func,
@@ -842,6 +1053,7 @@ Blocks.propTypes = {
     onSetBaudrate: PropTypes.func.isRequired,
     onSetCodeEditorValue: PropTypes.func,
     onSetSupportSwitchMode: PropTypes.func,
+    onShowMessageBox: PropTypes.func.isRequired,
     stageSize: PropTypes.oneOf(Object.keys(STAGE_DISPLAY_SIZES)).isRequired,
     toolboxXML: PropTypes.string,
     updateMetrics: PropTypes.func,
@@ -886,13 +1098,15 @@ Blocks.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-    anyModalVisible: (
-        Object.keys(state.scratchGui.modals).some(key => state.scratchGui.modals[key]) ||
-        state.scratchGui.mode.isFullScreen
-    ),
+    anyModalVisible:
+        Object.keys(state.scratchGui.modals).some(
+            key => state.scratchGui.modals[key],
+        ) || state.scratchGui.mode.isFullScreen,
     deviceData: state.scratchGui.deviceData.deviceData,
     deviceId: state.scratchGui.device.deviceId,
     deviceType: state.scratchGui.device.deviceType,
+    editingTarget: state.scratchGui.targets.editingTarget,
+    inputMode: state.scratchGui.inputMode.mode,
     peripheralName: state.scratchGui.connectionModal.peripheralName,
     deviceLibraryVisible: state.scratchGui.modals.deviceLibrary,
     extensionLibraryVisible: state.scratchGui.modals.extensionLibrary,
@@ -907,8 +1121,10 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    onActivateColorPicker: callback => dispatch(activateColorPicker(callback)),
-    onActivateCustomProcedures: (data, callback) => dispatch(activateCustomProcedures(data, callback)),
+    onActivateColorPicker: callback =>
+        dispatch(activateColorPicker(callback)),
+    onActivateCustomProcedures: (data, callback) =>
+        dispatch(activateCustomProcedures(data, callback)),
     onDeviceSelected: (id, name, type) => {
         dispatch(setDeviceId(id));
         dispatch(setDeviceName(name));
@@ -946,13 +1162,14 @@ const mapDispatchToProps = dispatch => ({
     onSetCodeEditorValue: value => {
         dispatch(setCodeEditorValue(value));
     },
+    onUpdatePythonCode: (targetId, code) => {
+        dispatch(updateTargetCode(targetId, code));
+    },
     onSetSupportSwitchMode: state => dispatch(setSupportSwitchMode(state)),
-    onCodeEditorIsUnlocked: () => showAlertWithTimeout(dispatch, 'codeEditorIsUnlocked')
+    onCodeEditorIsUnlocked: () =>
+        showAlertWithTimeout(dispatch, 'codeEditorIsUnlocked')
 });
 
 export default errorBoundaryHOC('Blocks')(
-    connect(
-        mapStateToProps,
-        mapDispatchToProps
-    )(Blocks)
+    connect(mapStateToProps, mapDispatchToProps)(Blocks),
 );

@@ -1,20 +1,20 @@
-import PropTypes from "prop-types";
-import React from "react";
-import { connect } from "react-redux";
-import { defineMessages, injectIntl, intlShape } from "react-intl";
+import PropTypes from 'prop-types';
+import React from 'react';
+import {connect} from 'react-redux';
+import {defineMessages, injectIntl, intlShape} from 'react-intl';
 
 import {
     getIsAnyCreatingNewState,
-    getIsShowingWithoutId,
-} from "../reducers/project-state";
-import { setProjectTitle } from "../reducers/project-title";
+    getIsShowingWithoutId
+} from '../reducers/project-state';
+import {setProjectTitle} from '../reducers/project-title';
 
 const messages = defineMessages({
     defaultProjectTitle: {
-        id: "gui.gui.defaultProjectTitle",
-        description: "Default title for project",
-        defaultMessage: "Nomokit Project",
-    },
+        id: 'gui.gui.defaultProjectTitle',
+        description: 'Default title for project',
+        defaultMessage: 'Nomokit Project'
+    }
 });
 
 /* Higher Order Component to get and set the project title
@@ -23,10 +23,10 @@ const messages = defineMessages({
  */
 const TitledHOC = function (WrappedComponent) {
     class TitledComponent extends React.Component {
-        componentDidMount() {
+        componentDidMount () {
             this.handleReceivedProjectTitle(this.props.projectTitle);
         }
-        componentDidUpdate(prevProps) {
+        componentDidUpdate (prevProps) {
             if (this.props.projectTitle !== prevProps.projectTitle) {
                 this.handleReceivedProjectTitle(this.props.projectTitle);
             }
@@ -48,15 +48,15 @@ const TitledHOC = function (WrappedComponent) {
                 this.props.onUpdateProjectTitle(this.props.reduxProjectTitle);
             }
         }
-        handleReceivedProjectTitle(requestedTitle) {
+        handleReceivedProjectTitle (requestedTitle) {
             let newTitle = requestedTitle;
-            if (newTitle === null || typeof newTitle === "undefined") {
-                newTitle = "Nomokit Project";
+            if (newTitle === null || typeof newTitle === 'undefined') {
+                newTitle = 'Nomokit Project';
             }
             this.props.onChangedProjectTitle(newTitle);
             return newTitle;
         }
-        render() {
+        render () {
             const {
                 /* eslint-disable no-unused-vars */
                 intl,
@@ -83,24 +83,24 @@ const TitledHOC = function (WrappedComponent) {
         onChangedProjectTitle: PropTypes.func,
         onUpdateProjectTitle: PropTypes.func,
         projectTitle: PropTypes.string,
-        reduxProjectTitle: PropTypes.string,
+        reduxProjectTitle: PropTypes.string
     };
 
     TitledComponent.defaultProps = {
-        onUpdateProjectTitle: () => {},
+        onUpdateProjectTitle: () => {}
     };
 
-    const mapStateToProps = (state) => {
+    const mapStateToProps = state => {
         const loadingState = state.scratchGui.projectState.loadingState;
         return {
             isAnyCreatingNewState: getIsAnyCreatingNewState(loadingState),
             isShowingWithoutId: getIsShowingWithoutId(loadingState),
-            reduxProjectTitle: state.scratchGui.projectTitle,
+            reduxProjectTitle: state.scratchGui.projectTitle
         };
     };
 
-    const mapDispatchToProps = (dispatch) => ({
-        onChangedProjectTitle: (title) => dispatch(setProjectTitle(title)),
+    const mapDispatchToProps = dispatch => ({
+        onChangedProjectTitle: title => dispatch(setProjectTitle(title))
     });
 
     return injectIntl(
@@ -108,4 +108,4 @@ const TitledHOC = function (WrappedComponent) {
     );
 };
 
-export { TitledHOC as default };
+export {TitledHOC as default};

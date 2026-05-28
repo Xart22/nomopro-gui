@@ -1,116 +1,116 @@
-import bindAll from "lodash.bindall";
-import PropTypes from "prop-types";
-import React from "react";
+import bindAll from 'lodash.bindall';
+import PropTypes from 'prop-types';
+import React from 'react';
 import {
     defineMessages,
     injectIntl,
     intlShape,
-    FormattedMessage,
-} from "react-intl";
-import ReactModal from "react-modal";
+    FormattedMessage
+} from 'react-intl';
+import ReactModal from 'react-modal';
 
-import Box from "../box/box.jsx";
+import Box from '../box/box.jsx';
 
-import styles from "./telemetry-modal.css";
+import styles from './telemetry-modal.css';
 
 const messages = defineMessages({
     label: {
-        id: "gui.telemetryOptIn.label",
-        defaultMessage: "Report statistics to improve Nomokit",
-        description: "Nomokit telemetry modal label - for accessibility",
+        id: 'gui.telemetryOptIn.label',
+        defaultMessage: 'Report statistics to improve Nomokit',
+        description: 'Nomokit telemetry modal label - for accessibility'
     },
     bodyText1: {
         defaultMessage:
-            "The Nomokit Team is always looking to better understand how Nomokit is used around the " +
-            "world. To help support this effort, you can allow Nomokit to automatically send usage information to " +
-            "the Nomokit Team.",
-        description: "First paragraph of body text for telemetry opt-in modal",
-        id: "gui.telemetryOptIn.body1",
+            'The Nomokit Team is always looking to better understand how Nomokit is used around the ' +
+            'world. To help support this effort, you can allow Nomokit to automatically send usage information to ' +
+            'the Nomokit Team.',
+        description: 'First paragraph of body text for telemetry opt-in modal',
+        id: 'gui.telemetryOptIn.body1'
     },
     bodyText2: {
         defaultMessage:
-            "The information we collect includes language selection, blocks usage, and some events like " +
-            "saving, loading, and uploading a project. We DO NOT collect any personal information. Please see our " +
-            "{privacyPolicyLink} for more information.",
-        description: "First paragraph of body text for telemetry opt-in modal",
-        id: "gui.telemetryOptIn.body2",
+            'The information we collect includes language selection, blocks usage, and some events like ' +
+            'saving, loading, and uploading a project. We DO NOT collect any personal information. Please see our ' +
+            '{privacyPolicyLink} for more information.',
+        description: 'First paragraph of body text for telemetry opt-in modal',
+        id: 'gui.telemetryOptIn.body2'
     },
     privacyPolicyLink: {
-        defaultMessage: "Privacy Policy",
-        description: "Link to the Nomokit privacy policy",
-        id: "gui.telemetryOptIn.privacyPolicyLink",
+        defaultMessage: 'Privacy Policy',
+        description: 'Link to the Nomokit privacy policy',
+        id: 'gui.telemetryOptIn.privacyPolicyLink'
     },
     optInText: {
-        defaultMessage: "Share my usage data with the Nomokit Team",
-        description: "Text for telemetry modal opt-in button",
-        id: "gui.telemetryOptIn.optInText",
+        defaultMessage: 'Share my usage data with the Nomokit Team',
+        description: 'Text for telemetry modal opt-in button',
+        id: 'gui.telemetryOptIn.optInText'
     },
     optInTooltip: {
-        defaultMessage: "Enable telemetry",
-        description: "Tooltip for telemetry modal opt-in button",
-        id: "gui.telemetryOptIn.optInTooltip",
+        defaultMessage: 'Enable telemetry',
+        description: 'Tooltip for telemetry modal opt-in button',
+        id: 'gui.telemetryOptIn.optInTooltip'
     },
     optOutText: {
-        defaultMessage: "Do not share my usage data with the Nomokit Team",
-        description: "Text for telemetry modal opt-in button",
-        id: "gui.telemetryOptIn.optOutText",
+        defaultMessage: 'Do not share my usage data with the Nomokit Team',
+        description: 'Text for telemetry modal opt-in button',
+        id: 'gui.telemetryOptIn.optOutText'
     },
     optOutTooltip: {
-        defaultMessage: "Disable telemetry",
-        description: "Tooltip for telemetry modal opt-out button",
-        id: "gui.telemetryOptIn.optOutTooltip",
+        defaultMessage: 'Disable telemetry',
+        description: 'Tooltip for telemetry modal opt-out button',
+        id: 'gui.telemetryOptIn.optOutTooltip'
     },
     settingWasUpdated: {
-        defaultMessage: "Your setting was updated.",
+        defaultMessage: 'Your setting was updated.',
         description:
-            "Message indicating that the telemetry setting was updated and saved",
-        id: "gui.telemetryOptIn.settingWasUpdated",
+            'Message indicating that the telemetry setting was updated and saved',
+        id: 'gui.telemetryOptIn.settingWasUpdated'
     },
     closeButton: {
-        defaultMessage: "Close",
+        defaultMessage: 'Close',
         description:
-            "Text for the button which closes the telemetry modal dialog",
-        id: "gui.telemetryOptIn.buttonClose",
-    },
+            'Text for the button which closes the telemetry modal dialog',
+        id: 'gui.telemetryOptIn.buttonClose'
+    }
 });
 
 // This should be at least as long as the CSS transition
 const SETTING_WAS_UPDATED_DURATION_MS = 3000;
 
 class TelemetryModal extends React.PureComponent {
-    constructor(props) {
+    constructor (props) {
         super(props);
-        bindAll(this, ["handleCancel", "handleOptInOutChanged"]);
+        bindAll(this, ['handleCancel', 'handleOptInOutChanged']);
         this.state = {
             // if the settingWasUpdated message is displayed, this will be the ID of its removal timer
-            settingWasUpdatedTimer: null,
+            settingWasUpdatedTimer: null
         };
     }
-    componentWillUnmount() {
+    componentWillUnmount () {
         if (this.state.settingWasUpdatedTimer) {
             clearTimeout(this.state.settingWasUpdatedTimer);
         }
     }
-    handleCancel() {
+    handleCancel () {
         this.props.onRequestClose();
         if (this.props.onCancel) {
             this.props.onCancel();
         }
     }
-    handleOptInOutChanged(e) {
-        if (e.target.value === "true") {
+    handleOptInOutChanged (e) {
+        if (e.target.value === 'true') {
             if (this.props.onOptIn) {
                 this.props.onOptIn();
                 this.handleSettingWasUpdated();
             }
-        } else if (e.target.value === "false") {
+        } else if (e.target.value === 'false') {
             if (this.props.onOptOut) {
                 this.props.onOptOut();
                 this.handleSettingWasUpdated();
             }
         }
     }
-    handleSettingWasUpdated() {
+    handleSettingWasUpdated () {
         if (this.state.settingWasUpdatedTimer) {
             clearTimeout(this.state.settingWasUpdatedTimer);
         }
@@ -119,20 +119,20 @@ class TelemetryModal extends React.PureComponent {
             SETTING_WAS_UPDATED_DURATION_MS
         );
         this.setState({
-            settingWasUpdatedTimer: newTimer,
+            settingWasUpdatedTimer: newTimer
         });
     }
-    handleSettingWasUpdatedTimeout(thisTimer) {
+    handleSettingWasUpdatedTimeout (thisTimer) {
         if (thisTimer !== this.state.settingWasUpdatedTimer) {
             // some other timer has taken over
             return;
         }
         this.setState({
-            settingWasUpdatedTimer: null,
+            settingWasUpdatedTimer: null
         });
     }
-    render() {
-        const isUndecided = typeof this.props.isTelemetryEnabled !== "boolean";
+    render () {
+        const isUndecided = typeof this.props.isTelemetryEnabled !== 'boolean';
         const isOff = this.props.isTelemetryEnabled === false;
         const isOn = this.props.isTelemetryEnabled === true;
         const settingWasUpdated = this.state.settingWasUpdatedTimer && (
@@ -146,7 +146,7 @@ class TelemetryModal extends React.PureComponent {
                 overlayClassName={styles.modalOverlay}
                 onRequestClose={this.handleCancel}
             >
-                <div dir={this.props.isRtl ? "rtl" : "ltr"}>
+                <div dir={this.props.isRtl ? 'rtl' : 'ltr'}>
                     <Box className={styles.illustration} />
 
                     <Box className={styles.body}>
@@ -171,7 +171,7 @@ class TelemetryModal extends React.PureComponent {
                                                 {...messages.privacyPolicyLink}
                                             />
                                         </a>
-                                    ),
+                                    )
                                 }}
                             />
                         </p>
@@ -241,7 +241,7 @@ TelemetryModal.propTypes = {
     onOptIn: PropTypes.func.isRequired,
     onOptOut: PropTypes.func.isRequired,
     onRequestClose: PropTypes.func,
-    onShowPrivacyPolicy: PropTypes.func,
+    onShowPrivacyPolicy: PropTypes.func
 };
 
 export default injectIntl(TelemetryModal);

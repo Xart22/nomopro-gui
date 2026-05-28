@@ -4,11 +4,14 @@ const SET_NAME = 'scratch-gui/device/setName';
 const CLEAR_NAME = 'scratch-gui/device/clearName';
 const SET_TYPE = 'scratch-gui/device/setType';
 const CLEAR_TYPE = 'scratch-gui/device/clearType';
+const SET_FIRMWARE_MODE = 'scratch-gui/device/setFirmwareMode';
+const CLEAR_FIRMWARE_MODE = 'scratch-gui/device/clearFirmwareMode';
 
 const initialState = {
     deviceId: null,
     deviceName: null,
-    deviceType: null
+    deviceType: null,
+    firmwareMode: 'firmata'
 };
 
 const reducer = function (state, action) {
@@ -37,6 +40,14 @@ const reducer = function (state, action) {
     case CLEAR_TYPE:
         return Object.assign({}, state, {
             deviceType: null
+        });
+    case SET_FIRMWARE_MODE:
+        return Object.assign({}, state, {
+            firmwareMode: action.firmwareMode
+        });
+    case CLEAR_FIRMWARE_MODE:
+        return Object.assign({}, state, {
+            firmwareMode: 'firmata'
         });
     default:
         return state;
@@ -82,6 +93,19 @@ const clearDeviceType = function () {
     };
 };
 
+const setFirmwareMode = function (firmwareMode) {
+    return {
+        type: SET_FIRMWARE_MODE,
+        firmwareMode: firmwareMode
+    };
+};
+
+const clearFirmwareMode = function () {
+    return {
+        type: CLEAR_FIRMWARE_MODE
+    };
+};
+
 export {
     reducer as default,
     initialState as deviceInitialState,
@@ -90,5 +114,7 @@ export {
     setDeviceName,
     clearDeviceName,
     setDeviceType,
-    clearDeviceType
+    clearDeviceType,
+    setFirmwareMode,
+    clearFirmwareMode
 };

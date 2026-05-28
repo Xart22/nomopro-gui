@@ -3,6 +3,7 @@ import 'es6-object-assign/auto';
 import 'core-js/fn/array/includes';
 import 'core-js/fn/promise/finally';
 import 'intl'; // For Safari 9
+import 'regenerator-runtime/runtime';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -16,7 +17,7 @@ import styles from './index.css';
 
 initialAnalytics();
 // Register "base" page view
-analytics.pageview('/');
+analytics.send({hitType: 'pageview', page: '/community/web'});
 
 const appTarget = document.createElement('div');
 appTarget.className = styles.app;
@@ -26,11 +27,16 @@ if (supportedBrowser()) {
     // require needed here to avoid importing unsupported browser-crashing code
     // at the top level
     require('./render-gui.jsx').default(appTarget);
-
 } else {
     BrowserModalComponent.setAppElement(appTarget);
-    const WrappedBrowserModalComponent = AppStateHOC(BrowserModalComponent, true /* localesOnly */);
+    const WrappedBrowserModalComponent = AppStateHOC(
+        BrowserModalComponent,
+        true /* localesOnly */,
+    );
     const handleBack = () => {};
     // eslint-disable-next-line react/jsx-no-bind
-    ReactDOM.render(<WrappedBrowserModalComponent onBack={handleBack} />, appTarget);
+    ReactDOM.render(
+        <WrappedBrowserModalComponent onBack={handleBack} />,
+        appTarget,
+    );
 }

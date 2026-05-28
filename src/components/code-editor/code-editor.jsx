@@ -5,7 +5,7 @@ import MonacoEditor from 'react-monaco-editor';
 
 import Box from '../box/box.jsx';
 
-import styles from './code-editor.css';
+import styles from '../code-editor/code-editor.css';
 
 const CodeEditorComponent = props => {
     const {
@@ -29,13 +29,21 @@ const CodeEditorComponent = props => {
             <MonacoEditor
                 language={language}
                 value={value}
-                options={Object.assign({}, CodeEditorComponent.defaultProps.options, options)}
+                options={Object.assign(
+                    {},
+                    CodeEditorComponent.defaultProps.options,
+                    options,
+                )}
                 width={width}
                 height={height}
                 onChange={onChange}
                 editorWillMount={editorWillMount}
                 editorDidMount={editorDidMount}
                 theme={theme}
+                onValidate={markers => {
+                    // eslint-disable-next-line no-console
+                    console.log('onValidate:', markers);
+                }}
                 {...componentProps}
             />
         </Box>

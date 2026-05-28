@@ -1,65 +1,66 @@
-import classNames from "classnames";
-import bindAll from "lodash.bindall";
-import PropTypes from "prop-types";
-import React from "react";
-import { defineMessages, injectIntl, intlShape } from "react-intl";
+import classNames from 'classnames';
+import bindAll from 'lodash.bindall';
+import PropTypes from 'prop-types';
+import React from 'react';
+import {defineMessages, injectIntl, intlShape} from 'react-intl';
 
-import LibraryItem from "../../containers/library-item.jsx";
-import Modal from "../../containers/modal.jsx";
-import Divider from "../divider/divider.jsx";
-import Filter from "../filter/filter.jsx";
-import TagButton from "../../containers/tag-button.jsx";
-import Spinner from "../spinner/spinner.jsx";
+import LibraryItem from '../../containers/library-item.jsx';
+import Modal from '../../containers/modal.jsx';
+import Divider from '../divider/divider.jsx';
+import Filter from '../filter/filter.jsx';
+import TagButton from '../../containers/tag-button.jsx';
+import Spinner from '../spinner/spinner.jsx';
 
-import styles from "./library.css";
+import styles from './library.css';
 
 const messages = defineMessages({
     filterPlaceholder: {
-        id: "gui.library.filterPlaceholder",
-        defaultMessage: "Search",
-        description: "Placeholder text for library search field",
+        id: 'gui.library.filterPlaceholder',
+        defaultMessage: 'Search',
+        description: 'Placeholder text for library search field'
     },
     allTag: {
-        id: "gui.library.allTag",
-        defaultMessage: "All",
+        id: 'gui.library.allTag',
+        defaultMessage: 'All',
         description:
-            "Label for library tag to revert to all items after filtering by tag.",
-    },
+            'Label for library tag to revert to all items after filtering by tag.'
+    }
 });
 
-const ALL_TAG = { tag: "all", intlLabel: messages.allTag };
+const ALL_TAG = {tag: 'all', intlLabel: messages.allTag};
 const tagListPrefix = [ALL_TAG];
 
 class LibraryComponent extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         bindAll(this, [
-            "handleClose",
-            "handleFilterChange",
-            "handleFilterClear",
-            "handleMouseEnter",
-            "handleMouseLeave",
-            "handlePlayingEnd",
-            "handleSelect",
-            "handleTagClick",
-            "setFilteredDataRef",
+            'handleClose',
+            'handleFilterChange',
+            'handleFilterClear',
+            'handleMouseEnter',
+            'handleMouseLeave',
+            'handlePlayingEnd',
+            'handleSelect',
+            'handleTagClick',
+            'setFilteredDataRef'
         ]);
         this.state = {
             playingItem: null,
-            filterQuery: "",
+            filterQuery: '',
             selectedTag: ALL_TAG.tag,
-            loaded: false,
+            loaded: false
         };
     }
-    componentDidMount() {
+    componentDidMount () {
         // Allow the spinner to display before loading the content
         setTimeout(() => {
-            this.setState({ loaded: true });
+            this.setState({loaded: true});
         });
-        if (this.props.setStopHandler)
+        if (this.props.setStopHandler) {
             this.props.setStopHandler(this.handlePlayingEnd);
+        }
     }
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate (prevProps, prevState) {
         if (
             prevState.filterQuery !== this.state.filterQuery ||
             prevState.selectedTag !== this.state.selectedTag
@@ -67,7 +68,7 @@ class LibraryComponent extends React.Component {
             this.scrollToTop();
         }
     }
-    handleSelect(id) {
+    handleSelect (id) {
         const available = this.getFilteredData()[id].available;
         const freeDevice = this.getFilteredData()[id].freeDevice;
         const isExtension = this.getFilteredData()[id].extensionId != undefined;
@@ -76,62 +77,62 @@ class LibraryComponent extends React.Component {
             this.getFilteredData()[id].deviceId == undefined;
         console.log(isSpritOrBackDrop);
         if (available || freeDevice || isExtension || isSpritOrBackDrop) {
-            console.log("selected");
+            console.log('selected');
             if (this.props.autoClose) {
                 this.handleClose();
             }
             this.props.onItemSelected(this.getFilteredData()[id]);
         }
     }
-    handleClose() {
+    handleClose () {
         this.props.onRequestClose();
     }
-    handleTagClick(tag) {
+    handleTagClick (tag) {
         if (this.state.playingItem === null) {
             this.setState({
-                filterQuery: "",
-                selectedTag: tag.toLowerCase(),
+                filterQuery: '',
+                selectedTag: tag.toLowerCase()
             });
         } else {
             this.props.onItemMouseLeave(
                 this.getFilteredData()[[this.state.playingItem]]
             );
             this.setState({
-                filterQuery: "",
+                filterQuery: '',
                 playingItem: null,
-                selectedTag: tag.toLowerCase(),
+                selectedTag: tag.toLowerCase()
             });
         }
     }
-    handleMouseEnter(id) {
+    handleMouseEnter (id) {
         // don't restart if mouse over already playing item
         if (this.props.onItemMouseEnter && this.state.playingItem !== id) {
             this.props.onItemMouseEnter(this.getFilteredData()[id]);
             this.setState({
-                playingItem: id,
+                playingItem: id
             });
         }
     }
-    handleMouseLeave(id) {
+    handleMouseLeave (id) {
         if (this.props.onItemMouseLeave) {
             this.props.onItemMouseLeave(this.getFilteredData()[id]);
             this.setState({
-                playingItem: null,
+                playingItem: null
             });
         }
     }
-    handlePlayingEnd() {
+    handlePlayingEnd () {
         if (this.state.playingItem !== null) {
             this.setState({
-                playingItem: null,
+                playingItem: null
             });
         }
     }
-    handleFilterChange(event) {
+    handleFilterChange (event) {
         if (this.state.playingItem === null) {
             this.setState({
                 filterQuery: event.target.value,
-                selectedTag: ALL_TAG.tag,
+                selectedTag: ALL_TAG.tag
             });
         } else {
             this.props.onItemMouseLeave(
@@ -140,19 +141,19 @@ class LibraryComponent extends React.Component {
             this.setState({
                 filterQuery: event.target.value,
                 playingItem: null,
-                selectedTag: ALL_TAG.tag,
+                selectedTag: ALL_TAG.tag
             });
         }
     }
-    handleFilterClear() {
-        this.setState({ filterQuery: "" });
+    handleFilterClear () {
+        this.setState({filterQuery: ''});
     }
-    getFilteredData() {
-        const data = this.props.data.filter((device) => device.hide !== true);
-        if (this.state.selectedTag === "all") {
+    getFilteredData () {
+        const data = this.props.data.filter(device => device.hide !== true);
+        if (this.state.selectedTag === 'all') {
             if (!this.state.filterQuery) return data;
             return data.filter(
-                (dataItem) =>
+                dataItem =>
                     (dataItem.tags || [])
                         // Second argument to map sets `this`
                         .map(
@@ -160,22 +161,21 @@ class LibraryComponent extends React.Component {
                             String.prototype.toLowerCase
                         )
                         .concat(
-                            dataItem.name
-                                ? (typeof dataItem.name === "string"
-                                      ? // Use the name if it is a string, else use formatMessage to get the translated name
-                                        dataItem.name
-                                      : this.props.intl.formatMessage(
-                                            dataItem.name.props
-                                        )
-                                  ).toLowerCase()
-                                : null
+                            dataItem.name ?
+                                (typeof dataItem.name === 'string' ? // Use the name if it is a string, else use formatMessage to get the translated name
+                                    dataItem.name :
+                                    this.props.intl.formatMessage(
+                                        dataItem.name.props
+                                    )
+                                ).toLowerCase() :
+                                null
                         )
-                        .join("\n") // unlikely to partially match newlines
+                        .join('\n') // unlikely to partially match newlines
                         .indexOf(this.state.filterQuery.toLowerCase()) !== -1
             );
         }
         return data.filter(
-            (dataItem) =>
+            dataItem =>
                 dataItem.tags &&
                 dataItem.tags
                     .map(
@@ -185,13 +185,13 @@ class LibraryComponent extends React.Component {
                     .indexOf(this.state.selectedTag) !== -1
         );
     }
-    scrollToTop() {
+    scrollToTop () {
         this.filteredDataRef.scrollTop = 0;
     }
-    setFilteredDataRef(ref) {
+    setFilteredDataRef (ref) {
         this.filteredDataRef = ref;
     }
-    render() {
+    render () {
         return (
             <Modal
                 fullScreen
@@ -251,7 +251,7 @@ class LibraryComponent extends React.Component {
                 <div
                     className={classNames(styles.libraryScrollGrid, {
                         [styles.withFilterBar]:
-                            this.props.filterable || this.props.tags,
+                            this.props.filterable || this.props.tags
                     })}
                     ref={this.setFilteredDataRef}
                 >
@@ -272,9 +272,9 @@ class LibraryComponent extends React.Component {
                                 helpLink={dataItem.helpLink}
                                 hidden={dataItem.hidden}
                                 iconMd5={
-                                    dataItem.costumes
-                                        ? dataItem.costumes[0].md5ext
-                                        : dataItem.md5ext
+                                    dataItem.costumes ?
+                                        dataItem.costumes[0].md5ext :
+                                        dataItem.md5ext
                                 }
                                 iconRawURL={dataItem.rawURL}
                                 icons={dataItem.costumes}
@@ -287,9 +287,9 @@ class LibraryComponent extends React.Component {
                                 isUnloadble={this.props.isUnloadble}
                                 isPlaying={this.state.playingItem === index}
                                 key={
-                                    typeof dataItem.name === "string"
-                                        ? dataItem.name
-                                        : dataItem.rawURL
+                                    typeof dataItem.name === 'string' ?
+                                        dataItem.name :
+                                        dataItem.rawURL
                                 }
                                 learnMore={dataItem.learnMore}
                                 manufactor={dataItem.manufactor}
@@ -308,7 +308,10 @@ class LibraryComponent extends React.Component {
                         ))
                     ) : (
                         <div className={styles.spinnerWrapper}>
-                            <Spinner large level="primary" />
+                            <Spinner
+                                large
+                                level="primary"
+                            />
                         </div>
                     )}
                 </div>
@@ -326,7 +329,7 @@ LibraryComponent.propTypes = {
             // @todo remove md5/rawURL prop from library, refactor to use storage
             md5: PropTypes.string,
             name: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-            rawURL: PropTypes.string,
+            rawURL: PropTypes.string
         })
         /* eslint-enable react/no-unused-prop-types, lines-around-comment */
     ),
@@ -341,14 +344,14 @@ LibraryComponent.propTypes = {
     setStopHandler: PropTypes.func,
     showPlayButton: PropTypes.bool,
     tags: PropTypes.arrayOf(PropTypes.shape(TagButton.propTypes)),
-    title: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired
 };
 
 LibraryComponent.defaultProps = {
     autoClose: true,
     isUnloadble: false,
     filterable: true,
-    showPlayButton: false,
+    showPlayButton: false
 };
 
 export default injectIntl(LibraryComponent);

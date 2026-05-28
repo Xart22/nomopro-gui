@@ -7,6 +7,7 @@
 }
 
 .body-wrapper {
+    position: relative;
     height: calc(100% - $menu-bar-height);
     background-color: $ui-primary;
 }
@@ -44,7 +45,9 @@
         much better ways to solve that (e.g. undo #2124, remove this flex-basis entirely). However, they run their own
         risks of breaking things, so let's just leave this as-is for the time being.
     */
-    flex-basis: calc(1024px - 408px - (($space + $stage-standard-border-width) * 2));
+    flex-basis: calc(
+        1024px - 408px - (($space + $stage-standard-border-width) * 2)
+    );
     flex-grow: 1;
     flex-shrink: 0;
     position: relative;
@@ -62,7 +65,7 @@
 
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 500;
-    font-size: 0.80rem;
+    font-size: 0.8rem;
 
     /* Overrides for react-tabs styling */
     margin: 0 !important;
@@ -118,8 +121,12 @@
     z-index: 1;
 }
 
+.tab:nth-of-type(4) {
+    z-index: 0;
+}
+
 .tab:hover {
-  background-color: $ui-primary;
+    background-color: $ui-primary;
 }
 
 .tab.is-selected {
@@ -147,7 +154,7 @@
     transform: scaleX(-1);
 }
 
-[dir="rtl"] .tab:nth-of-type(3) img {
+[dir="rtl"] .tab:nth-of-type(4) img {
     transform: scaleX(-1);
 }
 
@@ -194,6 +201,10 @@
 
 .hide-custom-and-sound-tab {
     visibility: visible;
+}
+
+.hide-python-tab {
+    visibility: hidden;
 }
 
 .blocks-wrapper {
@@ -257,11 +268,10 @@ $fade-out-distance: 15px;
     position: absolute;
     top: calc(calc(-1 * $fade-out-distance) - 1px);
     left: -1px;
-    background: linear-gradient(rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.15));
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.15));
     height: $fade-out-distance;
     width: calc(100% + 0.5px);
 }
-
 
 .extension-button {
     background: none;
@@ -316,6 +326,85 @@ $fade-out-distance: 15px;
     position: absolute;
     margin-top: 53px;
     pointer-events: none;
+}
+
+.switch-mode-modal {
+    width: min(560px, calc(100vw - 2rem));
+    background: #f6f4fa;
+}
+
+.switch-mode-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.2rem;
+    background: #f6f4fa;
+}
+
+.switch-mode-visual-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+.switch-mode-chip {
+    min-width: 7.5rem;
+    text-align: center;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    font-weight: 700;
+    color: #3a2660;
+}
+
+.switch-mode-arrow {
+    font-size: 1.3rem;
+    line-height: 1;
+    color: #6f2da8;
+    font-weight: 700;
+}
+
+.switch-mode-text {
+    text-align: center;
+    font-size: 0.95rem;
+    color: #4a4a4a;
+    line-height: 1.45;
+}
+
+.switch-mode-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    padding-top: 0.3rem;
+}
+
+.switch-mode-primary-button,
+.switch-mode-secondary-button {
+    border: none;
+    border-radius: 0.6rem;
+    padding: 0.55rem 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 120ms ease;
+}
+
+.switch-mode-primary-button {
+    background: #6f2da8;
+    color: #ffffff;
+}
+
+.switch-mode-secondary-button {
+    background: #ffffff;
+    color: #4a4a4a;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.switch-mode-primary-button:hover,
+.switch-mode-secondary-button:hover {
+    transform: translateY(-1px);
 }
 
 /*

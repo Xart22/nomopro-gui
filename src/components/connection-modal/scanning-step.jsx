@@ -87,37 +87,94 @@ const ScanningStep = props => (
                 counter={0}
                 total={3}
             />
-            <button
-                className={classNames(styles.bottomAreaItem, styles.connectionButton)}
-                onClick={props.onRefresh}
-            >
-                <FormattedMessage
-                    defaultMessage="Refresh"
-                    description="Button in prompt for starting a search"
-                    id="gui.connection.search"
-                />
-                <img
-                    className={styles.buttonIconRight}
-                    src={refreshIcon}
-                />
-            </button>
+            <Box className={classNames(styles.bottomAreaItem, styles.buttonRow)}>
+                {props.showFlashButton && (
+                    <button
+                        className={styles.connectionButton}
+                        onClick={props.onFlash}
+                        disabled={props.flashing || props.peripheralList.length === 0}
+                    >
+                        {props.flashing ? (
+                            <FormattedMessage
+                                defaultMessage="Flashing..."
+                                description="Flashing in progress"
+                                id="gui.connection.flashing"
+                            />
+                        ) : (
+                            <FormattedMessage
+                                defaultMessage="Flash MicroPython"
+                                description="Button to flash MicroPython firmware"
+                                id="gui.connection.flashMicropython"
+                            />
+                        )}
+                    </button>
+                )}
+                <button
+                    className={classNames(styles.bottomAreaItem, styles.connectionButton)}
+                    onClick={props.onRefresh}
+                    disabled={props.flashing}
+                >
+                    <FormattedMessage
+                        defaultMessage="Refresh"
+                        description="Button in prompt for starting a search"
+                        id="gui.connection.search"
+                    />
+                    <img
+                        className={styles.buttonIconRight}
+                        src={refreshIcon}
+                    />
+                </button>
+            </Box>
+            {props.flashError && (
+                <Box className={styles.bottomAreaItem}>
+                    <span style={{color: '#FF661A', fontSize: '12px'}}>{props.flashError}</span>
+                </Box>
+            )}
+            {props.flashProgress > 0 && props.flashProgress < 100 && (
+                <Box className={styles.bottomAreaItem}>
+                    <div
+                        style={{
+                            width: '100%',
+                            height: '6px',
+                            background: '#ddd',
+                            borderRadius: '3px',
+                            overflow: 'hidden',
+                            marginTop: '4px'
+                        }}
+                    >
+                        <div
+                            style={{
+                                width: `${props.flashProgress}%`,
+                                height: '100%',
+                                background: '#4C97FF',
+                                transition: 'width 0.3s'
+                            }}
+                        />
+                    </div>
+                </Box>
+            )}
         </Box>
     </Box>
 );
 
 ScanningStep.propTypes = {
     connectionSmallIconURL: PropTypes.string,
+    flashError: PropTypes.string,
+    flashProgress: PropTypes.number,
+    flashing: PropTypes.bool,
     isListAll: PropTypes.bool.isRequired,
     isSerialport: PropTypes.bool,
     onClickListAll: PropTypes.func.isRequired,
     onConnecting: PropTypes.func,
+    onFlash: PropTypes.func,
     onRefresh: PropTypes.func,
     peripheralList: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
         rssi: PropTypes.number,
         peripheralId: PropTypes.string
     })),
-    scanning: PropTypes.bool.isRequired
+    scanning: PropTypes.bool.isRequired,
+    showFlashButton: PropTypes.bool
 };
 
 ScanningStep.defaultProps = {

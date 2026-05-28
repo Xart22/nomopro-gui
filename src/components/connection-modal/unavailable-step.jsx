@@ -1,23 +1,23 @@
-import { FormattedMessage } from "react-intl";
-import PropTypes from "prop-types";
-import classNames from "classnames";
-import React from "react";
+import {FormattedMessage} from 'react-intl';
+import PropTypes from 'prop-types';
+import classNames from 'classnames';
+import React from 'react';
 
-import Box from "../box/box.jsx";
-import Dots from "./dots.jsx";
-import helpIcon from "./icons/help.svg";
-import backIcon from "./icons/back.svg";
-import usbAndBluetoothIcon from "./icons/usb-and-bluetooth.svg";
-import scratchLinkIcon from "./icons/scratchlink.svg";
+import Box from '../box/box.jsx';
+import Dots from './dots.jsx';
+import helpIcon from './icons/help.svg';
+import backIcon from './icons/back.svg';
+import usbAndBluetoothIcon from './icons/usb-and-bluetooth.svg';
+import scratchLinkIcon from './icons/scratchlink.svg';
 
-import styles from "./connection-modal.css";
+import styles from './connection-modal.css';
 
-const UnavailableStep = (props) => (
+const UnavailableStep = props => (
     <Box className={styles.body}>
         <Box className={styles.activityArea}>
             <div className={styles.scratchLinkHelp}>
                 <div className={styles.scratchLinkHelpStep}>
-                    <div className={styles.helpStepNumber}>{"1"}</div>
+                    <div className={styles.helpStepNumber}>{'1'}</div>
                     <div className={styles.helpStepImage}>
                         <img
                             className={styles.scratchLinkIcon}
@@ -33,7 +33,7 @@ const UnavailableStep = (props) => (
                     </div>
                 </div>
                 <div className={styles.scratchLinkHelpStep}>
-                    <div className={styles.helpStepNumber}>{"2"}</div>
+                    <div className={styles.helpStepNumber}>{'2'}</div>
                     <div className={styles.helpStepImage}>
                         <img
                             className={styles.scratchLinkIcon}
@@ -51,7 +51,11 @@ const UnavailableStep = (props) => (
             </div>
         </Box>
         <Box className={styles.bottomArea}>
-            <Dots error className={styles.bottomAreaItem} total={3} />
+            <Dots
+                error
+                className={styles.bottomAreaItem}
+                total={3}
+            />
             <Box
                 className={classNames(styles.bottomAreaItem, styles.buttonRow)}
             >
@@ -76,7 +80,10 @@ const UnavailableStep = (props) => (
                     className={styles.connectionButton}
                     onClick={props.onHelp}
                 >
-                    <img className={styles.buttonIconLeft} src={helpIcon} />
+                    <img
+                        className={styles.buttonIconLeft}
+                        src={helpIcon}
+                    />
                     <FormattedMessage
                         defaultMessage="Help"
                         description="Button to view help content"
@@ -90,7 +97,7 @@ const UnavailableStep = (props) => (
 
 UnavailableStep.propTypes = {
     onHelp: PropTypes.func,
-    onScanning: PropTypes.func,
+    onScanning: PropTypes.func
 };
 
 export default UnavailableStep;

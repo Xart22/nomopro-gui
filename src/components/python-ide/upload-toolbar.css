@@ -1,0 +1,196 @@
+.uploadToolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 4px 8px;
+    background: #1e1e2e;
+    border-bottom: 1px solid #333;
+    flex: 1;
+    min-width: 0;
+}
+
+.modeRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.modeSwitch {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vmButton {
+    background: #444;
+    color: #ccc;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.vmButton:hover {
+    background: #555;
+}
+
+.modeActive {
+    font-weight: bold;
+    color: #4CAF50;
+    font-size: 12px;
+}
+
+.firmwareStatus {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.statusDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.statusText {
+    font-size: 10px;
+    color: #999;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.actionRow {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.flashBtn,
+.uploadRunBtn,
+.uploadOnlyBtn,
+.stopBtn,
+.detectBtn {
+    padding: 5px 12px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.flashBtn {
+    background: #E65100;
+    color: white;
+}
+
+.flashBtn:hover:not(:disabled) {
+    background: #FF6D00;
+}
+
+.uploadRunBtn {
+    background: #2E7D32;
+    color: white;
+}
+
+.uploadRunBtn:hover:not(:disabled) {
+    background: #388E3C;
+}
+
+.uploadOnlyBtn {
+    background: #1565C0;
+    color: white;
+}
+
+.uploadOnlyBtn:hover:not(:disabled) {
+    background: #1976D2;
+}
+
+.stopBtn {
+    background: #C62828;
+    color: white;
+}
+
+.stopBtn:hover:not(:disabled) {
+    background: #D32F2F;
+}
+
+.detectBtn {
+    background: transparent;
+    color: #999;
+    padding: 1px 4px;
+    font-size: 12px;
+}
+
+.detectBtn:hover:not(:disabled) {
+    color: white;
+}
+
+.flashBtn:disabled,
+.uploadRunBtn:disabled,
+.uploadOnlyBtn:disabled,
+.stopBtn:disabled,
+.detectBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.progressRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.progressBar {
+    flex: 1;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    background: #4CAF50;
+    transition: width 0.3s ease;
+}
+
+.progressText {
+    font-size: 10px;
+    color: #999;
+    min-width: 100px;
+}
+
+.logArea {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    font-size: 11px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 3px;
+    padding: 4px 6px;
+    margin-top: 2px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.4;
+}
+
+.logLine {
+    color: #ccc;
+}
+
+.logLine:last-child {
+    color: #4CAF50;
+}
+
+.logLine:last-child:empty {
+    display: none;
+}

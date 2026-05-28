@@ -1,33 +1,33 @@
-import PropTypes from "prop-types";
-import React from "react";
-import ReactModal from "react-modal";
-import Box from "../box/box.jsx";
+import PropTypes from 'prop-types';
+import React from 'react';
+import ReactModal from 'react-modal';
+import Box from '../box/box.jsx';
 import {
     defineMessages,
     injectIntl,
     intlShape,
-    FormattedMessage,
-} from "react-intl";
+    FormattedMessage
+} from 'react-intl';
 
-import styles from "./webgl-modal.css";
+import styles from './webgl-modal.css';
 
 const messages = defineMessages({
     label: {
-        id: "gui.webglModal.label",
-        defaultMessage: "Your Browser Does Not Support WebGL",
-        description: "WebGL missing title",
-    },
+        id: 'gui.webglModal.label',
+        defaultMessage: 'Your Browser Does Not Support WebGL',
+        description: 'WebGL missing title'
+    }
 });
 
-const WebGlModal = ({ intl, ...props }) => (
+const WebGlModal = ({intl, ...props}) => (
     <ReactModal
         isOpen
         className={styles.modalContent}
-        contentLabel={intl.formatMessage({ ...messages.label })}
+        contentLabel={intl.formatMessage({...messages.label})}
         overlayClassName={styles.modalOverlay}
         onRequestClose={props.onBack}
     >
-        <div dir={props.isRtl ? "rtl" : "ltr"}>
+        <div dir={props.isRtl ? 'rtl' : 'ltr'}>
             <Box className={styles.illustration} />
 
             <Box className={styles.body}>
@@ -52,7 +52,7 @@ const WebGlModal = ({ intl, ...props }) => (
                                         id="gui.webglModal.webgllink"
                                     />
                                 </a>
-                            ),
+                            )
                         }}
                     />
                     {/* eslint-enable max-len */}
@@ -87,7 +87,7 @@ const WebGlModal = ({ intl, ...props }) => (
                                         id="gui.webglModal.previewfaqlinktext"
                                     />
                                 </a>
-                            ),
+                            )
                         }}
                     />
                 </div>
@@ -99,7 +99,7 @@ const WebGlModal = ({ intl, ...props }) => (
 WebGlModal.propTypes = {
     intl: intlShape.isRequired,
     isRtl: PropTypes.bool,
-    onBack: PropTypes.func.isRequired,
+    onBack: PropTypes.func.isRequired
 };
 
 export default injectIntl(WebGlModal);

@@ -18,18 +18,21 @@ import HardwareHeaderComponent from '../components/hardware-header/hardware-head
 class HardwareHeader extends React.Component {
     constructor (props) {
         super(props);
-        bindAll(this, [
-            'handleUpload'
-        ]);
+        bindAll(this, ['handleUpload']);
     }
 
     handleUpload () {
         if (this.props.peripheralName) {
-            const blocks = document.querySelector('.blocklyWorkspace .blocklyBlockCanvas');
+            const blocks = document.querySelector(
+                '.blocklyWorkspace .blocklyBlockCanvas',
+            );
             if (blocks.getBBox().height === 0) {
                 this.props.onWorkspaceIsEmpty();
             } else {
-                this.props.vm.uploadToPeripheral(this.props.deviceId, this.props.codeEditorValue);
+                this.props.vm.uploadToPeripheral(
+                    this.props.deviceId,
+                    this.props.codeEditorValue,
+                );
                 this.props.onOpenUploadProgress();
             }
         } else {
@@ -38,9 +41,17 @@ class HardwareHeader extends React.Component {
     }
 
     render () {
-        const {
-            ...props
-        } = this.props;
+        const {...props} = this.props;
+        // Debug: log when HardwareHeader renders and key props
+        try {
+            // eslint-disable-next-line no-console
+            console.log(
+                '[HardwareHeader] render peripheralName=',
+                this.props.peripheralName,
+                'stageSizeMode=',
+                this.props.stageSizeMode,
+            );
+        } catch (e) {}
         return (
             <HardwareHeaderComponent
                 onUpload={this.handleUpload}
@@ -69,18 +80,17 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    onNoPeripheralIsConnected: () => showAlertWithTimeout(dispatch, 'connectAPeripheralFirst'),
+    onNoPeripheralIsConnected: () =>
+        showAlertWithTimeout(dispatch, 'connectAPeripheralFirst'),
     onSetStageLarge: () => dispatch(setStageSize(STAGE_SIZE_MODES.large)),
     onSetStageSmall: () => dispatch(setStageSize(STAGE_SIZE_MODES.small)),
     onSetStageHide: () => dispatch(setStageSize(STAGE_SIZE_MODES.hide)),
     onOpenUploadProgress: () => dispatch(openUploadProgress()),
-    onWorkspaceIsEmpty: () => showAlertWithTimeout(dispatch, 'workspaceIsEmpty')
+    onWorkspaceIsEmpty: () =>
+        showAlertWithTimeout(dispatch, 'workspaceIsEmpty')
 });
 
 export default compose(
     injectIntl,
-    connect(
-        mapStateToProps,
-        mapDispatchToProps
-    )
+    connect(mapStateToProps, mapDispatchToProps),
 )(HardwareHeader);

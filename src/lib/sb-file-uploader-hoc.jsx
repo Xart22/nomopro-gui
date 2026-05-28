@@ -15,19 +15,25 @@ import {
     requestProjectUpload
 } from '../reducers/project-state';
 import {setProjectTitle} from '../reducers/project-title';
+import {openLoadingProject, closeLoadingProject} from '../reducers/modals';
+import {closeFileMenu} from '../reducers/menus';
+import {activateTab, PYTHON_TAB_INDEX} from '../reducers/editor-tab';
+import {setPythonMode} from '../reducers/input-mode';
 import {
-    openLoadingProject,
-    closeLoadingProject
-} from '../reducers/modals';
+    resetPythonIdeState,
+    restorePythonIdeState
+} from '../reducers/python-ide';
 import {
-    closeFileMenu
-} from '../reducers/menus';
+    hasPythonIdeContent,
+    loadPythonIdeStateFromVm
+} from '../lib/python-ide-project-state';
 
 const messages = defineMessages({
     loadError: {
         id: 'gui.projectLoader.loadError',
         defaultMessage: 'The project file that was selected failed to load.',
-        description: 'An error that displays when a local project file fails to load.'
+        description:
+            'An error that displays when a local project file fails to load.'
     }
 });
 
@@ -51,7 +57,8 @@ const SBFileUploaderHOC = function (WrappedComponent) {
                 'handleStartSelectingFileUpload',
                 'handleChange',
                 'onload',
-                'removeFileObjects'
+                'removeFileObjects',
+                'remapPythonIdeTargetIds'
             ]);
         }
         componentDidUpdate (prevProps) {
@@ -89,6 +96,8 @@ const SBFileUploaderHOC = function (WrappedComponent) {
         // We don't actually load the file here, we only decide whether to do so.
         handleChange (e) {
             const {
+                activeTabIndex,
+                inputMode,
                 intl,
                 isShowingWithoutId,
                 loadingState,
@@ -96,7 +105,8 @@ const SBFileUploaderHOC = function (WrappedComponent) {
                 userOwnsProject
             } = this.props;
             const thisFileInput = e.target;
-            if (thisFileInput.files) { // Don't attempt to load if no file was selected
+            if (thisFileInput.files) {
+                // Don't attempt to load if no file was selected
                 this.fileToUpload = thisFileInput.files[0];
 
                 // If user owns the project, or user has changed the project,
@@ -105,10 +115,18 @@ const SBFileUploaderHOC = function (WrappedComponent) {
                 // changed it, no need to confirm.)
                 let uploadAllowed = true;
                 if (userOwnsProject || (projectChanged && isShowingWithoutId)) {
-                    uploadAllowed = this.props.onShowMessageBox(MessageBoxType.confirm,
-                        intl.formatMessage(sharedMessages.replaceProjectWarning));
+                    uploadAllowed = this.props.onShowMessageBox(
+                        MessageBoxType.confirm,
+                        intl.formatMessage(
+                            sharedMessages.replaceProjectWarning,
+                        ),
+                    );
                 }
                 if (uploadAllowed) {
+                    this.keepPythonTabAfterLoad =
+                        inputMode === 'python' ||
+                        activeTabIndex === PYTHON_TAB_INDEX;
+                    this.props.onPrepareProjectUpload();
                     // cues step 4
                     this.props.requestProjectUpload(loadingState);
                 } else {
@@ -142,6 +160,61 @@ const SBFileUploaderHOC = function (WrappedComponent) {
             if (!matches) return '';
             return matches[1].substring(0, 100); // truncate project title to max 100 chars
         }
+        // Remap old target IDs in a Python IDE snapshot to the current VM's
+        // new target IDs (target IDs change every time vm.loadProject runs).
+        // Matching is done by fileName <-> sprite/stage name.
+        remapPythonIdeTargetIds (snapshot) {
+            if (!snapshot || !this.props.vm || !this.props.vm.runtime) {
+                return snapshot;
+            }
+            // Build map: fileName (e.g. "Sprite1.py") -> new target ID
+            const filenameToNewId = {};
+            (this.props.vm.runtime.targets || []).forEach(target => {
+                if (target.isStage) {
+                    filenameToNewId['Stage.py'] = target.id;
+                } else if (typeof target.getName === 'function') {
+                    const name = target.getName();
+                    if (name) {
+                        filenameToNewId[`${name}.py`] = target.id;
+                    }
+                }
+            });
+
+            // Remap filesByTargetId
+            const nextFilesByTargetId = Object.assign(
+                {},
+                snapshot.filesByTargetId,
+            );
+            Object.keys(snapshot.filesByTargetId || {}).forEach(oldId => {
+                const fileEntry = snapshot.filesByTargetId[oldId];
+                const newId = filenameToNewId[fileEntry.fileName];
+                if (newId && newId !== oldId) {
+                    nextFilesByTargetId[newId] = Object.assign(
+                        {},
+                        fileEntry,
+                        {targetId: newId},
+                    );
+                    delete nextFilesByTargetId[oldId];
+                }
+            });
+
+            // Remap fileTree entries for sprite/stage scripts
+            const nextFileTree = (snapshot.fileTree || []).map(item => {
+                if (item.type === 'file' && item.targetId) {
+                    const newId = filenameToNewId[item.name];
+                    if (newId) {
+                        return Object.assign({}, item, {targetId: newId});
+                    }
+                }
+                return item;
+            });
+
+            return Object.assign({}, snapshot, {
+                filesByTargetId: nextFilesByTargetId,
+                fileTree: nextFileTree,
+                activeTargetId: null
+            });
+        }
         // step 6: attached as a handler on our FileReader object; called when
         // file upload raw data is available in the reader
         onload () {
@@ -149,21 +222,43 @@ const SBFileUploaderHOC = function (WrappedComponent) {
                 this.props.onLoadingStarted();
                 const filename = this.fileToUpload && this.fileToUpload.name;
                 let loadingSuccess = false;
-                this.props.vm.loadProject(this.fileReader.result)
+                this.props.vm
+                    .loadProject(this.fileReader.result)
                     .then(() => {
                         if (filename) {
-                            const uploadedProjectTitle = this.getProjectTitleFromFilename(filename);
+                            const uploadedProjectTitle =
+                                this.getProjectTitleFromFilename(filename);
                             this.props.onSetProjectTitle(uploadedProjectTitle);
+                        }
+                        const rawSnapshot = loadPythonIdeStateFromVm(
+                            this.props.vm,
+                        );
+                        const pythonSnapshot = rawSnapshot ?
+                            this.remapPythonIdeTargetIds(rawSnapshot) :
+                            null;
+                        if (pythonSnapshot) {
+                            this.props.onRestorePythonIdeState(pythonSnapshot);
+                        }
+                        if (
+                            this.keepPythonTabAfterLoad ||
+                            hasPythonIdeContent(pythonSnapshot)
+                        ) {
+                            this.props.onRestorePythonEditor();
                         }
                         loadingSuccess = true;
                     })
                     .catch(error => {
                         log.warn(error);
-                        this.props.onShowMessageBox(MessageBoxType.alert,
-                            `${this.props.intl.formatMessage(messages.loadError)}\n${error}`);
+                        this.props.onShowMessageBox(
+                            MessageBoxType.alert,
+                            `${this.props.intl.formatMessage(messages.loadError)}\n${error}`,
+                        );
                     })
                     .then(() => {
-                        this.props.onLoadingFinished(this.props.loadingState, loadingSuccess);
+                        this.props.onLoadingFinished(
+                            this.props.loadingState,
+                            loadingSuccess,
+                        );
                         // go back to step 7: whether project loading succeeded
                         // or failed, reset file objects
                         this.removeFileObjects();
@@ -191,17 +286,23 @@ const SBFileUploaderHOC = function (WrappedComponent) {
                 loadingState,
                 onLoadingFinished,
                 onLoadingStarted,
+                onPrepareProjectUpload,
+                onRestorePythonEditor,
+                onRestorePythonIdeState,
                 onSetProjectTitle,
                 projectChanged,
                 requestProjectUpload: requestProjectUploadProp,
                 userOwnsProject,
+                isRealtimeMode,
                 /* eslint-enable no-unused-vars */
                 ...componentProps
             } = this.props;
             return (
                 <React.Fragment>
                     <WrappedComponent
-                        onStartSelectingFileUpload={this.handleStartSelectingFileUpload}
+                        onStartSelectingFileUpload={
+                            this.handleStartSelectingFileUpload
+                        }
                         {...componentProps}
                     />
                 </React.Fragment>
@@ -230,19 +331,26 @@ const SBFileUploaderHOC = function (WrappedComponent) {
     };
     const mapStateToProps = (state, ownProps) => {
         const loadingState = state.scratchGui.projectState.loadingState;
-        const user = state.session && state.session.session && state.session.session.user;
+        const user =
+            state.session &&
+            state.session.session &&
+            state.session.session.user;
         return {
             isLoadingUpload: getIsLoadingUpload(loadingState),
             isShowingWithoutId: getIsShowingWithoutId(loadingState),
             loadingState: loadingState,
             projectChanged: state.scratchGui.projectChanged,
-            userOwnsProject: ownProps.authorUsername && user &&
-                (ownProps.authorUsername === user.username),
-            vm: state.scratchGui.vm
+            userOwnsProject:
+                ownProps.authorUsername &&
+                user &&
+                ownProps.authorUsername === user.username,
+            vm: state.scratchGui.vm,
+            isRealtimeMode: state.scratchGui.programMode.isRealtimeMode
         };
     };
     const mapDispatchToProps = (dispatch, ownProps) => ({
-        cancelFileUpload: loadingState => dispatch(onLoadedProject(loadingState, false, false)),
+        cancelFileUpload: loadingState =>
+            dispatch(onLoadedProject(loadingState, false, false)),
         closeFileMenu: () => dispatch(closeFileMenu()),
         // transition project state from loading to regular, and close
         // loading screen and file menu
@@ -257,19 +365,38 @@ const SBFileUploaderHOC = function (WrappedComponent) {
         // step 4: transition the project state so we're ready to handle the new
         // project data. When this is done, the project state transition will be
         // noticed by componentDidUpdate()
-        requestProjectUpload: loadingState => dispatch(requestProjectUpload(loadingState))
+        requestProjectUpload: loadingState =>
+            dispatch(requestProjectUpload(loadingState)),
+        // Reset Python IDE state before loading new project data, so stale
+        // files from previous projects do not survive a load operation.
+        onPrepareProjectUpload: () => dispatch(resetPythonIdeState()),
+        // If upload was triggered while user was in Python mode/tab, return
+        // to Python editor after project load completes.
+        onRestorePythonEditor: () => {
+            dispatch(activateTab(PYTHON_TAB_INDEX));
+            dispatch(setPythonMode());
+        },
+        onRestorePythonIdeState: snapshot =>
+            dispatch(restorePythonIdeState(snapshot))
     });
     // Allow incoming props to override redux-provided props. Used to mock in tests.
-    const mergeProps = (stateProps, dispatchProps, ownProps) => Object.assign(
-        {}, stateProps, dispatchProps, ownProps
+    const mergeProps = (stateProps, dispatchProps, ownProps) => {
+        const merged = Object.assign({}, stateProps, dispatchProps, ownProps);
+        // Guard: don't activate Python mode when loading a project in upload mode
+        merged.onRestorePythonEditor = () => {
+            if (stateProps.isRealtimeMode !== false) {
+                dispatchProps.onRestorePythonEditor();
+            }
+        };
+        return merged;
+    };
+    return injectIntl(
+        connect(
+            mapStateToProps,
+            mapDispatchToProps,
+            mergeProps,
+        )(SBFileUploaderComponent),
     );
-    return injectIntl(connect(
-        mapStateToProps,
-        mapDispatchToProps,
-        mergeProps
-    )(SBFileUploaderComponent));
 };
 
-export {
-    SBFileUploaderHOC as default
-};
+export {SBFileUploaderHOC as default};

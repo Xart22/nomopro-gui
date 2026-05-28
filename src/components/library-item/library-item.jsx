@@ -1,28 +1,28 @@
-import { FormattedMessage } from "react-intl";
-import PropTypes from "prop-types";
-import React from "react";
+import {FormattedMessage} from 'react-intl';
+import PropTypes from 'prop-types';
+import React from 'react';
 
-import Box from "../box/box.jsx";
-import PlayButton from "../../containers/play-button.jsx";
-import styles from "./library-item.css";
-import classNames from "classnames";
+import Box from '../box/box.jsx';
+import PlayButton from '../../containers/play-button.jsx';
+import styles from './library-item.css';
+import classNames from 'classnames';
 
-import bluetoothIconURL from "./bluetooth.svg";
-import serialportIconURL from "./serialport.svg";
-import internetConnectionIconURL from "./internet-connection.svg";
+import bluetoothIconURL from './bluetooth.svg';
+import serialportIconURL from './serialport.svg';
+import internetConnectionIconURL from './internet-connection.svg';
 
-import prgramModeRealtimeIconURL from "./program-mode-realtime.svg";
-import prgramModeUploadIconURL from "./program-mode-upload.svg";
+import prgramModeRealtimeIconURL from './program-mode-realtime.svg';
+import prgramModeUploadIconURL from './program-mode-upload.svg';
 
-import programLanguageBlockIconURL from "./program-language-block.svg";
-import programLanguageCIconURL from "./program-language-c.svg";
-import programLanguageCppIconURL from "./program-language-cpp.svg";
-import programLanguagePythonIconURL from "./program-language-python.svg";
-import programLanguageMicroPythonIconURL from "./program-language-microPython.svg";
+import programLanguageBlockIconURL from './program-language-block.svg';
+import programLanguageCIconURL from './program-language-c.svg';
+import programLanguageCppIconURL from './program-language-cpp.svg';
+import programLanguagePythonIconURL from './program-language-python.svg';
+import programLanguageMicroPythonIconURL from './program-language-microPython.svg';
 
 /* eslint-disable react/prefer-stateless-function */
 class LibraryItemComponent extends React.PureComponent {
-    render() {
+    render () {
         const needToBuyStyle =
             !this.props.available &&
             !this.props.freeDevice &&
@@ -45,11 +45,11 @@ class LibraryItemComponent extends React.PureComponent {
                         [styles.disabled]:
                             this.props.disabled ||
                             needToBuyStyle ||
-                            nomoproSubsItem,
+                            nomoproSubsItem
                     },
-                    this.props.extensionId || this.props.deviceId
-                        ? styles.libraryItemExtension
-                        : null,
+                    this.props.extensionId || this.props.deviceId ?
+                        styles.libraryItemExtension :
+                        null,
                     this.props.hidden ? styles.hidden : null
                 )}
                 onClick={this.props.onClick}
@@ -71,9 +71,9 @@ class LibraryItemComponent extends React.PureComponent {
                             rel="noopener noreferrer"
                             target="_blank"
                             onClick={
-                                this.props.onClickBuyNow
-                                    ? this.props.onClickBuyNow
-                                    : null
+                                this.props.onClickBuyNow ?
+                                    this.props.onClickBuyNow :
+                                    null
                             }
                         >
                             <div className={styles.buyNowText}>
@@ -88,13 +88,13 @@ class LibraryItemComponent extends React.PureComponent {
                     {nomoproSubsItem ? (
                         <a
                             className={styles.libraryItemName}
-                            href={"https://nomo-kit.com/payment"}
+                            href={'https://nomo-kit.com/payment'}
                             rel="noopener noreferrer"
                             target="_blank"
                             onClick={
-                                this.props.onClickBuyNow
-                                    ? this.props.onClickBuyNow
-                                    : null
+                                this.props.onClickBuyNow ?
+                                    this.props.onClickBuyNow :
+                                    null
                             }
                         >
                             <div className={styles.buyNowText}>
@@ -121,12 +121,12 @@ class LibraryItemComponent extends React.PureComponent {
                 ) : null}
                 <div
                     className={
-                        this.props.extensionId || this.props.deviceId
-                            ? classNames(
-                                  styles.featuredExtensionText,
-                                  styles.featuredText
-                              )
-                            : styles.featuredText
+                        this.props.extensionId || this.props.deviceId ?
+                            classNames(
+                                styles.featuredExtensionText,
+                                styles.featuredText
+                            ) :
+                            styles.featuredText
                     }
                 >
                     <a
@@ -135,9 +135,9 @@ class LibraryItemComponent extends React.PureComponent {
                         rel="noopener noreferrer"
                         target="_blank"
                         onClick={
-                            this.props.onClickLearnMore
-                                ? this.props.onClickLearnMore
-                                : null
+                            this.props.onClickLearnMore ?
+                                this.props.onClickLearnMore :
+                                null
                         }
                     >
                         {this.props.name}
@@ -153,79 +153,79 @@ class LibraryItemComponent extends React.PureComponent {
                 this.props.collaborator ||
                 this.props.manufactor ? (
                     <div className={styles.featuredExtensionMetadataFirstRow}>
-                        <div className={styles.featuredExtensionRequirement}>
+                            <div className={styles.featuredExtensionRequirement}>
                             {this.props.bluetoothRequired ||
                             this.props.serialportRequired ||
                             this.props.internetConnectionRequired ? (
                                 <div>
-                                    <div>
+                                            <div>
                                         <FormattedMessage
-                                            defaultMessage="Requires"
-                                            description="Label for extension hardware requirements"
-                                            id="gui.extensionLibrary.requires"
-                                        />
+                                                    defaultMessage="Requires"
+                                                    description="Label for extension hardware requirements"
+                                                    id="gui.extensionLibrary.requires"
+                                                />
                                     </div>
-                                    <div
+                                            <div
                                         className={
-                                            styles.featuredExtensionMetadataDetail
-                                        }
+                                                    styles.featuredExtensionMetadataDetail
+                                                }
                                     >
                                         {this.props.bluetoothRequired ? (
-                                            <img src={bluetoothIconURL} />
-                                        ) : null}
+                                                    <img src={bluetoothIconURL} />
+                                                ) : null}
                                         {this.props.serialportRequired ? (
-                                            <img src={serialportIconURL} />
-                                        ) : null}
+                                                    <img src={serialportIconURL} />
+                                                ) : null}
                                         {this.props
-                                            .internetConnectionRequired ? (
-                                            <img
-                                                src={internetConnectionIconURL}
-                                            />
-                                        ) : null}
+                                                    .internetConnectionRequired ? (
+                                                        <img
+                                                            src={internetConnectionIconURL}
+                                                        />
+                                                    ) : null}
                                     </div>
-                                </div>
-                            ) : null}
+                                        </div>
+                                    ) : null}
                         </div>
-                        <div className={styles.featuredExtensionCollaboration}>
+                            <div className={styles.featuredExtensionCollaboration}>
                             {this.props.collaborator ? (
-                                <div>
                                     <div>
-                                        <FormattedMessage
+                                    <div>
+                                            <FormattedMessage
                                             defaultMessage="Collaboration with"
                                             description="Label for extension collaboration"
                                             id="gui.extensionLibrary.collaboration"
                                         />
-                                    </div>
+                                        </div>
                                     <div
-                                        className={
-                                            styles.featuredExtensionMetadataDetail
-                                        }
-                                    >
-                                        {this.props.collaborator}
-                                    </div>
+                                            className={
+                                                styles.featuredExtensionMetadataDetail
+                                            }
+                                        >
+                                            {this.props.collaborator}
+                                        </div>
                                 </div>
-                            ) : null}
+                                ) : null}
                             {this.props.manufactor ? (
-                                <div>
                                     <div>
-                                        <FormattedMessage
+                                    <div>
+                                            <FormattedMessage
                                             defaultMessage="Manufactor"
                                             description="Label for device manufactor"
                                             id="gui.extensionLibrary.manufactor"
                                         />
-                                    </div>
+                                        </div>
                                     <div
-                                        className={
-                                            styles.featuredExtensionMetadataDetail
-                                        }
-                                    >
-                                        {this.props.manufactor}
-                                    </div>
+                                            className={
+                                                styles.featuredExtensionMetadataDetail
+                                            }
+                                        >
+                                            {this.props.manufactor}
+                                        </div>
                                 </div>
-                            ) : null}
+                                ) : null}
                         </div>
-                    </div>
-                ) : null}
+                        </div>
+                    ) : null}
                 {this.props.author || this.props.version ? (
                     <div className={styles.featuredExtensionMetadataFirstRow}>
                         <div className={styles.featuredExtensionVersion}>
@@ -288,19 +288,19 @@ class LibraryItemComponent extends React.PureComponent {
                                         }
                                     >
                                         {this.props.programMode.includes(
-                                            "realtime"
+                                            'realtime'
                                         ) ? (
                                             <img
-                                                src={prgramModeRealtimeIconURL}
-                                            />
-                                        ) : null}
+                                                    src={prgramModeRealtimeIconURL}
+                                                />
+                                            ) : null}
                                         {this.props.programMode.includes(
-                                            "upload"
+                                            'upload'
                                         ) ? (
                                             <img
-                                                src={prgramModeUploadIconURL}
-                                            />
-                                        ) : null}
+                                                    src={prgramModeUploadIconURL}
+                                                />
+                                            ) : null}
                                     </div>
                                 </div>
                             ) : null}
@@ -323,46 +323,46 @@ class LibraryItemComponent extends React.PureComponent {
                                         }
                                     >
                                         {this.props.programLanguage.includes(
-                                            "block"
+                                            'block'
                                         ) ? (
                                             <img
-                                                src={
-                                                    programLanguageBlockIconURL
-                                                }
-                                            />
-                                        ) : null}
+                                                    src={
+                                                        programLanguageBlockIconURL
+                                                    }
+                                                />
+                                            ) : null}
                                         {this.props.programLanguage.includes(
-                                            "c"
+                                            'c'
                                         ) ? (
                                             <img
-                                                src={programLanguageCIconURL}
-                                            />
-                                        ) : null}
+                                                    src={programLanguageCIconURL}
+                                                />
+                                            ) : null}
                                         {this.props.programLanguage.includes(
-                                            "cpp"
+                                            'cpp'
                                         ) ? (
                                             <img
-                                                src={programLanguageCppIconURL}
-                                            />
-                                        ) : null}
+                                                    src={programLanguageCppIconURL}
+                                                />
+                                            ) : null}
                                         {this.props.programLanguage.includes(
-                                            "python"
+                                            'python'
                                         ) ? (
                                             <img
-                                                src={
-                                                    programLanguagePythonIconURL
-                                                }
-                                            />
-                                        ) : null}
+                                                    src={
+                                                        programLanguagePythonIconURL
+                                                    }
+                                                />
+                                            ) : null}
                                         {this.props.programLanguage.includes(
-                                            "microPython"
+                                            'microPython'
                                         ) ? (
                                             <img
-                                                src={
-                                                    programLanguageMicroPythonIconURL
-                                                }
-                                            />
-                                        ) : null}
+                                                    src={
+                                                        programLanguageMicroPythonIconURL
+                                                    }
+                                                />
+                                            ) : null}
                                     </div>
                                 </div>
                             ) : null}
@@ -426,9 +426,9 @@ class LibraryItemComponent extends React.PureComponent {
                             <div
                                 className={classNames(
                                     styles.featuredExtensionLoadState,
-                                    this.props.isLoaded
-                                        ? styles.featuredExtensionLoaded
-                                        : null
+                                    this.props.isLoaded ?
+                                        styles.featuredExtensionLoaded :
+                                        null
                                 )}
                             >
                                 {this.props.isLoaded ? (
@@ -456,7 +456,7 @@ class LibraryItemComponent extends React.PureComponent {
         ) : (
             <Box
                 className={classNames(styles.libraryItem, {
-                    [styles.hidden]: this.props.hidden,
+                    [styles.hidden]: this.props.hidden
                 })}
                 role="button"
                 tabIndex="0"
@@ -476,14 +476,14 @@ class LibraryItemComponent extends React.PureComponent {
                     <Box
                         className={styles.libraryItemImageContainer}
                         onMouseEnter={
-                            this.props.showPlayButton
-                                ? this.props.onMouseEnter
-                                : null
+                            this.props.showPlayButton ?
+                                this.props.onMouseEnter :
+                                null
                         }
                         onMouseLeave={
-                            this.props.showPlayButton
-                                ? this.props.onMouseLeave
-                                : null
+                            this.props.showPlayButton ?
+                                this.props.onMouseLeave :
+                                null
                         }
                     >
                         <img
@@ -547,12 +547,12 @@ LibraryItemComponent.propTypes = {
     freeDevice: PropTypes.bool,
     available: PropTypes.bool,
     buyNowUrl: PropTypes.string,
-    onClickBuyNow: PropTypes.func.isRequired,
+    onClickBuyNow: PropTypes.func.isRequired
 };
 
 LibraryItemComponent.defaultProps = {
     disabled: false,
-    showPlayButton: false,
+    showPlayButton: false
     // active: true,
 };
 

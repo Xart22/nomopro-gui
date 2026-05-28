@@ -4,6 +4,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {projectTitleInitialState} from '../reducers/project-title';
 import downloadBlob from '../lib/download-blob';
+import {savePythonIdeStateToVm} from '../lib/python-ide-project-state';
 /**
  * Project saver component passes a downloadProject function to its child.
  * It expects this child to be a function with the signature
@@ -21,11 +22,14 @@ import downloadBlob from '../lib/download-blob';
 class SB3Downloader extends React.Component {
     constructor (props) {
         super(props);
-        bindAll(this, [
-            'downloadProject'
-        ]);
+        bindAll(this, ['downloadProject']);
     }
     downloadProject () {
+        try {
+            savePythonIdeStateToVm(this.props.vm, this.props.pythonIdeState);
+        } catch (e) {
+            // Ignore persistence errors and continue with save flow.
+        }
         this.props.saveProjectSb3().then(content => {
             if (this.props.onSaveFinished) {
                 this.props.onSaveFinished();
@@ -34,13 +38,8 @@ class SB3Downloader extends React.Component {
         });
     }
     render () {
-        const {
-            children
-        } = this.props;
-        return children(
-            this.props.className,
-            this.downloadProject
-        );
+        const {children} = this.props;
+        return children(this.props.className, this.downloadProject);
     }
 }
 
@@ -57,18 +56,27 @@ SB3Downloader.propTypes = {
     className: PropTypes.string,
     onSaveFinished: PropTypes.func,
     projectFilename: PropTypes.string,
-    saveProjectSb3: PropTypes.func
+    pythonIdeState: PropTypes.object,
+    saveProjectSb3: PropTypes.func,
+    vm: PropTypes.object
 };
 SB3Downloader.defaultProps = {
     className: ''
 };
 
 const mapStateToProps = state => ({
-    saveProjectSb3: state.scratchGui.vm.saveProjectSb3.bind(state.scratchGui.vm),
-    projectFilename: getProjectFilename(state.scratchGui.projectTitle, projectTitleInitialState)
+    saveProjectSb3: state.scratchGui.vm.saveProjectSb3.bind(
+        state.scratchGui.vm,
+    ),
+    projectFilename: getProjectFilename(
+        state.scratchGui.projectTitle,
+        projectTitleInitialState,
+    ),
+    pythonIdeState: state.scratchGui.pythonIde,
+    vm: state.scratchGui.vm
 });
 
 export default connect(
     mapStateToProps,
-    () => ({}) // omit dispatch prop
+    () => ({}), // omit dispatch prop
 )(SB3Downloader);

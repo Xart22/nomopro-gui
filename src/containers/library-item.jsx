@@ -1,48 +1,48 @@
-import bindAll from "lodash.bindall";
-import PropTypes from "prop-types";
-import React from "react";
-import { injectIntl } from "react-intl";
+import bindAll from 'lodash.bindall';
+import PropTypes from 'prop-types';
+import React from 'react';
+import {injectIntl} from 'react-intl';
 
-import LibraryItemComponent from "../components/library-item/library-item.jsx";
+import LibraryItemComponent from '../components/library-item/library-item.jsx';
 
 class LibraryItem extends React.PureComponent {
-    constructor(props) {
+    constructor (props) {
         super(props);
         bindAll(this, [
-            "handleBlur",
-            "handleClick",
-            "handleClickLearnMore",
-            "handleClickBuyNow",
-            "handleFocus",
-            "handleKeyPress",
-            "handleMouseEnter",
-            "handleMouseLeave",
-            "handlePlay",
-            "handleStop",
-            "rotateIcon",
-            "startRotatingIcons",
-            "stopRotatingIcons",
+            'handleBlur',
+            'handleClick',
+            'handleClickLearnMore',
+            'handleClickBuyNow',
+            'handleFocus',
+            'handleKeyPress',
+            'handleMouseEnter',
+            'handleMouseLeave',
+            'handlePlay',
+            'handleStop',
+            'rotateIcon',
+            'startRotatingIcons',
+            'stopRotatingIcons'
         ]);
         this.state = {
             iconIndex: 0,
             isRotatingIcon: false,
-            isProcessing: false,
+            isProcessing: false
         };
     }
-    componentWillUpdate(newProps) {
+    componentWillUpdate (newProps) {
         if (this.props.isLoaded !== newProps.isLoaded) {
             this.setState({
-                isProcessing: false,
+                isProcessing: false
             });
         }
     }
-    componentWillUnmount() {
+    componentWillUnmount () {
         clearInterval(this.intervalId);
     }
-    handleBlur(id) {
+    handleBlur (id) {
         this.handleMouseLeave(id);
     }
-    handleClick(e) {
+    handleClick (e) {
         const isSpriteAndBackdrop =
             this.props.extensionId == undefined &&
             this.props.deviceId == undefined;
@@ -55,11 +55,11 @@ class LibraryItem extends React.PureComponent {
                 isSpriteAndBackdrop)
         ) {
             if (!this.state.isProcessing) {
-                console.log("isProcessing");
+                console.log('isProcessing');
                 if (this.props.isUnloadble) {
-                    console.log("unloadble");
+                    console.log('unloadble');
                     this.setState({
-                        isProcessing: true,
+                        isProcessing: true
                     });
                 }
                 this.props.onSelect(this.props.id);
@@ -67,25 +67,25 @@ class LibraryItem extends React.PureComponent {
         }
         e.preventDefault();
     }
-    handleClickLearnMore(e) {
+    handleClickLearnMore (e) {
         e.stopPropagation();
     }
 
-    handleClickBuyNow(e) {
+    handleClickBuyNow (e) {
         e.stopPropagation();
     }
-    handleFocus(id) {
+    handleFocus (id) {
         if (!this.props.showPlayButton) {
             this.handleMouseEnter(id);
         }
     }
-    handleKeyPress(e) {
-        if (e.key === " " || e.key === "Enter") {
+    handleKeyPress (e) {
+        if (e.key === ' ' || e.key === 'Enter') {
             e.preventDefault();
             this.props.onSelect(this.props.id);
         }
     }
-    handleMouseEnter() {
+    handleMouseEnter () {
         // only show hover effects on the item if not showing a play button
         if (!this.props.showPlayButton) {
             this.props.onMouseEnter(this.props.id);
@@ -93,48 +93,48 @@ class LibraryItem extends React.PureComponent {
                 this.stopRotatingIcons();
                 this.setState(
                     {
-                        isRotatingIcon: true,
+                        isRotatingIcon: true
                     },
                     this.startRotatingIcons
                 );
             }
         }
     }
-    handleMouseLeave() {
+    handleMouseLeave () {
         // only show hover effects on the item if not showing a play button
         if (!this.props.showPlayButton) {
             this.props.onMouseLeave(this.props.id);
             if (this.props.icons && this.props.icons.length) {
                 this.setState(
                     {
-                        isRotatingIcon: false,
+                        isRotatingIcon: false
                     },
                     this.stopRotatingIcons
                 );
             }
         }
     }
-    handlePlay() {
+    handlePlay () {
         this.props.onMouseEnter(this.props.id);
     }
-    handleStop() {
+    handleStop () {
         this.props.onMouseLeave(this.props.id);
     }
-    startRotatingIcons() {
+    startRotatingIcons () {
         this.rotateIcon();
         this.intervalId = setInterval(this.rotateIcon, 300);
     }
-    stopRotatingIcons() {
+    stopRotatingIcons () {
         if (this.intervalId) {
             this.intervalId = clearInterval(this.intervalId);
         }
     }
-    rotateIcon() {
+    rotateIcon () {
         const nextIconIndex =
             (this.state.iconIndex + 1) % this.props.icons.length;
-        this.setState({ iconIndex: nextIconIndex });
+        this.setState({iconIndex: nextIconIndex});
     }
-    curIconMd5() {
+    curIconMd5 () {
         const iconMd5Prop = this.props.iconMd5;
         if (
             this.props.icons &&
@@ -150,11 +150,11 @@ class LibraryItem extends React.PureComponent {
         }
         return iconMd5Prop;
     }
-    render() {
+    render () {
         const iconMd5 = this.curIconMd5();
-        const iconURL = iconMd5
-            ? `https://openblockcc.github.io/openblock-assets/assets/${iconMd5}`
-            : this.props.iconRawURL;
+        const iconURL = iconMd5 ?
+            `https://openblockcc.github.io/openblock-assets/assets/${iconMd5}` :
+            this.props.iconRawURL;
         return (
             <LibraryItemComponent
                 author={this.props.author}
@@ -223,7 +223,7 @@ LibraryItem.propTypes = {
     icons: PropTypes.arrayOf(
         PropTypes.shape({
             baseLayerMD5: PropTypes.string, // 2.0 library format, TODO GH-5084
-            md5ext: PropTypes.string, // 3.0 library format
+            md5ext: PropTypes.string // 3.0 library format
         })
     ),
     id: PropTypes.number.isRequired,
@@ -246,11 +246,11 @@ LibraryItem.propTypes = {
     freeDevice: PropTypes.bool,
     available: PropTypes.bool,
     buyNowUrl: PropTypes.string,
-    nomoproSubsItem: PropTypes.bool,
+    nomoproSubsItem: PropTypes.bool
 };
 
 LibraryItem.defaultProps = {
-    isLoaded: false,
+    isLoaded: false
 };
 
 export default injectIntl(LibraryItem);

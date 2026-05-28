@@ -1,12 +1,12 @@
-import React from "react";
-import { FormattedMessage } from "react-intl";
-import classNames from "classnames";
-import styles from "./loader.css";
-import PropTypes from "prop-types";
+import React from 'react';
+import {FormattedMessage} from 'react-intl';
+import classNames from 'classnames';
+import styles from './loader.css';
+import PropTypes from 'prop-types';
 
-import topBlock from "./top-block.svg";
-import middleBlock from "./middle-block.svg";
-import bottomBlock from "./bottom-block.svg";
+import topBlock from './top-block.svg';
+import middleBlock from './middle-block.svg';
+import bottomBlock from './bottom-block.svg';
 const messages = [
     {
         message: (
@@ -16,7 +16,7 @@ const messages = [
                 id="gui.loader.message1"
             />
         ),
-        weight: 50,
+        weight: 50
     },
     {
         message: (
@@ -26,7 +26,7 @@ const messages = [
                 id="gui.loader.message2"
             />
         ),
-        weight: 50,
+        weight: 50
     },
     {
         message: (
@@ -36,7 +36,7 @@ const messages = [
                 id="gui.loader.message3"
             />
         ),
-        weight: 50,
+        weight: 50
     },
     {
         message: (
@@ -46,7 +46,7 @@ const messages = [
                 id="gui.loader.message4"
             />
         ),
-        weight: 50,
+        weight: 50
     },
     {
         message: (
@@ -56,7 +56,7 @@ const messages = [
                 id="gui.loader.message1"
             />
         ),
-        weight: 20,
+        weight: 20
     },
     {
         message: (
@@ -66,7 +66,7 @@ const messages = [
                 id="gui.loader.message5"
             />
         ),
-        weight: 1,
+        weight: 1
     },
     {
         message: (
@@ -76,7 +76,7 @@ const messages = [
                 id="gui.loader.message6"
             />
         ),
-        weight: 1,
+        weight: 1
     },
     {
         message: (
@@ -86,7 +86,7 @@ const messages = [
                 id="gui.loader.message7"
             />
         ),
-        weight: 1,
+        weight: 1
     },
     {
         message: (
@@ -96,50 +96,50 @@ const messages = [
                 id="gui.loader.message8"
             />
         ),
-        weight: 1,
-    },
+        weight: 1
+    }
 ];
 const mainMessages = {
-    "gui.loader.headline": (
+    'gui.loader.headline': (
         <FormattedMessage
             defaultMessage="Loading Project"
             description="Main loading message"
             id="gui.loader.headline"
         />
     ),
-    "gui.loader.creating": (
+    'gui.loader.creating': (
         <FormattedMessage
             defaultMessage="Creating Project"
             description="Main creating message"
             id="gui.loader.creating"
         />
     ),
-    "gui.loader.headlineDevice": (
+    'gui.loader.headlineDevice': (
         <FormattedMessage
             defaultMessage="Loading Your Devices"
             description="Main device message"
             id="gui.loader.headlineDevice"
         />
-    ),
+    )
 };
 
 class LoaderComponent extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
-            messageNumber: this.chooseRandomMessage(),
+            messageNumber: this.chooseRandomMessage()
         };
     }
-    componentDidMount() {
+    componentDidMount () {
         // Start an interval to choose a new message every 5 seconds
         this.intervalId = setInterval(() => {
-            this.setState({ messageNumber: this.chooseRandomMessage() });
+            this.setState({messageNumber: this.chooseRandomMessage()});
         }, 5000);
     }
-    componentWillUnmount() {
+    componentWillUnmount () {
         clearInterval(this.intervalId);
     }
-    chooseRandomMessage() {
+    chooseRandomMessage () {
         let messageNumber;
         const sum = messages.reduce((acc, m) => acc + m.weight, 0);
         let rand = sum * Math.random();
@@ -152,18 +152,27 @@ class LoaderComponent extends React.Component {
         }
         return messageNumber;
     }
-    render() {
+    render () {
         return (
             <div
                 className={classNames(styles.background, {
-                    [styles.fullscreen]: this.props.isFullScreen,
+                    [styles.fullscreen]: this.props.isFullScreen
                 })}
             >
                 <div className={styles.container}>
                     <div className={styles.blockAnimation}>
-                        <img className={styles.topBlock} src={topBlock} />
-                        <img className={styles.middleBlock} src={middleBlock} />
-                        <img className={styles.bottomBlock} src={bottomBlock} />
+                        <img
+                            className={styles.topBlock}
+                            src={topBlock}
+                        />
+                        <img
+                            className={styles.middleBlock}
+                            src={middleBlock}
+                        />
+                        <img
+                            className={styles.bottomBlock}
+                            src={bottomBlock}
+                        />
                     </div>
                     <div className={styles.title}>
                         {mainMessages[this.props.messageId]}
@@ -174,11 +183,14 @@ class LoaderComponent extends React.Component {
                             style={{
                                 transform: `translate(0, -${
                                     this.state.messageNumber * 25
-                                }px)`,
+                                }px)`
                             }}
                         >
                             {messages.map((m, i) => (
-                                <div className={styles.message} key={i}>
+                                <div
+                                    className={styles.message}
+                                    key={i}
+                                >
                                     {m.message}
                                 </div>
                             ))}
@@ -192,11 +204,11 @@ class LoaderComponent extends React.Component {
 
 LoaderComponent.propTypes = {
     isFullScreen: PropTypes.bool,
-    messageId: PropTypes.string,
+    messageId: PropTypes.string
 };
 LoaderComponent.defaultProps = {
     isFullScreen: false,
-    messageId: "gui.loader.headline",
+    messageId: 'gui.loader.headline'
 };
 
 export default LoaderComponent;

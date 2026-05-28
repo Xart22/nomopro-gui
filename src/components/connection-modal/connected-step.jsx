@@ -45,9 +45,31 @@ const ConnectedStep = props => (
                 total={3}
             />
             <div className={classNames(styles.bottomAreaItem, styles.cornerButtons)}>
+                {props.showFlashButton && (
+                    <button
+                        className={styles.connectionButton}
+                        onClick={props.onFlash}
+                        disabled={props.flashing}
+                    >
+                        {props.flashing ? (
+                            <FormattedMessage
+                                defaultMessage="Flashing..."
+                                description="Flashing in progress"
+                                id="gui.connection.flashing"
+                            />
+                        ) : (
+                            <FormattedMessage
+                                defaultMessage="Re-flash MicroPython"
+                                description="Button to re-flash MicroPython firmware"
+                                id="gui.connection.reflashMicropython"
+                            />
+                        )}
+                    </button>
+                )}
                 <button
                     className={classNames(styles.redButton, styles.connectionButton)}
                     onClick={props.onDisconnect}
+                    disabled={props.flashing}
                 >
                     <FormattedMessage
                         defaultMessage="Disconnect"
@@ -58,6 +80,7 @@ const ConnectedStep = props => (
                 <button
                     className={styles.connectionButton}
                     onClick={props.onCancel}
+                    disabled={props.flashing}
                 >
                     <FormattedMessage
                         defaultMessage="Go to Editor"
@@ -66,15 +89,69 @@ const ConnectedStep = props => (
                     />
                 </button>
             </div>
+            {props.flashError && (
+                <Box className={styles.bottomAreaItem}>
+                    <span style={{color: '#FF661A', fontSize: '12px'}}>{props.flashError}</span>
+                </Box>
+            )}
+            {props.flashProgress > 0 && props.flashProgress < 100 && (
+                <Box className={styles.bottomAreaItem}>
+                    <div
+                        style={{
+                            width: '100%',
+                            height: '6px',
+                            background: '#ddd',
+                            borderRadius: '3px',
+                            overflow: 'hidden',
+                            marginTop: '4px'
+                        }}
+                    >
+                        <div
+                            style={{
+                                width: `${props.flashProgress}%`,
+                                height: '100%',
+                                background: '#4C97FF',
+                                transition: 'width 0.3s'
+                            }}
+                        />
+                    </div>
+                </Box>
+            )}
+            {props.flashLog && (
+                <Box className={styles.bottomAreaItem}>
+                    <pre
+                        style={{
+                            color: '#333',
+                            fontSize: '11px',
+                            maxHeight: '120px',
+                            overflow: 'auto',
+                            background: '#f5f5f5',
+                            padding: '6px',
+                            borderRadius: '3px',
+                            margin: 0,
+                            whiteSpace: 'pre-wrap',
+                            wordBreak: 'break-word'
+                        }}
+                    >
+                        {props.flashLog}
+                    </pre>
+                </Box>
+            )}
         </Box>
     </Box>
 );
 
 ConnectedStep.propTypes = {
     connectionIconURL: PropTypes.string.isRequired,
+    flashError: PropTypes.string,
+    flashLog: PropTypes.string,
+    flashProgress: PropTypes.number,
+    flashing: PropTypes.bool,
     isSerialport: PropTypes.bool,
     onCancel: PropTypes.func,
-    onDisconnect: PropTypes.func
+    onDisconnect: PropTypes.func,
+    onFlash: PropTypes.func,
+    showFlashButton: PropTypes.bool
 };
 
 export default ConnectedStep;

@@ -63,14 +63,19 @@ class ScanningStep extends React.Component {
         return (
             <ScanningStepComponent
                 connectionSmallIconURL={this.props.connectionSmallIconURL}
+                flashError={this.props.flashError}
+                flashProgress={this.props.flashProgress}
+                flashing={this.props.flashing}
                 isSerialport={this.props.isSerialport}
                 isListAll={this.props.isListAll}
                 peripheralList={this.state.peripheralList}
                 phase={this.state.phase}
                 scanning={this.state.scanning}
+                showFlashButton={this.props.showFlashButton}
                 title={this.props.deviceId}
                 onConnected={this.props.onConnected}
                 onConnecting={this.props.onConnecting}
+                onFlash={this.props.onFlash}
                 onClickListAll={this.handleClickListAll}
                 onRefresh={this.handleRefresh}
             />
@@ -80,12 +85,17 @@ class ScanningStep extends React.Component {
 
 ScanningStep.propTypes = {
     connectionSmallIconURL: PropTypes.string,
+    flashError: PropTypes.string,
+    flashProgress: PropTypes.number,
+    flashing: PropTypes.bool,
     isSerialport: PropTypes.bool.isRequired,
     isListAll: PropTypes.bool.isRequired,
     deviceId: PropTypes.string.isRequired,
     onConnected: PropTypes.func.isRequired,
     onConnecting: PropTypes.func.isRequired,
+    onFlash: PropTypes.func,
     onClickListAll: PropTypes.func.isRequired,
+    showFlashButton: PropTypes.bool,
     vm: PropTypes.instanceOf(VM).isRequired
 };
 
