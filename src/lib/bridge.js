@@ -422,12 +422,12 @@ const executeExtensionOpcode = async (
         );
     }
 
-    const result = primitive(args, {target});
+    let result = primitive(args, {target});
     if (result && typeof result.then === 'function') {
-        await result;
+        result = await result;
     }
 
-    return true;
+    return result;
 };
 
 const buildCommandResultContext = (context, target) => {

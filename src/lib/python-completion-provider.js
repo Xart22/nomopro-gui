@@ -942,6 +942,484 @@ const NOMOPRO_EXTENSION_COMPLETIONS = [
         insertText: 'use(${1:device})',
         detail: 'use(device) → device',
         doc: 'Set the active device for module-level convenience functions.'
+    },
+
+    // ─── Music ──────────────────────────────────────────────────────────────────────
+    {
+        label: 'play_drum',
+        kind: 'Function',
+        insertText: 'play_drum(${1:drum}, ${2:0.25})',
+        detail: 'play_drum(drum, beats=0.25)',
+        doc: 'Play a drum sound for a number of beats. drum: 1-18 (1=Snare, 2=Bass, etc.).'
+    },
+    {
+        label: 'rest',
+        kind: 'Function',
+        insertText: 'rest(${1:0.25})',
+        detail: 'rest(beats=0.25)',
+        doc: 'Rest (silence) for a number of beats.'
+    },
+    {
+        label: 'play_note',
+        kind: 'Function',
+        insertText: 'play_note(${1:60}, ${2:0.25})',
+        detail: 'play_note(note, beats=0.25)',
+        doc: 'Play a MIDI note for a number of beats. note: 0-127 (60=Middle C).'
+    },
+    {
+        label: 'set_instrument',
+        kind: 'Function',
+        insertText: 'set_instrument(${1:1})',
+        detail: 'set_instrument(instrument=1)',
+        doc: 'Set the instrument. 1=Piano, 2=Electric Piano, ..., 21=Synth Pad.'
+    },
+    {
+        label: 'set_tempo',
+        kind: 'Function',
+        insertText: 'set_tempo(${1:60})',
+        detail: 'set_tempo(tempo=60)',
+        doc: 'Set the tempo in BPM (beats per minute).'
+    },
+    {
+        label: 'change_tempo',
+        kind: 'Function',
+        insertText: 'change_tempo(${1:20})',
+        detail: 'change_tempo(delta=20)',
+        doc: 'Change the tempo by a delta value in BPM.'
+    },
+    {
+        label: 'get_tempo',
+        kind: 'Function',
+        insertText: 'get_tempo()',
+        detail: 'get_tempo() → number',
+        doc: 'Get the current tempo in BPM. (Desktop only; returns None on web).'
+    },
+
+    // ─── Handpose ───────────────────────────────────────────────────────────────────
+    {
+        label: 'handpose_video',
+        kind: 'Function',
+        insertText: "handpose_video(${1:'on'})",
+        detail: "handpose_video(state='on')",
+        doc: 'Control handpose video preview: on, off, or on-flipped.'
+    },
+    {
+        label: 'handpose_set_transparency',
+        kind: 'Function',
+        insertText: 'handpose_set_transparency(${1:50})',
+        detail: 'handpose_set_transparency(value)',
+        doc: 'Set handpose video transparency (0-100).'
+    },
+    {
+        label: 'handpose_set_ratio',
+        kind: 'Function',
+        insertText: "handpose_set_ratio(${1:'0.75'})",
+        detail: "handpose_set_ratio(ratio='0.75')",
+        doc: 'Set handpose detection ratio: 0.5, 0.75, 1, 1.5, or 2.0.'
+    },
+    {
+        label: 'handpose_get_x',
+        kind: 'Function',
+        insertText: "handpose_get_x(${1:'1'})",
+        detail: "handpose_get_x(landmark='1') → number",
+        doc: 'Get X position of a hand landmark (0=wrist, 1-20=fingers). (Desktop only.)'
+    },
+    {
+        label: 'handpose_get_y',
+        kind: 'Function',
+        insertText: "handpose_get_y(${1:'1'})",
+        detail: "handpose_get_y(landmark='1') → number",
+        doc: 'Get Y position of a hand landmark. (Desktop only.)'
+    },
+    {
+        label: 'handpose_get_z',
+        kind: 'Function',
+        insertText: "handpose_get_z(${1:'1'})",
+        detail: "handpose_get_z(landmark='1') → number",
+        doc: 'Get Z position of a hand landmark. (Desktop only.)'
+    },
+
+    // ─── Speech to Text ─────────────────────────────────────────────────────────────
+    {
+        label: 'listen',
+        kind: 'Function',
+        insertText: 'listen()',
+        detail: 'listen()',
+        doc: 'Start listening for speech input and wait for a phrase.'
+    },
+    {
+        label: 'get_speech',
+        kind: 'Function',
+        insertText: 'get_speech()',
+        detail: 'get_speech() → string',
+        doc: 'Get the recognized speech text. (Desktop only; returns None on web).'
+    },
+
+    // ─── Translate ──────────────────────────────────────────────────────────────────
+    {
+        label: 'translate_text',
+        kind: 'Function',
+        insertText: 'translate_text(${1:"hello"}, ${2:"en"})',
+        detail: "translate_text(words, language='en') → string",
+        doc: 'Translate text to the specified language. (Desktop only; returns None on web).'
+    },
+    {
+        label: 'get_viewer_language',
+        kind: 'Function',
+        insertText: 'get_viewer_language()',
+        detail: 'get_viewer_language() → string',
+        doc: 'Get the detected viewer language code. (Desktop only.)'
+    },
+
+    // ─── Object Detection ───────────────────────────────────────────────────────────
+    {
+        label: 'ob2_analyse',
+        kind: 'Function',
+        insertText: 'ob2_analyse()',
+        detail: 'ob2_analyse()',
+        doc: 'Analyse the current video frame for object detection.'
+    },
+    {
+        label: 'ob2_video',
+        kind: 'Function',
+        insertText: "ob2_video(${1:'on'})",
+        detail: "ob2_video(state='on')",
+        doc: 'Control object detection video preview: on, off, or on-flipped.'
+    },
+    {
+        label: 'ob2_show_bounding_boxes',
+        kind: 'Function',
+        insertText: "ob2_show_bounding_boxes(${1:'show'})",
+        detail: "ob2_show_bounding_boxes(show='show')",
+        doc: 'Show or hide bounding boxes: show or hide.'
+    },
+    {
+        label: 'ob2_set_threshold',
+        kind: 'Function',
+        insertText: 'ob2_set_threshold(${1:0.5})',
+        detail: 'ob2_set_threshold(threshold=0.5)',
+        doc: 'Set detection confidence threshold (0.0-1.0).'
+    },
+    {
+        label: 'ob2_get_counts',
+        kind: 'Function',
+        insertText: 'ob2_get_counts()',
+        detail: 'ob2_get_counts() → number',
+        doc: 'Get total object count. (Desktop only.)'
+    },
+    {
+        label: 'ob2_is_detected',
+        kind: 'Function',
+        insertText: "ob2_is_detected(${1:'person'})",
+        detail: "ob2_is_detected(label='person') → bool",
+        doc: 'Check if a specific object label is detected. (Desktop only.)'
+    },
+    {
+        label: 'ob2_get_count_of',
+        kind: 'Function',
+        insertText: "ob2_get_count_of(${1:'person'})",
+        detail: "ob2_get_count_of(label='person') → number",
+        doc: 'Get count of a specific object label. (Desktop only.)'
+    },
+    {
+        label: 'ob2_get_objects',
+        kind: 'Function',
+        insertText: "ob2_get_objects(${1:'label'}, ${2:0})",
+        detail: "ob2_get_objects(property='label', index=0) → string",
+        doc: 'Get object property: label, confidence, positionX, positionY, width, height. (Desktop only.)'
+    },
+
+    // ─── ML ─────────────────────────────────────────────────────────────────────────
+    {
+        label: 'ml_add_example1',
+        kind: 'Function',
+        insertText: 'ml_add_example1()',
+        detail: 'ml_add_example1()',
+        doc: 'Add a training example for label 1 (webcam snapshot).'
+    },
+    {
+        label: 'ml_add_example2',
+        kind: 'Function',
+        insertText: 'ml_add_example2()',
+        detail: 'ml_add_example2()',
+        doc: 'Add a training example for label 2.'
+    },
+    {
+        label: 'ml_add_example3',
+        kind: 'Function',
+        insertText: 'ml_add_example3()',
+        detail: 'ml_add_example3()',
+        doc: 'Add a training example for label 3.'
+    },
+    {
+        label: 'ml_train',
+        kind: 'Function',
+        insertText: "ml_train(${1:'4'})",
+        detail: "ml_train(label='4')",
+        doc: 'Train the ML model for a specific label (4-10).'
+    },
+    {
+        label: 'ml_train_any',
+        kind: 'Function',
+        insertText: "ml_train_any(${1:'11'})",
+        detail: "ml_train_any(label='11')",
+        doc: 'Train the ML model with an arbitrary label string.'
+    },
+    {
+        label: 'ml_get_label',
+        kind: 'Function',
+        insertText: 'ml_get_label()',
+        detail: 'ml_get_label() → string',
+        doc: 'Get the current classification label. (Desktop only.)'
+    },
+    {
+        label: 'ml_get_count',
+        kind: 'Function',
+        insertText: "ml_get_count(${1:'11'})",
+        detail: "ml_get_count(label='11') → number",
+        doc: 'Get the count of a specific label. (Desktop only.)'
+    },
+    {
+        label: 'ml_reset',
+        kind: 'Function',
+        insertText: "ml_reset(${1:'all'})",
+        detail: "ml_reset(label='all')",
+        doc: 'Reset training data for a label (all, 1-10).'
+    },
+    {
+        label: 'ml_reset_any',
+        kind: 'Function',
+        insertText: "ml_reset_any(${1:'11'})",
+        detail: "ml_reset_any(label='11')",
+        doc: 'Reset training data with an arbitrary label string.'
+    },
+    {
+        label: 'ml_download',
+        kind: 'Function',
+        insertText: 'ml_download()',
+        detail: 'ml_download()',
+        doc: 'Download the trained KNN model as a JSON file.'
+    },
+    {
+        label: 'ml_upload',
+        kind: 'Function',
+        insertText: 'ml_upload()',
+        detail: 'ml_upload()',
+        doc: 'Upload a previously downloaded KNN model JSON file.'
+    },
+    {
+        label: 'ml_toggle',
+        kind: 'Function',
+        insertText: "ml_toggle(${1:'off'})",
+        detail: "ml_toggle(state='off')",
+        doc: 'Toggle ML classification on/off.'
+    },
+    {
+        label: 'ml_set_interval',
+        kind: 'Function',
+        insertText: "ml_set_interval(${1:'1'})",
+        detail: "ml_set_interval(interval='1')",
+        doc: 'Set classification interval: 1, 0.5, 0.2, or 0.1 seconds.'
+    },
+    {
+        label: 'ml_video',
+        kind: 'Function',
+        insertText: "ml_video(${1:'off'})",
+        detail: "ml_video(state='off')",
+        doc: 'Control ML video preview: on, off, or on-flipped.'
+    },
+    {
+        label: 'ml_set_transparency',
+        kind: 'Function',
+        insertText: 'ml_set_transparency(${1:50})',
+        detail: 'ml_set_transparency(value)',
+        doc: 'Set ML video transparency (0-100).'
+    },
+    {
+        label: 'ml_set_input',
+        kind: 'Function',
+        insertText: "ml_set_input(${1:'webcam'})",
+        detail: "ml_set_input(source='webcam')",
+        doc: 'Set ML input source: webcam, stage, or backdrop.'
+    },
+
+    // ─── TM2Scratch ─────────────────────────────────────────────────────────────────
+    {
+        label: 'tm2_set_input',
+        kind: 'Function',
+        insertText: "tm2_set_input(${1:'webcam'})",
+        detail: "tm2_set_input(source='webcam')",
+        doc: 'Set TM2Scratch input source: webcam or stage.'
+    },
+    {
+        label: 'tm2_is_image_detected',
+        kind: 'Function',
+        insertText: "tm2_is_image_detected(${1:'any'})",
+        detail: "tm2_is_image_detected(label='any') → bool",
+        doc: 'Check if an image label is detected. (Desktop only.)'
+    },
+    {
+        label: 'tm2_image_confidence',
+        kind: 'Function',
+        insertText: "tm2_image_confidence(${1:''})",
+        detail: "tm2_image_confidence(label='') → number",
+        doc: 'Get confidence of a specific image label. (Desktop only.)'
+    },
+    {
+        label: 'tm2_set_image_model',
+        kind: 'Function',
+        insertText: 'tm2_set_image_model(${1:url})',
+        detail: 'tm2_set_image_model(url)',
+        doc: 'Set the Teachable Machine image classification model URL.'
+    },
+    {
+        label: 'tm2_classify_image',
+        kind: 'Function',
+        insertText: 'tm2_classify_image()',
+        detail: 'tm2_classify_image()',
+        doc: 'Classify the current video frame using the image model.'
+    },
+    {
+        label: 'tm2_get_image_label',
+        kind: 'Function',
+        insertText: 'tm2_get_image_label()',
+        detail: 'tm2_get_image_label() → string',
+        doc: 'Get the current image classification label. (Desktop only.)'
+    },
+    {
+        label: 'tm2_is_sound_detected',
+        kind: 'Function',
+        insertText: "tm2_is_sound_detected(${1:'any'})",
+        detail: "tm2_is_sound_detected(label='any') → bool",
+        doc: 'Check if a sound label is detected. (Desktop only.)'
+    },
+    {
+        label: 'tm2_sound_confidence',
+        kind: 'Function',
+        insertText: "tm2_sound_confidence(${1:''})",
+        detail: "tm2_sound_confidence(label='') → number",
+        doc: 'Get confidence of a specific sound label. (Desktop only.)'
+    },
+    {
+        label: 'tm2_set_sound_model',
+        kind: 'Function',
+        insertText: 'tm2_set_sound_model(${1:url})',
+        detail: 'tm2_set_sound_model(url)',
+        doc: 'Set the Teachable Machine sound classification model URL.'
+    },
+    {
+        label: 'tm2_get_sound_label',
+        kind: 'Function',
+        insertText: 'tm2_get_sound_label()',
+        detail: 'tm2_get_sound_label() → string',
+        doc: 'Get the current sound classification label. (Desktop only.)'
+    },
+    {
+        label: 'tm2_toggle',
+        kind: 'Function',
+        insertText: "tm2_toggle(${1:'off'})",
+        detail: "tm2_toggle(state='off')",
+        doc: 'Toggle TM2Scratch classification on/off.'
+    },
+    {
+        label: 'tm2_set_interval',
+        kind: 'Function',
+        insertText: "tm2_set_interval(${1:'1'})",
+        detail: "tm2_set_interval(interval='1')",
+        doc: 'Set TM2Scratch classification interval: 1, 0.5, 0.2, or 0.1 seconds.'
+    },
+    {
+        label: 'tm2_set_threshold',
+        kind: 'Function',
+        insertText: 'tm2_set_threshold(${1:0.5})',
+        detail: 'tm2_set_threshold(threshold=0.5)',
+        doc: 'Set confidence threshold for TM2Scratch (0.0-1.0).'
+    },
+    {
+        label: 'tm2_get_threshold',
+        kind: 'Function',
+        insertText: 'tm2_get_threshold()',
+        detail: 'tm2_get_threshold() → number',
+        doc: 'Get current TM2Scratch confidence threshold. (Desktop only.)'
+    },
+    {
+        label: 'tm2_video',
+        kind: 'Function',
+        insertText: "tm2_video(${1:'on'})",
+        detail: "tm2_video(state='on')",
+        doc: 'Control TM2Scratch video preview: on, off, or on-flipped.'
+    },
+
+    // ─── TMPose2Scratch ─────────────────────────────────────────────────────────────
+    {
+        label: 'tmpose_is_detected',
+        kind: 'Function',
+        insertText: "tmpose_is_detected(${1:'any'})",
+        detail: "tmpose_is_detected(label='any') → bool",
+        doc: 'Check if a pose label is detected. (Desktop only.)'
+    },
+    {
+        label: 'tmpose_confidence',
+        kind: 'Function',
+        insertText: "tmpose_confidence(${1:''})",
+        detail: "tmpose_confidence(label='') → number",
+        doc: 'Get confidence of a specific pose label. (Desktop only.)'
+    },
+    {
+        label: 'tmpose_set_model',
+        kind: 'Function',
+        insertText: 'tmpose_set_model(${1:url})',
+        detail: 'tmpose_set_model(url)',
+        doc: 'Set the Teachable Machine pose classification model URL.'
+    },
+    {
+        label: 'tmpose_classify',
+        kind: 'Function',
+        insertText: 'tmpose_classify()',
+        detail: 'tmpose_classify()',
+        doc: 'Classify the current video frame using the pose model.'
+    },
+    {
+        label: 'tmpose_get_label',
+        kind: 'Function',
+        insertText: 'tmpose_get_label()',
+        detail: 'tmpose_get_label() → string',
+        doc: 'Get the current pose classification label. (Desktop only.)'
+    },
+    {
+        label: 'tmpose_toggle',
+        kind: 'Function',
+        insertText: "tmpose_toggle(${1:'off'})",
+        detail: "tmpose_toggle(state='off')",
+        doc: 'Toggle TMPose2Scratch classification on/off.'
+    },
+    {
+        label: 'tmpose_set_interval',
+        kind: 'Function',
+        insertText: "tmpose_set_interval(${1:'1'})",
+        detail: "tmpose_set_interval(interval='1')",
+        doc: 'Set TMPose2Scratch classification interval: 1, 0.5, 0.2, or 0.1 seconds.'
+    },
+    {
+        label: 'tmpose_set_threshold',
+        kind: 'Function',
+        insertText: 'tmpose_set_threshold(${1:0.5})',
+        detail: 'tmpose_set_threshold(threshold=0.5)',
+        doc: 'Set confidence threshold (0.0-1.0).'
+    },
+    {
+        label: 'tmpose_get_threshold',
+        kind: 'Function',
+        insertText: 'tmpose_get_threshold()',
+        detail: 'tmpose_get_threshold() → number',
+        doc: 'Get current confidence threshold. (Desktop only.)'
+    },
+    {
+        label: 'tmpose_video',
+        kind: 'Function',
+        insertText: "tmpose_video(${1:'off'})",
+        detail: "tmpose_video(state='off')",
+        doc: 'Control TMPose2Scratch video preview: on, off, or on-flipped.'
     }
 ];
 

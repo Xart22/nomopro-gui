@@ -418,11 +418,10 @@ const PythonIde = props => {
             }
         }
 
-        // Execute bridge command immediately, not via promise chain.
-        // The chain defers execution and causes commands to only process after the
-        // subprocess exits. For realtime device control, commands must execute
-        // synchronously on each data event.
-        executeBridgeCommand(vm, command, commandContextRef.current)
+        // Execute bridge command. The caller (desktop runner) awaits onCommand()
+        // for REPORTER blocks, so the returned promise must resolve after bridge
+        // execution to ensure _pendingDeviceResults are available.
+        return executeBridgeCommand(vm, command, commandContextRef.current)
             .then(result => {
                 if (result) commandContextRef.current = result;
             })

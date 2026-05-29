@@ -32,7 +32,7 @@ Python IDE (Integrated Development Environment) adalah aplikasi untuk menulis da
 
 ### 🎁 Built-in Functions yang Tersedia
 
-Python IDE ini dilengkapi dengan **100+ built-in functions** yang terbagi dalam 8 kategori:
+Python IDE ini dilengkapi dengan **200+ built-in functions** yang terbagi dalam 15 kategori:
 
 1. **Movement** - `move()`, `goto()`, `turn_right()`, `turn_left()`, `point()`
 2. **Appearance** - `switch_costume()`, `next_costume()`, `show()`, `hide()`
@@ -42,8 +42,50 @@ Python IDE ini dilengkapi dengan **100+ built-in functions** yang terbagi dalam 
 6. **Events** - `@when_green_flag_clicked`, `@when_key_pressed`, `@when_i_receive()`
 7. **Variables & Lists** - `variable()`, `list_value()`, `add_to_list()`, `item_of_list()`
 8. **Device Control** - `pinMode()`, `digitalWrite()`, `analogRead()`, `servoWrite()`
+9. **Music** - `play_drum()`, `play_note()`, `set_instrument()`, `set_tempo()`, `get_tempo()`
+10. **Hand Pose** - `handpose_get_x()`, `handpose_get_y()`, `handpose_get_z()`, `handpose_video()`
+11. **Speech to Text** - `listen()`, `get_speech()`
+12. **Translate** - `translate_text()`, `get_viewer_language()`
+13. **Video Sensing** - `video_toggle()`, `set_video_transparency()`
+14. **Text to Speech** - `speak()`, `set_voice()`, `set_speech_language()`
+15. **ML/AI** - `ml_add_example1()`, `ob2_analyse()`, `tm2_classify_image()`, `tmpose_classify()`
 
 **Semua fungsi sudah terintegrasi** dan bisa langsung digunakan tanpa install tambahan!
+
+---
+
+### 🌐 Web vs Desktop: Perbedaan Kemampuan
+
+Python IDE dapat berjalan di **Web (browser)** maupun **Desktop (Electron app)**. Beberapa fitur hanya tersedia di Desktop karena membutuhkan akses ke sistem file dan proses Python native.
+
+| Fitur | Web (Browser/Pyodide) | Desktop (Electron) |
+|-------|-----------------------|-------------------|
+| **Eksekusi Python** | ✅ Pyodide (di browser) | ✅ Native Python (subprocess) |
+| **Sprite Control** | ✅ `move()`, `say()`, dll | ✅ Sama |
+| **Pen Drawing** | ✅ `pen_down()`, `pen_up()`, dll | ✅ Sama |
+| **Text to Speech** | ✅ `speak()`, `set_voice()` | ✅ Sama |
+| **Video Sensing** | ✅ `video_toggle()`, `set_video_transparency()` | ✅ Sama |
+| **Music** | ✅ COMMAND blocks (`play_drum`, `play_note`, dll) | ✅ Sama |
+| **Handpose** | ✅ COMMAND blocks (`handpose_video`, dll) | ✅ Sama |
+| **Speech to Text** | ✅ `listen()` | ✅ Sama |
+| **ML/AI (COMMANDs)** | ✅ `ml_add_example1()`, `ml_train()`, dll | ✅ Sama |
+| **OB2/TM2/TMPose (COMMANDs)** | ✅ `ob2_analyse()`, `tm2_classify_image()`, dll | ✅ Sama |
+| | | |
+| **REPORTER (return value)** | ❌ **Return `None`** | ✅ **Return value asli** |
+| **Device Control (realtime)** | ❌ **Return `None`** | ✅ `digitalRead()`, `analogRead()` |
+| **Translate** | ❌ **Return `None`** | ✅ `translate_text()`, `get_viewer_language()` |
+| **get_tempo()** | ❌ **Return `None`** | ✅ Return BPM |
+| **handpose_get_x/y/z()** | ❌ **Return `None`** | ✅ Return koordinat |
+| **get_speech()** | ❌ **Return `None`** | ✅ Return text |
+| **ob2_get_counts/is_detected()** | ❌ **Return `None`** | ✅ Return nilai |
+| **ml_get_label/get_count()** | ❌ **Return `None`** | ✅ Return nilai |
+| **tm2/tmpose confidence/threshold** | ❌ **Return `None`** | ✅ Return nilai |
+
+> **Mengapa REPORTER tidak work di Web?** Di Web (Pyodide), Python berjalan di dalam browser worker tanpa akses stdin/stdout pipe yang diperlukan untuk komunikasi dua arah (request-response). Desktop mode menggunakan native Python subprocess dengan stdin/stdout pipe penuh.
+
+**Rekomendasi:**
+- Gunakan **Web mode** untuk belajar, testing, dan COMMAND blocks
+- Gunakan **Desktop mode** jika perlu REPORTER blocks (return value) atau device control
 
 ---
 
@@ -1193,6 +1235,273 @@ digitalWrite(13, False)
 
 ---
 
+### 🎵 Fungsi untuk Music Extension
+
+| Fungsi | Deskripsi | Contoh |
+|--------|-----------|--------|
+| `play_drum(drum, beats)` | Main drum | `play_drum(1, 0.5)` |
+| `play_note(note, beats)` | Main not dengan durasi | `play_note(60, 0.5)` |
+| `rest(beats)` | Diam `beats` ketukan | `rest(0.5)` |
+| `set_instrument(instrument)` | Pilih instrumen (0-20) | `set_instrument(1)` |
+| `set_tempo(tempo)` | Set tempo BPM | `set_tempo(120)` |
+| `change_tempo_by(delta)` | Ubah tempo ±BPM | `change_tempo_by(20)` |
+| `get_tempo()` | Ambil tempo saat ini | `print(get_tempo())` |
+
+> **get_tempo()** hanya return nilai asli di Desktop mode. Di Web return `None`.
+
+**Contoh:**
+```python
+# Main lagu sederhana
+set_instrument(1)        # Piano
+set_tempo(120)           # 120 BPM
+play_note(60, 0.5)       # C4
+play_note(64, 0.5)       # E4
+play_note(67, 0.5)       # G4
+play_drum(1, 1)          # Snare
+```
+
+---
+
+### 🔊 Fungsi untuk Text to Speech (TTS)
+
+| Fungsi | Deskripsi | Contoh |
+|--------|-----------|--------|
+| `speak(text)` | Ucapkan teks | `speak("Hello!")` |
+| `set_voice(voice)` | Pilih suara (alto/tenor/soprano) | `set_voice("alto")` |
+| `set_speech_language(lang)` | Pilih bahasa (id/en/ja/dll) | `set_speech_language("id")` |
+
+**Contoh:**
+```python
+# Sapaan multi-bahasa
+set_voice("alto")
+set_speech_language("id")
+speak("Halo, selamat datang!")
+set_speech_language("en")
+speak("Hello, welcome!")
+```
+
+---
+
+### 🎥 Fungsi untuk Video Sensing
+
+| Fungsi | Deskripsi | Contoh |
+|--------|-----------|--------|
+| `video_toggle(state)` | Nyalakan/matikan kamera | `video_toggle("on")` |
+| `set_video_transparency(value)` | Atur transparansi video (0-100) | `set_video_transparency(50)` |
+
+**Contoh:**
+```python
+# Kamera sebagai background
+video_toggle("on")
+set_video_transparency(30)
+wait(5)
+video_toggle("off")
+```
+
+---
+
+### 🖐️ Fungsi untuk Hand Pose Extension
+
+| Fungsi | Deskripsi | Contoh |
+|--------|-----------|--------|
+| `handpose_video(state)` | Nyalakan/matikan deteksi tangan | `handpose_video("on")` |
+| `handpose_get_x(index)` | Posisi X landmark ke-n (0-20) | `x = handpose_get_x(0)` |
+| `handpose_get_y(index)` | Posisi Y landmark ke-n | `y = handpose_get_y(0)` |
+| `handpose_get_z(index)` | Posisi Z landmark ke-n | `z = handpose_get_z(0)` |
+| `handpose_video_toggle(state)` | Toggle video handpose | `handpose_video_toggle("on")` |
+| `handpose_set_video_transparency(value)` | Transparansi handpose video | `handpose_set_video_transparency(30)` |
+
+> **handpose_get_x/y/z()** hanya return nilai asli di Desktop mode. Di Web return `None`.
+
+**Contoh:**
+```python
+# Deteksi posisi ujung jari
+handpose_video("on")
+x = handpose_get_x(8)    # Ujung jari telunjuk
+y = handpose_get_y(8)
+print(f"Jari di ({x}, {y})")
+```
+
+---
+
+### 🎤 Fungsi untuk Speech to Text Extension
+
+| Fungsi | Deskripsi | Contoh |
+|--------|-----------|--------|
+| `listen()` | Rekam suara (blocking) | `listen()` |
+| `get_speech()` | Ambil hasil transkripsi | `text = get_speech()` |
+
+> **get_speech()** hanya return nilai asli di Desktop mode. Di Web return `None`.
+
+**Contoh:**
+```python
+# Voice command
+say("Katakan sesuatu!")
+listen()
+command = get_speech()
+say(f"Kamu bilang: {command}")
+```
+
+---
+
+### 🌐 Fungsi untuk Translate Extension
+
+| Fungsi | Deskripsi | Contoh |
+|--------|-----------|--------|
+| `translate_text(text)` | Terjemahkan teks | `result = translate_text("Hello")` |
+| `get_viewer_language()` | Ambil bahasa viewer | `lang = get_viewer_language()` |
+
+> Kedua fungsi ini **hanya return nilai asli di Desktop mode**. Di Web return `None`.
+
+**Contoh:**
+```python
+# Terjemahan otomatis
+lang = get_viewer_language()
+print(f"Bahasa viewer: {lang}")
+terjemahan = translate_text("Hello")
+say(terjemahan)
+```
+
+---
+
+### 🤖 Fungsi untuk OB2Scratch Extension (Object Detection)
+
+| Fungsi | Deskripsi | Contoh |
+|--------|-----------|--------|
+| `ob2_analyse()` | Analisis frame kamera | `ob2_analyse()` |
+| `ob2_get_count()` | Jumlah objek terdeteksi | `count = ob2_get_count()` |
+| `ob2_get_x(n)` | Posisi X objek ke-n | `x = ob2_get_x(0)` |
+| `ob2_get_y(n)` | Posisi Y objek ke-n | `y = ob2_get_y(0)` |
+| `ob2_get_width(n)` | Lebar objek ke-n | `w = ob2_get_width(0)` |
+| `ob2_get_height(n)` | Tinggi objek ke-n | `h = ob2_get_height(0)` |
+| `ob2_get_category(n)` | Label objek ke-n | `label = ob2_get_category(0)` |
+| `ob2_is_detected(n)` | Cek objek ke-n terdeteksi | `if ob2_is_detected(0):` |
+
+> Fungsi **get_*** dan **is_detected** hanya return nilai asli di Desktop mode. **ob2_analyse()** work di semua mode.
+
+**Contoh:**
+```python
+# Deteksi objek real-time
+video_toggle("on")
+ob2_analyse()
+count = ob2_get_count()
+for i in range(count):
+    x = ob2_get_x(i)
+    y = ob2_get_y(i)
+    label = ob2_get_category(i)
+    print(f"Objek {i}: {label} di ({x}, {y})")
+```
+
+---
+
+### 🧠 Fungsi untuk Machine Learning Extension
+
+| Fungsi | Deskripsi | Contoh |
+|--------|-----------|--------|
+| `ml_add_example1(label)` | Tambah contoh ke class 1 | `ml_add_example1("rock")` |
+| `ml_add_example2(label)` | Tambah contoh ke class 2 | `ml_add_example2("paper")` |
+| `ml_add_example3(label)` | Tambah contoh ke class 3 | `ml_add_example3("scissors")` |
+| `ml_add_example4(label)` | Tambah contoh ke class 4 | `ml_add_example4("spock")` |
+| `ml_add_example5(label)` | Tambah contoh ke class 5 | `ml_add_example5("lizard")` |
+| `ml_train()` | Latih model | `ml_train()` |
+| `ml_classify()` | Klasifikasikan input | `ml_classify()` |
+| `ml_get_label()` | Ambil label hasil klasifikasi | `label = ml_get_label()` |
+| `ml_get_count()` | Jumlah class terlatih | `count = ml_get_count()` |
+| `ml_set_confidence(threshold)` | Set threshold confidence | `ml_set_confidence(0.8)` |
+| `ml_get_confidence()` | Ambil confidence | `conf = ml_get_confidence()` |
+| `ml_clear()` | Reset semua contoh | `ml_clear()` |
+| `ml_when_example1_labeled()` | Event example 1 labeled | (HAT - otomatis) |
+| `ml_when_example2_labeled()` | Event example 2 labeled | (HAT - otomatis) |
+| `ml_when_example3_labeled()` | Event example 3 labeled | (HAT - otomatis) |
+| `ml_when_example4_labeled()` | Event example 4 labeled | (HAT - otomatis) |
+| `ml_when_example5_labeled()` | Event example 5 labeled | (HAT - otomatis) |
+| `ml_when_classify_done()` | Event klasifikasi selesai | (HAT - otomatis) |
+
+> Fungsi **get_*** hanya return nilai asli di Desktop mode. **add_example**, **train**, **classify**, **clear** work di semua mode.
+
+**Contoh:**
+```python
+# Training model sederhana
+ml_add_example1("gunting")
+ml_add_example1("gunting")
+ml_add_example2("batu")
+ml_add_example2("batu")
+ml_train()
+ml_classify()
+label = ml_get_label()
+say(f"Hasil: {label}")
+```
+
+---
+
+### 📸 Fungsi untuk TM2Scratch Extension (Image Classification)
+
+| Fungsi | Deskripsi | Contoh |
+|--------|-----------|--------|
+| `tm2_classify_image()` | Klasifikasikan gambar kamera | `tm2_classify_image()` |
+| `tm2_get_label(n)` | Ambil label class ke-n (0-2) | `label = tm2_get_label(0)` |
+| `tm2_get_confidence(n)` | Ambil confidence class ke-n | `conf = tm2_get_confidence(0)` |
+| `tm2_set_threshold(threshold)` | Set threshold | `tm2_set_threshold(0.8)` |
+| `tm2_get_threshold()` | Ambil threshold | `th = tm2_get_threshold()` |
+| `tm2_get_class_n(n)` | Ambil label + confidence class ke-n | `data = tm2_get_class_n(0)` |
+| `tm2_analyze_frame()` | Analisis frame (mirip classify) | `tm2_analyze_frame()` |
+| `tm2_get_image_width()` | Lebar gambar | `w = tm2_get_image_width()` |
+| `tm2_get_image_height()` | Tinggi gambar | `h = tm2_get_image_height()` |
+| `tm2_get_image_x()` | Posisi X gambar | `x = tm2_get_image_x()` |
+| `tm2_get_image_y()` | Posisi Y gambar | `y = tm2_get_image_y()` |
+| `tm2_set_label(n, label)` | Set label class ke-n | `tm2_set_label(0, "kucing")` |
+| `tm2_set_model(model)` | Set model URL/path | `tm2_set_model("model.json")` |
+| `tm2_load_model()` | Load model | `tm2_load_model()` |
+| `tm2_when_classify_done()` | Event klasifikasi selesai | (HAT - otomatis) |
+| `tm2_when_image_loaded()` | Event gambar selesai load | (HAT - otomatis) |
+
+> Fungsi **get_*** hanya return nilai asli di Desktop mode. **classify**, **analyze_frame**, **set_model**, **load_model** work di semua mode.
+
+**Contoh:**
+```python
+# Klasifikasi gambar dengan Teachable Machine
+tm2_set_model("https://storage.googleapis.com/model.json")
+tm2_load_model()
+tm2_classify_image()
+for i in range(3):
+    label = tm2_get_label(i)
+    conf = tm2_get_confidence(i)
+    print(f"Class {i}: {label} ({conf:.2%})")
+```
+
+---
+
+### 🧍 Fungsi untuk TMPose2Scratch Extension (Pose Classification)
+
+| Fungsi | Deskripsi | Contoh |
+|--------|-----------|--------|
+| `tmpose_classify()` | Klasifikasikan pose | `tmpose_classify()` |
+| `tmpose_get_label(n)` | Ambil label pose ke-n | `label = tmpose_get_label(0)` |
+| `tmpose_get_confidence(n)` | Ambil confidence pose ke-n | `conf = tmpose_get_confidence(0)` |
+| `tmpose_set_threshold(threshold)` | Set threshold | `tmpose_set_threshold(0.8)` |
+| `tmpose_get_threshold()` | Ambil threshold | `th = tmpose_get_threshold()` |
+| `tmpose_get_class_n(n)` | Ambil label + confidence | `data = tmpose_get_class_n(0)` |
+| `tmpose_analyze_frame()` | Analisis frame pose | `tmpose_analyze_frame()` |
+| `tmpose_set_label(n, label)` | Set label pose ke-n | `tmpose_set_label(0, "duduk")` |
+| `tmpose_set_model(model)` | Set model URL/path | `tmpose_set_model("model.json")` |
+| `tmpose_load_model()` | Load model pose | `tmpose_load_model()` |
+| `tmpose_when_classify_done()` | Event klasifikasi selesai | (HAT - otomatis) |
+
+> Fungsi **get_*** hanya return nilai asli di Desktop mode. **classify**, **analyze_frame**, **set_model**, **load_model** work di semua mode.
+
+**Contoh:**
+```python
+# Klasifikasi pose tubuh
+tmpose_set_model("pose_model.json")
+tmpose_load_model()
+tmpose_classify()
+label = tmpose_get_label(0)
+conf = tmpose_get_confidence(0)
+say(f"Pose: {label} ({conf:.0%})")
+```
+
+---
+
 ## 📋 Quick Reference Card (Printable)
 
 ### 🚀 Mode Selection
@@ -1205,7 +1514,7 @@ digitalWrite(13, False)
 
 ### 📦 Built-in Functions Summary
 
-Python IDE ini dilengkapi **100+ built-in functions** dalam 8 kategori utama:
+Python IDE ini dilengkapi **200+ built-in functions** dalam 15 kategori utama:
 
 #### 1. Movement (Pergerakan)
 ```python
@@ -1297,6 +1606,41 @@ analogRead(A0)            # Baca sensor
 servoWrite(9, 90)         # Set servo
 
 serialPrint("Hello")      # Kirim serial
+```
+
+#### 9. Music & Speech (Musik & Suara)
+```python
+play_drum(1, 0.5)              # Main drum 0.5 detik
+play_note(60, 0.5)             # Main note C4
+set_instrument(1)              # Ganti instrumen piano
+set_tempo(120)                 # Set tempo 120 BPM
+speak("Hello")                 # Text to speech
+set_voice("alto")              # Ganti suara TTS
+set_speech_language("id")      # Ganti bahasa TTS
+listen()                       # Merekam suara
+```
+
+#### 10. Video Sensing (Video)
+```python
+video_toggle("on")             # Nyalakan kamera
+set_video_transparency(50)     # Atur transparansi
+```
+
+#### 11. Hand Pose (Tangan)
+```python
+handpose_video("on")           # Nyalakan deteksi tangan
+handpose_get_x(0)              # Posisi X jari ke-0
+handpose_get_y(0)              # Posisi Y jari ke-0
+handpose_get_z(0)              # Posisi Z jari ke-0
+```
+
+#### 12. AI / ML (Kecerdasan Buatan)
+```python
+ob2_analyse()                  # Analisis objek
+tm2_classify_image()           # Klasifikasi gambar
+tmpose_classify()              # Klasifikasi pose
+ml_train()                     # Latih model
+ml_add_example1("label")       # Tambah contoh
 ```
 
 ### ⌨️ Keyboard Shortcuts

@@ -70,6 +70,72 @@ __all__ = [
     "set_speech_language",
     "video_toggle",
     "set_video_transparency",
+    "play_drum",
+    "rest",
+    "play_note",
+    "set_instrument",
+    "set_tempo",
+    "change_tempo",
+    "get_tempo",
+    "handpose_video",
+    "handpose_set_transparency",
+    "handpose_set_ratio",
+    "handpose_get_x",
+    "handpose_get_y",
+    "handpose_get_z",
+    "listen",
+    "get_speech",
+    "translate_text",
+    "get_viewer_language",
+    "ob2_analyse",
+    "ob2_video",
+    "ob2_show_bounding_boxes",
+    "ob2_set_threshold",
+    "ob2_get_counts",
+    "ob2_is_detected",
+    "ob2_get_count_of",
+    "ob2_get_objects",
+    "ml_add_example1",
+    "ml_add_example2",
+    "ml_add_example3",
+    "ml_train",
+    "ml_train_any",
+    "ml_get_label",
+    "ml_get_count",
+    "ml_reset",
+    "ml_reset_any",
+    "ml_download",
+    "ml_upload",
+    "ml_toggle",
+    "ml_set_interval",
+    "ml_video",
+    "ml_set_transparency",
+    "ml_set_input",
+    "tm2_set_input",
+    "tm2_is_image_detected",
+    "tm2_image_confidence",
+    "tm2_set_image_model",
+    "tm2_classify_image",
+    "tm2_get_image_label",
+    "tm2_is_sound_detected",
+    "tm2_sound_confidence",
+    "tm2_set_sound_model",
+    "tm2_get_sound_label",
+    "tm2_toggle",
+    "tm2_set_interval",
+    "tm2_set_threshold",
+    "tm2_get_threshold",
+    "tm2_video",
+    "tmpose_is_detected",
+    "tmpose_confidence",
+    "tmpose_set_model",
+    "tmpose_classify",
+    "tmpose_get_label",
+    "tmpose_toggle",
+    "tmpose_set_interval",
+    "tmpose_set_threshold",
+    "tmpose_get_threshold",
+    "tmpose_video",
     "load_device",
     "clear_device",
     "ArduinoDevice",
@@ -353,6 +419,212 @@ class Sprite:
     def setVideoTransparency(self, value):
         self._emit("setVideoTransparency", [value])
 
+    # Music
+    def playDrum(self, drum, beats):
+        self._emit("extMusicPlayDrumForBeats", [drum, beats])
+
+    def rest(self, beats):
+        self._emit("extMusicRestForBeats", [beats])
+
+    def playNote(self, note, beats):
+        self._emit("extMusicPlayNoteForBeats", [note, beats])
+
+    def setInstrument(self, instrument):
+        self._emit("extMusicSetInstrument", [instrument])
+
+    def setTempo(self, tempo):
+        self._emit("extMusicSetTempo", [tempo])
+
+    def changeTempo(self, delta):
+        self._emit("extMusicChangeTempo", [delta])
+
+    def getTempo(self):
+        return _extension_rpc("extMusicGetTempo")
+
+    # Handpose
+    def handposeVideo(self, state="off"):
+        self._emit("extHandposeVideoToggle", [str(state)])
+
+    def handposeSetTransparency(self, value):
+        self._emit("extHandposeSetVideoTransparency", [value])
+
+    def handposeSetRatio(self, ratio):
+        self._emit("extHandposeSetRatio", [str(ratio)])
+
+    def handposeGetX(self, landmark="1"):
+        return _extension_rpc("extHandposeGetX", [str(landmark)])
+
+    def handposeGetY(self, landmark="1"):
+        return _extension_rpc("extHandposeGetY", [str(landmark)])
+
+    def handposeGetZ(self, landmark="1"):
+        return _extension_rpc("extHandposeGetZ", [str(landmark)])
+
+    # Speech to Text
+    def listen(self):
+        self._emit("extSpeechListenAndWait")
+
+    def getSpeech(self):
+        return _extension_rpc("extSpeechGetSpeech")
+
+    # Translate
+    def translateText(self, words, language):
+        return _extension_rpc("extTranslateGetTranslate", [str(words), str(language)])
+
+    def getViewerLanguage(self):
+        return _extension_rpc("extTranslateGetViewerLanguage")
+
+    # Object Detection
+    def ob2Analyse(self):
+        self._emit("extOb2AnalyseImage")
+
+    def ob2Video(self, state="on"):
+        self._emit("extOb2VideoToggle", [str(state)])
+
+    def ob2ShowBoundingBoxes(self, show="show"):
+        self._emit("extOb2ShowBoundingBoxes", [str(show)])
+
+    def ob2SetThreshold(self, threshold):
+        self._emit("extOb2SetDetectionThreshold", [threshold])
+
+    def ob2GetCounts(self):
+        return _extension_rpc("extOb2GetCounts")
+
+    def ob2IsDetected(self, label="person"):
+        return _extension_rpc("extOb2IsDetected", [str(label)])
+
+    def ob2GetCountOf(self, label="person"):
+        return _extension_rpc("extOb2GetCountOf", [str(label)])
+
+    def ob2GetObjects(self, prop="label", index=0):
+        return _extension_rpc("extOb2GetObjects", [str(prop), index])
+
+    # ML
+    def mlAddExample1(self):
+        self._emit("extMlAddExample1")
+
+    def mlAddExample2(self):
+        self._emit("extMlAddExample2")
+
+    def mlAddExample3(self):
+        self._emit("extMlAddExample3")
+
+    def mlTrain(self, label="4"):
+        self._emit("extMlTrain", [str(label)])
+
+    def mlTrainAny(self, label="11"):
+        self._emit("extMlTrainAny", [str(label)])
+
+    def mlGetLabel(self):
+        return _extension_rpc("extMlGetLabel")
+
+    def mlGetCount(self, label="11"):
+        return _extension_rpc("extMlGetCountByLabel", [str(label)])
+
+    def mlReset(self, label="all"):
+        self._emit("extMlReset", [str(label)])
+
+    def mlResetAny(self, label="11"):
+        self._emit("extMlResetAny", [str(label)])
+
+    def mlDownload(self):
+        self._emit("extMlDownload")
+
+    def mlUpload(self):
+        self._emit("extMlUpload")
+
+    def mlToggle(self, state="off"):
+        self._emit("extMlToggleClassification", [str(state)])
+
+    def mlSetInterval(self, interval="1"):
+        self._emit("extMlSetClassificationInterval", [str(interval)])
+
+    def mlVideo(self, state="off"):
+        self._emit("extMlVideoToggle", [str(state)])
+
+    def mlSetTransparency(self, value):
+        self._emit("extMlSetVideoTransparency", [value])
+
+    def mlSetInput(self, input_src="webcam"):
+        self._emit("extMlSetInput", [str(input_src)])
+
+    # TM2Scratch
+    def tm2SetInput(self, input_src="webcam"):
+        self._emit("extTm2SetInput", [str(input_src)])
+
+    def tm2IsImageDetected(self, label="any"):
+        return _extension_rpc("extTm2IsImageLabelDetected", [str(label)])
+
+    def tm2ImageConfidence(self, label=""):
+        return _extension_rpc("extTm2ImageLabelConfidence", [str(label)])
+
+    def tm2SetImageModel(self, url):
+        self._emit("extTm2SetImageClassificationModelURL", [str(url)])
+
+    def tm2ClassifyImage(self):
+        self._emit("extTm2ClassifyVideoImage")
+
+    def tm2GetImageLabel(self):
+        return _extension_rpc("extTm2GetImageLabel")
+
+    def tm2IsSoundDetected(self, label="any"):
+        return _extension_rpc("extTm2IsSoundLabelDetected", [str(label)])
+
+    def tm2SoundConfidence(self, label=""):
+        return _extension_rpc("extTm2SoundLabelConfidence", [str(label)])
+
+    def tm2SetSoundModel(self, url):
+        self._emit("extTm2SetSoundClassificationModelURL", [str(url)])
+
+    def tm2GetSoundLabel(self):
+        return _extension_rpc("extTm2GetSoundLabel")
+
+    def tm2Toggle(self, state="off"):
+        self._emit("extTm2ToggleClassification", [str(state)])
+
+    def tm2SetInterval(self, interval="1"):
+        self._emit("extTm2SetClassificationInterval", [str(interval)])
+
+    def tm2SetThreshold(self, threshold):
+        self._emit("extTm2SetConfidenceThreshold", [threshold])
+
+    def tm2GetThreshold(self):
+        return _extension_rpc("extTm2GetConfidenceThreshold")
+
+    def tm2Video(self, state="on"):
+        self._emit("extTm2VideoToggle", [str(state)])
+
+    # TMPose2Scratch
+    def tmposeIsDetected(self, label="any"):
+        return _extension_rpc("extTmposeIsPoseLabelDetected", [str(label)])
+
+    def tmposeConfidence(self, label=""):
+        return _extension_rpc("extTmposePoseLabelConfidence", [str(label)])
+
+    def tmposeSetModel(self, url):
+        self._emit("extTmposeSetPoseClassificationModelURL", [str(url)])
+
+    def tmposeClassify(self):
+        self._emit("extTmposeClassifyVideoPose")
+
+    def tmposeGetLabel(self):
+        return _extension_rpc("extTmposeGetPoseLabel")
+
+    def tmposeToggle(self, state="off"):
+        self._emit("extTmposeToggleClassification", [str(state)])
+
+    def tmposeSetInterval(self, interval="1"):
+        self._emit("extTmposeSetClassificationInterval", [str(interval)])
+
+    def tmposeSetThreshold(self, threshold):
+        self._emit("extTmposeSetConfidenceThreshold", [threshold])
+
+    def tmposeGetThreshold(self):
+        return _extension_rpc("extTmposeGetConfidenceThreshold")
+
+    def tmposeVideo(self, state="off"):
+        self._emit("extTmposeVideoToggle", [str(state)])
+
 
 sprite = Sprite()
 stage = Sprite()
@@ -558,6 +830,294 @@ def set_video_transparency(value):
     sys.stdout.flush()
 
 
+# ─── Music Extension ─────────────────────────────────────────────────────────
+
+
+def play_drum(drum, beats=0.25):
+    sprite.playDrum(drum, beats)
+
+
+def rest(beats=0.25):
+    sprite.rest(beats)
+
+
+def play_note(note, beats=0.25):
+    sprite.playNote(note, beats)
+
+
+def set_instrument(instrument=1):
+    sprite.setInstrument(instrument)
+
+
+def set_tempo(tempo=60):
+    sprite.setTempo(tempo)
+
+
+def change_tempo(delta=20):
+    sprite.changeTempo(delta)
+
+
+def get_tempo():
+    return sprite.getTempo()
+
+
+# ─── Handpose Extension ──────────────────────────────────────────────────────
+
+
+def handpose_video(state="off"):
+    sprite.handposeVideo(state)
+
+
+def handpose_set_transparency(value):
+    sprite.handposeSetTransparency(value)
+
+
+def handpose_set_ratio(ratio):
+    sprite.handposeSetRatio(ratio)
+
+
+def handpose_get_x(landmark="1"):
+    return sprite.handposeGetX(landmark)
+
+
+def handpose_get_y(landmark="1"):
+    return sprite.handposeGetY(landmark)
+
+
+def handpose_get_z(landmark="1"):
+    return sprite.handposeGetZ(landmark)
+
+
+# ─── Speech to Text Extension ────────────────────────────────────────────────
+
+
+def listen():
+    sprite.listen()
+
+
+def get_speech():
+    return sprite.getSpeech()
+
+
+# ─── Translate Extension ─────────────────────────────────────────────────────
+
+
+def translate_text(words, language="en"):
+    return sprite.translateText(words, language)
+
+
+def get_viewer_language():
+    return sprite.getViewerLanguage()
+
+
+# ─── Object Detection Extension ──────────────────────────────────────────────
+
+
+def ob2_analyse():
+    sprite.ob2Analyse()
+
+
+def ob2_video(state="on"):
+    sprite.ob2Video(state)
+
+
+def ob2_show_bounding_boxes(show="show"):
+    sprite.ob2ShowBoundingBoxes(show)
+
+
+def ob2_set_threshold(threshold=0.5):
+    sprite.ob2SetThreshold(threshold)
+
+
+def ob2_get_counts():
+    return sprite.ob2GetCounts()
+
+
+def ob2_is_detected(label="person"):
+    return sprite.ob2IsDetected(label)
+
+
+def ob2_get_count_of(label="person"):
+    return sprite.ob2GetCountOf(label)
+
+
+def ob2_get_objects(prop="label", index=0):
+    return sprite.ob2GetObjects(prop, index)
+
+
+# ─── ML Extension ────────────────────────────────────────────────────────────
+
+
+def ml_add_example1():
+    sprite.mlAddExample1()
+
+
+def ml_add_example2():
+    sprite.mlAddExample2()
+
+
+def ml_add_example3():
+    sprite.mlAddExample3()
+
+
+def ml_train(label="4"):
+    sprite.mlTrain(label)
+
+
+def ml_train_any(label="11"):
+    sprite.mlTrainAny(label)
+
+
+def ml_get_label():
+    return sprite.mlGetLabel()
+
+
+def ml_get_count(label="11"):
+    return sprite.mlGetCount(label)
+
+
+def ml_reset(label="all"):
+    sprite.mlReset(label)
+
+
+def ml_reset_any(label="11"):
+    sprite.mlResetAny(label)
+
+
+def ml_download():
+    sprite.mlDownload()
+
+
+def ml_upload():
+    sprite.mlUpload()
+
+
+def ml_toggle(state="off"):
+    sprite.mlToggle(state)
+
+
+def ml_set_interval(interval="1"):
+    sprite.mlSetInterval(interval)
+
+
+def ml_video(state="off"):
+    sprite.mlVideo(state)
+
+
+def ml_set_transparency(value):
+    sprite.mlSetTransparency(value)
+
+
+def ml_set_input(input_src="webcam"):
+    sprite.mlSetInput(input_src)
+
+
+# ─── TM2Scratch Extension ────────────────────────────────────────────────────
+
+
+def tm2_set_input(input_src="webcam"):
+    sprite.tm2SetInput(input_src)
+
+
+def tm2_is_image_detected(label="any"):
+    return sprite.tm2IsImageDetected(label)
+
+
+def tm2_image_confidence(label=""):
+    return sprite.tm2ImageConfidence(label)
+
+
+def tm2_set_image_model(url):
+    sprite.tm2SetImageModel(url)
+
+
+def tm2_classify_image():
+    sprite.tm2ClassifyImage()
+
+
+def tm2_get_image_label():
+    return sprite.tm2GetImageLabel()
+
+
+def tm2_is_sound_detected(label="any"):
+    return sprite.tm2IsSoundDetected(label)
+
+
+def tm2_sound_confidence(label=""):
+    return sprite.tm2SoundConfidence(label)
+
+
+def tm2_set_sound_model(url):
+    sprite.tm2SetSoundModel(url)
+
+
+def tm2_get_sound_label():
+    return sprite.tm2GetSoundLabel()
+
+
+def tm2_toggle(state="off"):
+    sprite.tm2Toggle(state)
+
+
+def tm2_set_interval(interval="1"):
+    sprite.tm2SetInterval(interval)
+
+
+def tm2_set_threshold(threshold=0.5):
+    sprite.tm2SetThreshold(threshold)
+
+
+def tm2_get_threshold():
+    return sprite.tm2GetThreshold()
+
+
+def tm2_video(state="on"):
+    sprite.tm2Video(state)
+
+
+# ─── TMPose2Scratch Extension ────────────────────────────────────────────────
+
+
+def tmpose_is_detected(label="any"):
+    return sprite.tmposeIsDetected(label)
+
+
+def tmpose_confidence(label=""):
+    return sprite.tmposeConfidence(label)
+
+
+def tmpose_set_model(url):
+    sprite.tmposeSetModel(url)
+
+
+def tmpose_classify():
+    sprite.tmposeClassify()
+
+
+def tmpose_get_label():
+    return sprite.tmposeGetLabel()
+
+
+def tmpose_toggle(state="off"):
+    sprite.tmposeToggle(state)
+
+
+def tmpose_set_interval(interval="1"):
+    sprite.tmposeSetInterval(interval)
+
+
+def tmpose_set_threshold(threshold=0.5):
+    sprite.tmposeSetThreshold(threshold)
+
+
+def tmpose_get_threshold():
+    return sprite.tmposeGetThreshold()
+
+
+def tmpose_video(state="off"):
+    sprite.tmposeVideo(state)
+
+
 def load_device(device_id, device_type="", pnpid_list=None):
     if pnpid_list is None:
         pnpid_list = []
@@ -623,9 +1183,55 @@ def _device_rpc(device_id, cmd, args=None):
     return None
 
 
+# ─── Extension RPC (for REPORTER-type extension opcodes) ─────────────────────
+
+_extension_rpc_counter = 0
+
+
+def _extension_emit(cmd, args=None, request_id=None):
+    if args is None:
+        args = []
+    payload = {"cmd": cmd, "args": args}
+    if request_id is not None:
+        payload["_requestId"] = request_id
+    sys.stdout.write(_json_dumps(payload) + "\n")
+    sys.stdout.flush()
+
+
+def _extension_rpc(ext_cmd, args=None):
+    global _extension_rpc_counter
+    if args is None:
+        args = []
+    _extension_rpc_counter += 1
+    request_id = _extension_rpc_counter
+    _extension_emit(ext_cmd, args, request_id)
+
+    result_container = [None]
+    done_event = _threading.Event()
+
+    def _read_stdin():
+        try:
+            line = sys.stdin.readline()
+            if line:
+                result_container[0] = json.loads(line.strip())
+        except Exception:
+            pass
+        done_event.set()
+
+    t = _threading.Thread(target=_read_stdin, daemon=True)
+    t.start()
+    done_event.wait(timeout=5.0)
+
+    if result_container[0]:
+        result = result_container[0]
+        if result.get("_requestId") == request_id:
+            return result.get("value")
+    return None
+
+
 class ArduinoDevice:
     """Base class for controlling Arduino-compatible boards via Firmata in realtime mode.
-    
+
     Usage:
         uno = ArduinoDevice("arduinoUno", "arduino")
         uno.pinMode(13, "OUTPUT")
@@ -646,7 +1252,9 @@ class ArduinoDevice:
 
     def digitalWrite(self, pin, value):
         """Write HIGH (True/1) or LOW (False/0) to a digital pin."""
-        _device_emit(self._device_id, "deviceDigitalWrite", [self._device_id, pin, bool(value)])
+        _device_emit(
+            self._device_id, "deviceDigitalWrite", [self._device_id, pin, bool(value)]
+        )
 
     def digitalRead(self, pin):
         """Read digital value (0 or 1) from a pin.
@@ -657,7 +1265,9 @@ class ArduinoDevice:
 
     def analogWrite(self, pin, value):
         """Write PWM value (0–255) to a PWM-capable pin."""
-        _device_emit(self._device_id, "deviceAnalogWrite", [self._device_id, pin, int(value)])
+        _device_emit(
+            self._device_id, "deviceAnalogWrite", [self._device_id, pin, int(value)]
+        )
 
     def analogRead(self, pin):
         """Read analog value (0–1023) from an analog pin.
@@ -668,7 +1278,9 @@ class ArduinoDevice:
 
     def servoWrite(self, pin, angle):
         """Set servo angle (0–180 degrees)."""
-        _device_emit(self._device_id, "deviceServoWrite", [self._device_id, pin, int(angle)])
+        _device_emit(
+            self._device_id, "deviceServoWrite", [self._device_id, pin, int(angle)]
+        )
 
     def serialPrint(self, text):
         """Print text to the serial port (no newline)."""
@@ -676,10 +1288,13 @@ class ArduinoDevice:
 
     def serialPrintln(self, text):
         """Print text followed by a newline to the serial port."""
-        _device_emit(self._device_id, "deviceSerialWriteLn", [self._device_id, str(text)])
+        _device_emit(
+            self._device_id, "deviceSerialWriteLn", [self._device_id, str(text)]
+        )
 
 
 # ─── Device Factory Functions ─────────────────────────────────────────────────
+
 
 def arduinoUno():
     """Create an Arduino Uno device instance for realtime control."""

@@ -54,7 +54,8 @@ class GUI extends React.Component {
         showSwitchModeDialog: false,
         pendingTabIndex: null,
         switchFromMode: MODE_BLOCK,
-        switchToMode: MODE_BLOCK
+        switchToMode: MODE_BLOCK,
+        showLandingPage: true
     };
 
     isNeutralEditorTab = tabIndex =>
@@ -226,6 +227,20 @@ class GUI extends React.Component {
 
         this.props.onActivateTab(tab);
         return true;
+    };
+
+    handleSelectJuniorCode = () => {
+        window.location.href = this.props.juniorCodeUrl;
+    };
+
+    handleSelectBlockCode = () => {
+        this.setState({showLandingPage: false});
+    };
+
+    handleSelectPythonIDE = () => {
+        this.setState({showLandingPage: false}, () => {
+            this.props.onActivateTab(PYTHON_TAB_INDEX);
+        });
     };
 
     handleActivateCostumesTab = () =>
@@ -446,6 +461,10 @@ class GUI extends React.Component {
         return (
             <GUIComponent
                 loading={fetchingProject || isLoading || loadingStateVisible}
+                showLandingPage={this.state.showLandingPage}
+                onSelectJuniorCode={this.handleSelectJuniorCode}
+                onSelectBlockCode={this.handleSelectBlockCode}
+                onSelectPythonIDE={this.handleSelectPythonIDE}
                 onActivateCostumesTab={this.handleActivateCostumesTab}
                 onActivateSoundsTab={this.handleActivateSoundsTab}
                 onActivateTab={this.handleActivateTab}
@@ -499,7 +518,8 @@ GUI.defaultProps = {
     onProjectLoaded: () => {},
     onUpdateProjectId: () => {},
     onVmInit: (/* vm */) => {},
-    onResetPythonIdeState: () => {}
+    onResetPythonIdeState: () => {},
+    juniorCodeUrl: '/junior-block-code/'
 };
 
 const mapStateToProps = state => {
