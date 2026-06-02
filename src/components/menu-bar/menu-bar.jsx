@@ -76,6 +76,9 @@ import {
     closeLoginMenu,
     loginMenuOpen
 } from '../../reducers/menus';
+import {resetPythonIdeState} from '../../reducers/python-ide';
+import {activateTab, BLOCKS_TAB_INDEX} from '../../reducers/editor-tab';
+import {setBlockMode} from '../../reducers/input-mode';
 import {setStageSize} from '../../reducers/stage-size';
 import {setUploadMode, setRealtimeMode} from '../../reducers/program-mode';
 import {
@@ -220,6 +223,7 @@ class MenuBar extends React.Component {
         super(props);
         bindAll(this, [
             'handleClickNew',
+            'handleClickNewProject',
             'handleClickRemix',
             'handleClickOpenCommunity',
             'handleClickOpenWiki',
@@ -259,21 +263,55 @@ class MenuBar extends React.Component {
         );
     }
     handleClickNew () {
-        // if the project is dirty, and user owns the project, we will autosave.
-        // but if they are not logged in and can't save, user should consider
-        // downloading or logging in first.
-        // Note that if user is logged in and editing someone else's project,
-        // they'll lose their work.
+        this.props.onRequestCloseFile();
+        this.clearProjectContent();
+        this.props.onShowLandingPage();
+        this.props.dispatch(requestNewProject(false));
+        this.props.dispatch(resetPythonIdeState());
+        this.props.dispatch(activateTab(BLOCKS_TAB_INDEX));
+        this.props.dispatch(setBlockMode());
+    }
+    handleClickNewProject () {
         const readyToReplaceProject = this.props.confirmReadyToReplaceProject(
             this.props.intl.formatMessage(sharedMessages.replaceProjectWarning),
         );
         this.props.onRequestCloseFile();
         if (readyToReplaceProject) {
-            this.props.onClickNew(
-                this.props.canSave && this.props.canCreateNew,
-            );
+            this.clearProjectContent();
+            this.props.dispatch(requestNewProject(false));
+            this.props.dispatch(resetPythonIdeState());
         }
         this.props.onRequestCloseFile();
+    }
+    clearProjectContent () {
+        const runtime = this.props.vm && this.props.vm.runtime;
+        if (!runtime || !Array.isArray(runtime.targets)) return;
+        runtime.targets.forEach(target => {
+            const blocks = target && target.blocks && target.blocks._blocks;
+            if (!blocks) return;
+            const blockIds = Object.keys(blocks);
+            const topLevelIds = blockIds.filter(
+                id => blocks[id] && blocks[id].topLevel
+            );
+            const idsToDelete = topLevelIds.length > 0 ? topLevelIds : blockIds;
+            idsToDelete.forEach(id => {
+                if (target.blocks && typeof target.blocks.deleteBlock === 'function') {
+                    target.blocks.deleteBlock(id);
+                }
+            });
+            if (target.comments && typeof target.comments === 'object') {
+                target.comments = {};
+            }
+        });
+        if (typeof this.props.vm.emitWorkspaceUpdate === 'function') {
+            this.props.vm.emitWorkspaceUpdate();
+        }
+        if (typeof this.props.vm.emitTargetsUpdate === 'function') {
+            this.props.vm.emitTargetsUpdate(false);
+        }
+        if (typeof this.props.vm.refreshWorkspace === 'function') {
+            this.props.vm.refreshWorkspace();
+        }
     }
     handleClickRemix () {
         this.props.onClickRemix();
@@ -549,6 +587,13 @@ class MenuBar extends React.Component {
                 id="gui.menuBar.new"
             />
         );
+        const newProjectMessage2 = (
+            <FormattedMessage
+                defaultMessage="New Project"
+                description="Menu bar item for creating a new project in same mode"
+                id="gui.menuBar.newProject"
+            />
+        );
         const checkUpdate = (
             <FormattedMessage
                 defaultMessage="Check update"
@@ -652,6 +697,12 @@ class MenuBar extends React.Component {
                                         onClick={this.handleClickNew}
                                     >
                                         {newProjectMessage}
+                                    </MenuItem>
+                                    <MenuItem
+                                        isRtl={this.props.isRtl}
+                                        onClick={this.handleClickNewProject}
+                                    >
+                                        {newProjectMessage2}
                                     </MenuItem>
                                 </MenuSection>
                                 {(this.props.canSave ||
@@ -1143,6 +1194,7 @@ MenuBar.propTypes = {
     onClickLogin: PropTypes.func,
     onClickLogo: PropTypes.func,
     onClickNew: PropTypes.func,
+    onShowLandingPage: PropTypes.func,
     onClickRemix: PropTypes.func,
     onClickSave: PropTypes.func,
     onClickSaveAsCopy: PropTypes.func,
@@ -1190,7 +1242,8 @@ MenuBar.propTypes = {
     onSetStageLarge: PropTypes.func.isRequired,
     deviceId: PropTypes.string,
     deviceName: PropTypes.string,
-    onDeviceIsEmpty: PropTypes.func
+    onDeviceIsEmpty: PropTypes.func,
+    dispatch: PropTypes.func
 };
 
 MenuBar.defaultProps = {
@@ -1251,7 +1304,7 @@ const mapDispatchToProps = dispatch => ({
     onRequestCloseLogin: () => dispatch(closeLoginMenu()),
     onRequestOpenAbout: () => dispatch(openAboutMenu()),
     onRequestCloseAbout: () => dispatch(closeAboutMenu()),
-    onClickNew: needSave => dispatch(requestNewProject(needSave)),
+    dispatch,
     onClickRemix: () => dispatch(remixProject()),
     onClickSave: () => dispatch(manualUpdateProject()),
     onClickSaveAsCopy: () => dispatch(saveProjectAsCopy()),

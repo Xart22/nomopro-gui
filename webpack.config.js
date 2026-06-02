@@ -27,7 +27,10 @@ const base = {
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
     devtool: 'cheap-module-source-map',
     devServer: {
-        contentBase: path.resolve(__dirname, 'build'),
+        contentBase: [
+            path.resolve(__dirname, 'build'),
+            path.resolve(__dirname, 'nomokitjr')
+        ],
         host: '0.0.0.0',
         port: process.env.PORT || 8601
     },
@@ -221,6 +224,12 @@ module.exports = [
                     from: 'extension-worker.{js,js.map}',
                     context: 'node_modules/openblock-vm/dist/web'
                 }
+            ]),
+            new CopyWebpackPlugin([
+                {
+                    from: 'nomokitjr',
+                    to: 'nomokitjr'
+                }
             ])
         ])
     })
@@ -263,6 +272,12 @@ module.exports = [
                     {
                         from: 'extension-worker.{js,js.map}',
                         context: 'node_modules/openblock-vm/dist/web'
+                    }
+                ]),
+                new CopyWebpackPlugin([
+                    {
+                        from: 'nomokitjr',
+                        to: 'nomokitjr'
                     }
                 ]),
                 // Include library JSON files for scratch-desktop to use for downloading

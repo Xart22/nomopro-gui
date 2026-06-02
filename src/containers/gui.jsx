@@ -55,7 +55,8 @@ class GUI extends React.Component {
         pendingTabIndex: null,
         switchFromMode: MODE_BLOCK,
         switchToMode: MODE_BLOCK,
-        showLandingPage: true
+        showLandingPage: true,
+        showJuniorContent: false
     };
 
     isNeutralEditorTab = tabIndex =>
@@ -229,8 +230,20 @@ class GUI extends React.Component {
         return true;
     };
 
+    handleMessage = event => {
+        if (event.data && event.data.type === 'closeJuniorContent') {
+            this.handleCloseJuniorContent();
+        }
+    };
     handleSelectJuniorCode = () => {
-        window.location.href = this.props.juniorCodeUrl;
+        this.setState({showJuniorContent: true});
+    };
+    handleCloseJuniorContent = () => {
+        this.setState({showJuniorContent: false});
+    };
+
+    handleShowLandingPage = () => {
+        this.setState({showLandingPage: true});
     };
 
     handleSelectBlockCode = () => {
@@ -372,9 +385,12 @@ class GUI extends React.Component {
                 document.head.appendChild(script);
             }
         } catch (e) {}
+
+        window.addEventListener('message', this.handleMessage);
     }
 
     componentWillUnmount () {
+        window.removeEventListener('message', this.handleMessage);
         if (this._onPythonIdeAdd) {
             window.removeEventListener(
                 'python-ide-add-extension',
@@ -462,9 +478,12 @@ class GUI extends React.Component {
             <GUIComponent
                 loading={fetchingProject || isLoading || loadingStateVisible}
                 showLandingPage={this.state.showLandingPage}
+                showJuniorContent={this.state.showJuniorContent}
                 onSelectJuniorCode={this.handleSelectJuniorCode}
                 onSelectBlockCode={this.handleSelectBlockCode}
                 onSelectPythonIDE={this.handleSelectPythonIDE}
+                onCloseJuniorContent={this.handleCloseJuniorContent}
+                onShowLandingPage={this.handleShowLandingPage}
                 onActivateCostumesTab={this.handleActivateCostumesTab}
                 onActivateSoundsTab={this.handleActivateSoundsTab}
                 onActivateTab={this.handleActivateTab}

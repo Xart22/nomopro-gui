@@ -93,9 +93,12 @@ const GUIComponent = (props) => {
         canUseCloud,
         children,
         showLandingPage,
+        showJuniorContent,
         onSelectJuniorCode,
         onSelectBlockCode,
         onSelectPythonIDE,
+        onCloseJuniorContent,
+        onShowLandingPage,
         connectionModalVisible,
         uploadProgressVisible,
         costumeLibraryVisible,
@@ -383,6 +386,7 @@ const GUIComponent = (props) => {
                                 onClickCheckUpdate={onClickCheckUpdate}
                                 onClickClearCache={onClickClearCache}
                                 onClickInstallDriver={onClickInstallDriver}
+                                onShowLandingPage={onShowLandingPage}
                             />
                             <Box className={styles.bodyWrapper}>
                                 <Box className={styles.flexWrapper}>
@@ -637,6 +641,21 @@ const GUIComponent = (props) => {
                     );
                 }}
             </MediaQuery>
+            {showJuniorContent ? (
+                <Box className={styles.juniorOverlay}>
+                    <button
+                        className={styles.juniorCloseButton}
+                        onClick={onCloseJuniorContent}
+                    >
+                        &times;
+                    </button>
+                    <iframe
+                        className={styles.juniorIframe}
+                        src="/nomokit-jr"
+                        title="Nomokit Jr"
+                    />
+                </Box>
+            ) : null}
         </React.Fragment>
     );
 };
