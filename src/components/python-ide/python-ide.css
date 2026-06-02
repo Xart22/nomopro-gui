@@ -513,19 +513,22 @@ e.g. STAGE_DIMENSION_DEFAULTS in lib/screen-utils.js */
     -webkit-align-items: center;
     -ms-flex-align: center;
     align-items: center;
-    -webkit-flex-wrap: nowrap;
-    -ms-flex-wrap: nowrap;
-    flex-wrap: nowrap;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
     padding: 0.35rem 0.7rem;
     background: hsla(215, 50%, 90%, 1);
     font-size: 0.9rem;
-    gap: 0.75rem;
+    gap: 0.5rem 0.75rem;
     min-height: 2.6rem;
-    height: 2.6rem;
     -webkit-flex-shrink: 0;
     -ms-flex-negative: 0;
     flex-shrink: 0;
-    overflow: hidden;
+    overflow: visible;
+}
+
+.btnLabel {
+    display: inline;
 }
 
 .tabList {
@@ -553,8 +556,12 @@ e.g. STAGE_DIMENSION_DEFAULTS in lib/screen-utils.js */
     border-radius: 0.85rem;
     overflow-x: auto;
     overflow-y: hidden;
-    scrollbar-width: thin;
+    scrollbar-width: none;
     scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+}
+
+.tabList::-webkit-scrollbar {
+    display: none;
 }
 
 .tab {
@@ -657,9 +664,9 @@ e.g. STAGE_DIMENSION_DEFAULTS in lib/screen-utils.js */
     -ms-flex-align: center;
     align-items: center;
     gap: 0.35rem;
-    -webkit-flex-wrap: nowrap;
-    -ms-flex-wrap: nowrap;
-    flex-wrap: nowrap;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
     -webkit-flex: 0 1 auto;
     -ms-flex: 0 1 auto;
     flex: 0 1 auto;
@@ -668,10 +675,6 @@ e.g. STAGE_DIMENSION_DEFAULTS in lib/screen-utils.js */
     -webkit-justify-content: flex-end;
     -ms-flex-pack: end;
     justify-content: flex-end;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
 }
 
 .actionButton {
@@ -1584,18 +1587,20 @@ e.g. STAGE_DIMENSION_DEFAULTS in lib/screen-utils.js */
 
 @media (max-width: 1240px) {
     .terminal-toolbar {
-        gap: 0.5rem;
+        gap: 0.35rem 0.5rem;
         padding: 0.3rem 0.55rem;
     }
 
     .tab {
-        padding: 0.32rem 0.72rem;
+        padding: 0.32rem 0.65rem;
         font-size: 0.72rem;
+        gap: 0.25rem;
     }
 
     .actionButton {
-        padding: 0.32rem 0.58rem;
-        font-size: 0.74rem;
+        padding: 0.32rem 0.55rem;
+        font-size: 0.72rem;
+        gap: 0.25rem;
     }
 
     .realtime-toggle {
@@ -1604,23 +1609,87 @@ e.g. STAGE_DIMENSION_DEFAULTS in lib/screen-utils.js */
     }
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1060px) {
     .tabList {
-        -webkit-flex: 1 1 auto;
-        -ms-flex: 1 1 auto;
-        flex: 1 1 auto;
-        min-width: 44%;
+        -webkit-flex: 1 1 100%;
+        -ms-flex: 1 1 100%;
+        flex: 1 1 100%;
+        order: 1;
     }
 
     .terminal-actions {
-        -webkit-flex: 0 1 auto;
-        -ms-flex: 0 1 auto;
-        flex: 0 1 auto;
-        max-width: 56%;
+        -webkit-flex: 1 1 100%;
+        -ms-flex: 1 1 100%;
+        flex: 1 1 100%;
+        order: 2;
+        -webkit-box-pack: start;
+        -webkit-justify-content: flex-start;
+        -ms-flex-pack: start;
+        justify-content: flex-start;
+    }
+
+    .terminal-toolbar {
+        gap: 0.3rem 0.4rem;
+        padding: 0.3rem 0.5rem;
+    }
+}
+
+@media (max-width: 980px) {
+    .tabList .btnLabel {
+        display: none;
+    }
+
+    .tab {
+        padding: 0.35rem 0.55rem;
+        gap: 0;
+    }
+
+    .tab svg {
+        width: 1rem;
+        height: 1rem;
     }
 
     .actionButton {
-        padding: 0.3rem 0.5rem;
-        font-size: 0.72rem;
+        padding: 0.3rem 0.45rem;
+        font-size: 0.7rem;
+    }
+
+    .realtime-toggle span {
+        display: none;
+    }
+
+    .realtime-toggle {
+        padding: 0.3rem 0.45rem;
+    }
+}
+
+@media (max-width: 860px) {
+    .terminal-actions .btnLabel {
+        display: none;
+    }
+
+    .actionButton {
+        padding: 0.35rem;
+        gap: 0;
+    }
+
+    .actionButton svg {
+        width: 0.95rem;
+        height: 0.95rem;
+    }
+
+    .terminal-toolbar {
+        padding: 0.25rem 0.4rem;
+        gap: 0.25rem 0.35rem;
+    }
+
+    .tabList {
+        padding: 0.15rem;
+        border-radius: 0.65rem;
+    }
+
+    .tab {
+        padding: 0.3rem 0.45rem;
+        border-radius: 0.5rem;
     }
 }

@@ -965,6 +965,7 @@ const PythonIdeComponent = (props) => {
                                             : styles.tab
                                     }
                                     onClick={() => setActiveBottomTab("output")}
+                                    title="Output"
                                     type="button"
                                 >
                                     <svg
@@ -978,7 +979,7 @@ const PythonIdeComponent = (props) => {
                                         <polyline points="16 18 22 12 16 6" />
                                         <polyline points="8 6 2 12 8 18" />
                                     </svg>
-                                    Output
+                                    <span className={styles.btnLabel}>Output</span>
                                 </button>
                                 <button
                                     className={
@@ -987,6 +988,7 @@ const PythonIdeComponent = (props) => {
                                             : styles.tab
                                     }
                                     onClick={() => setActiveBottomTab("error")}
+                                    title="Error"
                                     type="button"
                                 >
                                     <svg
@@ -1006,7 +1008,7 @@ const PythonIdeComponent = (props) => {
                                             y2="16"
                                         />
                                     </svg>
-                                    Error
+                                    <span className={styles.btnLabel}>Error</span>
                                 </button>
                                 <button
                                     className={
@@ -1054,7 +1056,7 @@ const PythonIdeComponent = (props) => {
                                             y2="18"
                                         />
                                     </svg>
-                                    Serial{isDeviceConnected ? " ●" : ""}
+                                    <span className={styles.btnLabel}>Serial{isDeviceConnected ? " ●" : ""}</span>
                                 </button>
                                 {isMicroPythonDevice && (
                                     <button
@@ -1080,7 +1082,7 @@ const PythonIdeComponent = (props) => {
                                             <polyline points="4 17 10 11 4 5" />
                                             <polyline points="12 19 20 19" />
                                         </svg>
-                                        REPL
+                                        <span className={styles.btnLabel}>REPL</span>
                                     </button>
                                 )}
                                 {supportsMicroPython &&
@@ -1113,7 +1115,7 @@ const PythonIdeComponent = (props) => {
                                                 />
                                                 <polyline points="6 9 12 15 18 9" />
                                             </svg>
-                                            Upload
+                                            <span className={styles.btnLabel}>Upload</span>
                                         </button>
                                     )}
                             </Box>
@@ -1133,7 +1135,7 @@ const PythonIdeComponent = (props) => {
                                     >
                                         <polygon points="5,3 19,12 5,21" />
                                     </svg>
-                                    Run
+                                    <span className={styles.btnLabel}>Run</span>
                                 </button>
                                 <button
                                     className={`${styles.actionButton} ${styles.runAllButton}`}
@@ -1151,7 +1153,7 @@ const PythonIdeComponent = (props) => {
                                         <polygon points="3,3 15,12 3,21" />
                                         <polygon points="11,3 23,12 11,21" />
                                     </svg>
-                                    Run All
+                                    <span className={styles.btnLabel}>Run All</span>
                                 </button>
                                 <button
                                     className={`${styles.actionButton} ${styles.stopButton}`}
@@ -1174,7 +1176,7 @@ const PythonIdeComponent = (props) => {
                                             rx="1"
                                         />
                                     </svg>
-                                    Stop
+                                    <span className={styles.btnLabel}>Stop</span>
                                 </button>
                                 {isMicroPythonDevice && (
                                     <>
@@ -1199,9 +1201,9 @@ const PythonIdeComponent = (props) => {
                                                 <polyline points="4 17 10 11 4 5" />
                                                 <polyline points="12 19 20 19" />
                                             </svg>
-                                            {isUploading
+                                            <span className={styles.btnLabel}>{isUploading
                                                 ? "..."
-                                                : "µPython Run"}
+                                                : "µPython Run"}</span>
                                         </button>
                                         <button
                                             className={`${styles.actionButton} ${styles.runAllButton}`}
@@ -1236,9 +1238,9 @@ const PythonIdeComponent = (props) => {
                                                     y2="17"
                                                 />
                                             </svg>
-                                            {isUploading
+                                            <span className={styles.btnLabel}>{isUploading
                                                 ? "..."
-                                                : "Upload main.py"}
+                                                : "Upload main.py"}</span>
                                         </button>
                                     </>
                                 )}
@@ -1259,7 +1261,7 @@ const PythonIdeComponent = (props) => {
                                             )
                                         }
                                     />
-                                    <span>Realtime</span>
+                                    <span className={styles.btnLabel}>Realtime</span>
                                 </label>
                                 <button
                                     className={`${styles.actionButton} ${styles.expandButton}`}
@@ -1295,7 +1297,11 @@ const PythonIdeComponent = (props) => {
                                             </>
                                         )}
                                     </svg>
-                                    {isTerminalExpanded ? "Collapse" : "Expand"}
+                                    <span className={styles.btnLabel}>
+                                        {isTerminalExpanded ?
+                                            "Collapse" :
+                                            "Expand"}
+                                    </span>
                                 </button>
                                 {supportsMicroPython &&
                                     runtimeTarget === "vm" && (
@@ -1311,7 +1317,7 @@ const PythonIdeComponent = (props) => {
                                             title="Switch to MicroPython upload mode"
                                             style={{ marginLeft: "4px" }}
                                         >
-                                            µPy Upload
+                                            <span className={styles.btnLabel}>µPy Upload</span>
                                         </button>
                                     )}
                             </Box>
