@@ -8,7 +8,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: #4a4a8a;
+    background: #0293dd;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -69,7 +69,6 @@
 }
 
 .cardIcon {
-    width: 72px;
     height: 72px;
     flex-shrink: 0;
 }

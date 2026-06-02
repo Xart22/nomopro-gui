@@ -1,72 +1,72 @@
-import classNames from 'classnames';
-import omit from 'lodash.omit';
-import PropTypes from 'prop-types';
-import React from 'react';
+import classNames from "classnames";
+import omit from "lodash.omit";
+import PropTypes from "prop-types";
+import React from "react";
 import {
     defineMessages,
     FormattedMessage,
     injectIntl,
-    intlShape
-} from 'react-intl';
-import {connect} from 'react-redux';
-import MediaQuery from 'react-responsive';
-import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
-import tabStyles from 'react-tabs/style/react-tabs.css';
-import VM from 'openblock-vm';
-import Renderer from 'scratch-render';
+    intlShape,
+} from "react-intl";
+import { connect } from "react-redux";
+import MediaQuery from "react-responsive";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import tabStyles from "react-tabs/style/react-tabs.css";
+import VM from "openblock-vm";
+import Renderer from "scratch-render";
 
-import Blocks from '../../containers/blocks.jsx';
-import CostumeTab from '../../containers/costume-tab.jsx';
-import TargetPane from '../../containers/target-pane.jsx';
-import SoundTab from '../../containers/sound-tab.jsx';
-import StageWrapper from '../../containers/stage-wrapper.jsx';
-import Loader from '../loader/loader.jsx';
-import LandingPage from '../landing-page/landing-page.jsx';
-import Box from '../box/box.jsx';
-import MenuBar from '../menu-bar/menu-bar.jsx';
-import CostumeLibrary from '../../containers/costume-library.jsx';
-import BackdropLibrary from '../../containers/backdrop-library.jsx';
-import Watermark from '../../containers/watermark.jsx';
-import Hardware from '../../containers/hardware.jsx';
-import HardwareHeader from '../../containers/hardware-header.jsx';
-import PythonIde from '../../containers/python-ide.jsx';
+import Blocks from "../../containers/blocks.jsx";
+import CostumeTab from "../../containers/costume-tab.jsx";
+import TargetPane from "../../containers/target-pane.jsx";
+import SoundTab from "../../containers/sound-tab.jsx";
+import StageWrapper from "../../containers/stage-wrapper.jsx";
+import Loader from "../loader/loader.jsx";
+import LandingPage from "../landing-page/landing-page.jsx";
+import Box from "../box/box.jsx";
+import MenuBar from "../menu-bar/menu-bar.jsx";
+import CostumeLibrary from "../../containers/costume-library.jsx";
+import BackdropLibrary from "../../containers/backdrop-library.jsx";
+import Watermark from "../../containers/watermark.jsx";
+import Hardware from "../../containers/hardware.jsx";
+import HardwareHeader from "../../containers/hardware-header.jsx";
+import PythonIde from "../../containers/python-ide.jsx";
 
 // eslint-disable-next-line no-unused-vars
-import Backpack from '../../containers/backpack.jsx';
-import WebGlModal from '../../containers/webgl-modal.jsx';
-import TipsLibrary from '../../containers/tips-library.jsx';
-import Cards from '../../containers/cards.jsx';
-import Alerts from '../../containers/alerts.jsx';
-import DragLayer from '../../containers/drag-layer.jsx';
-import ConnectionModal from '../../containers/connection-modal.jsx';
-import UploadProgress from '../../containers/upload-progress.jsx';
-import Modal from '../modal/modal.jsx';
-import TelemetryModal from '../telemetry-modal/telemetry-modal.jsx';
-import UpdateModal from '../../containers/update-modal.jsx';
+import Backpack from "../../containers/backpack.jsx";
+import WebGlModal from "../../containers/webgl-modal.jsx";
+import TipsLibrary from "../../containers/tips-library.jsx";
+import Cards from "../../containers/cards.jsx";
+import Alerts from "../../containers/alerts.jsx";
+import DragLayer from "../../containers/drag-layer.jsx";
+import ConnectionModal from "../../containers/connection-modal.jsx";
+import UploadProgress from "../../containers/upload-progress.jsx";
+import Modal from "../modal/modal.jsx";
+import TelemetryModal from "../telemetry-modal/telemetry-modal.jsx";
+import UpdateModal from "../../containers/update-modal.jsx";
 
-import layout, {STAGE_SIZE_MODES} from '../../lib/layout-constants';
-import {resolveStageSize} from '../../lib/screen-utils';
+import layout, { STAGE_SIZE_MODES } from "../../lib/layout-constants";
+import { resolveStageSize } from "../../lib/screen-utils";
 
-import styles from './gui.css';
-import addExtensionIcon from './icon--extensions.svg';
-import codeIcon from './icon--code.svg';
-import pythonIcon from './python-logo.svg';
-import costumesIcon from './icon--costumes.svg';
-import soundsIcon from './icon--sounds.svg';
+import styles from "./gui.css";
+import addExtensionIcon from "./icon--extensions.svg";
+import codeIcon from "./icon--code.svg";
+import pythonIcon from "./python-logo.svg";
+import costumesIcon from "./icon--costumes.svg";
+import soundsIcon from "./icon--sounds.svg";
 
 const messages = defineMessages({
     addExtension: {
-        id: 'gui.gui.addExtension',
-        description: 'Button to add an extension in the target pane',
-        defaultMessage: 'Add Extension'
-    }
+        id: "gui.gui.addExtension",
+        description: "Button to add an extension in the target pane",
+        defaultMessage: "Add Extension",
+    },
 });
 
 // Cache this value to only retrieve it once the first time.
 // Assume that it doesn't change for a session.
 let isRendererSupported = null;
 
-const GUIComponent = props => {
+const GUIComponent = (props) => {
     const {
         accountNavOpen,
         activeTabIndex,
@@ -157,7 +157,7 @@ const GUIComponent = props => {
         onCancelSwitchMode,
         inputMode,
         ...componentProps
-    } = omit(props, 'dispatch');
+    } = omit(props, "dispatch");
     if (children) {
         return <Box {...componentProps}>{children}</Box>;
     }
@@ -174,15 +174,15 @@ const GUIComponent = props => {
         tabSelected: classNames(
             tabStyles.reactTabsTabSelected,
             styles.isSelected,
-        )
+        ),
     };
 
     if (isRendererSupported === null) {
         isRendererSupported = Renderer.isSupported();
     }
 
-    const switchFromLabel = switchFromMode === 'python' ? 'Python' : 'Block';
-    const switchToLabel = switchToMode === 'python' ? 'Python' : 'Block';
+    const switchFromLabel = switchFromMode === "python" ? "Python" : "Block";
+    const switchToLabel = switchToMode === "python" ? "Python" : "Block";
 
     return (
         <React.Fragment>
@@ -194,8 +194,11 @@ const GUIComponent = props => {
                 />
             ) : null}
             <MediaQuery minWidth={layout.fullSizeMinWidth}>
-                {isFullSize => {
-                    const stageSize = resolveStageSize(stageSizeMode, isFullSize);
+                {(isFullSize) => {
+                    const stageSize = resolveStageSize(
+                        stageSizeMode,
+                        isFullSize,
+                    );
 
                     return isPlayerOnly ? (
                         <StageWrapper
@@ -216,7 +219,7 @@ const GUIComponent = props => {
                     ) : (
                         <Box
                             className={styles.pageWrapper}
-                            dir={isRtl ? 'rtl' : 'ltr'}
+                            dir={isRtl ? "rtl" : "ltr"}
                             {...componentProps}
                         >
                             {telemetryModalVisible ? (
@@ -226,7 +229,9 @@ const GUIComponent = props => {
                                     onCancel={onTelemetryModalCancel}
                                     onOptIn={onTelemetryModalOptIn}
                                     onOptOut={onTelemetryModalOptOut}
-                                    onRequestClose={onRequestCloseTelemetryModal}
+                                    onRequestClose={
+                                        onRequestCloseTelemetryModal
+                                    }
                                     onShowPrivacyPolicy={onShowPrivacyPolicy}
                                 />
                             ) : null}
@@ -246,23 +251,42 @@ const GUIComponent = props => {
                                     onRequestClose={onCancelSwitchMode}
                                 >
                                     <Box className={styles.switchModeBody}>
-                                        <Box className={styles.switchModeVisualRow}>
-                                            <Box className={styles.switchModeChip}>
+                                        <Box
+                                            className={
+                                                styles.switchModeVisualRow
+                                            }
+                                        >
+                                            <Box
+                                                className={
+                                                    styles.switchModeChip
+                                                }
+                                            >
                                                 {switchFromLabel}
                                             </Box>
-                                            <Box className={styles.switchModeArrow}>
-                                                {'>>'}
+                                            <Box
+                                                className={
+                                                    styles.switchModeArrow
+                                                }
+                                            >
+                                                {">>"}
                                             </Box>
-                                            <Box className={styles.switchModeChip}>
+                                            <Box
+                                                className={
+                                                    styles.switchModeChip
+                                                }
+                                            >
                                                 {switchToLabel}
                                             </Box>
                                         </Box>
                                         <Box className={styles.switchModeText}>
-                                            You are switching to the {switchToLabel}{' '}
-                                            coding environment. Python code and
-                                            block code do not run in parallel.
+                                            You are switching to the{" "}
+                                            {switchToLabel} coding environment.
+                                            Python code and block code do not
+                                            run in parallel.
                                         </Box>
-                                        <Box className={styles.switchModeActions}>
+                                        <Box
+                                            className={styles.switchModeActions}
+                                        >
                                             <button
                                                 className={
                                                     styles.switchModePrimaryButton
@@ -300,13 +324,17 @@ const GUIComponent = props => {
                             {costumeLibraryVisible ? (
                                 <CostumeLibrary
                                     vm={vm}
-                                    onRequestClose={onRequestCloseCostumeLibrary}
+                                    onRequestClose={
+                                        onRequestCloseCostumeLibrary
+                                    }
                                 />
                             ) : null}
                             {backdropLibraryVisible ? (
                                 <BackdropLibrary
                                     vm={vm}
-                                    onRequestClose={onRequestCloseBackdropLibrary}
+                                    onRequestClose={
+                                        onRequestCloseBackdropLibrary
+                                    }
                                 />
                             ) : null}
                             {updateModalVisible ? (
@@ -342,7 +370,9 @@ const GUIComponent = props => {
                                 onCloseAccountNav={onCloseAccountNav}
                                 onLogOut={onLogOut}
                                 onOpenRegistration={onOpenRegistration}
-                                onProjectTelemetryEvent={onProjectTelemetryEvent}
+                                onProjectTelemetryEvent={
+                                    onProjectTelemetryEvent
+                                }
                                 onSeeCommunity={onSeeCommunity}
                                 onShare={onShare}
                                 onStartSelectingFileUpload={
@@ -356,7 +386,13 @@ const GUIComponent = props => {
                             />
                             <Box className={styles.bodyWrapper}>
                                 <Box className={styles.flexWrapper}>
-                                    <Box className={styles.editorWrapper}>
+                                    <Box
+                                        className={classNames(
+                                            styles.editorWrapper,
+                                            inputMode === "python" &&
+                                                styles.pythonEditorWrapper,
+                                        )}
+                                    >
                                         <Tabs
                                             forceRenderTabPanel
                                             className={tabClassNames.tabs}
@@ -370,9 +406,15 @@ const GUIComponent = props => {
                                             onSelect={onActivateTab}
                                         >
                                             <TabList
-                                                className={tabClassNames.tabList}
+                                                className={
+                                                    tabClassNames.tabList
+                                                }
                                             >
-                                                <Tab className={tabClassNames.tab}>
+                                                <Tab
+                                                    className={
+                                                        tabClassNames.tab
+                                                    }
+                                                >
                                                     <img
                                                         draggable={false}
                                                         src={codeIcon}
@@ -387,11 +429,14 @@ const GUIComponent = props => {
                                                     className={classNames(
                                                         tabClassNames.tab,
                                                         isRealtimeMode ||
-                                                        inputMode === 'python' ?
-                                                            styles.hideCustomAndSoundTab :
-                                                            styles.showCustomAndSoundTab,
+                                                            inputMode ===
+                                                                "python"
+                                                            ? styles.hideCustomAndSoundTab
+                                                            : styles.showCustomAndSoundTab,
                                                     )}
-                                                    onClick={onActivateCostumesTab}
+                                                    onClick={
+                                                        onActivateCostumesTab
+                                                    }
                                                 >
                                                     <img
                                                         draggable={false}
@@ -415,11 +460,14 @@ const GUIComponent = props => {
                                                     className={classNames(
                                                         tabClassNames.tab,
                                                         isRealtimeMode ||
-                                                        inputMode === 'python' ?
-                                                            styles.hideCustomAndSoundTab :
-                                                            styles.showCustomAndSoundTab,
+                                                            inputMode ===
+                                                                "python"
+                                                            ? styles.hideCustomAndSoundTab
+                                                            : styles.showCustomAndSoundTab,
                                                     )}
-                                                    onClick={onActivateSoundsTab}
+                                                    onClick={
+                                                        onActivateSoundsTab
+                                                    }
                                                 >
                                                     <img
                                                         draggable={false}
@@ -434,9 +482,9 @@ const GUIComponent = props => {
                                                 <Tab
                                                     className={classNames(
                                                         tabClassNames.tab,
-                                                        !isRealtimeMode ?
-                                                            styles.hidePythonTab :
-                                                            null,
+                                                        !isRealtimeMode
+                                                            ? styles.hidePythonTab
+                                                            : null,
                                                     )}
                                                 >
                                                     <img
@@ -451,17 +499,25 @@ const GUIComponent = props => {
                                                 </Tab>
                                             </TabList>
                                             <TabPanel
-                                                className={tabClassNames.tabPanel}
+                                                className={
+                                                    tabClassNames.tabPanel
+                                                }
                                             >
                                                 <Box
-                                                    className={styles.blocksWrapper}
+                                                    className={
+                                                        styles.blocksWrapper
+                                                    }
                                                 >
                                                     <Blocks
-                                                        canUseCloud={canUseCloud}
+                                                        canUseCloud={
+                                                            canUseCloud
+                                                        }
                                                         grow={1}
-                                                        isVisible={blocksTabVisible}
+                                                        isVisible={
+                                                            blocksTabVisible
+                                                        }
                                                         options={{
-                                                            media: `${basePath}static/blocks-media/`
+                                                            media: `${basePath}static/blocks-media/`,
                                                         }}
                                                         stageSize={stageSize}
                                                         vm={vm}
@@ -491,23 +547,31 @@ const GUIComponent = props => {
                                                                 styles.extensionButtonIcon
                                                             }
                                                             draggable={false}
-                                                            src={addExtensionIcon}
+                                                            src={
+                                                                addExtensionIcon
+                                                            }
                                                         />
                                                     </button>
                                                 </Box>
-                                                <Box className={styles.watermark}>
+                                                <Box
+                                                    className={styles.watermark}
+                                                >
                                                     <Watermark />
                                                 </Box>
                                             </TabPanel>
                                             <TabPanel
-                                                className={tabClassNames.tabPanel}
+                                                className={
+                                                    tabClassNames.tabPanel
+                                                }
                                             >
                                                 {costumesTabVisible ? (
                                                     <CostumeTab vm={vm} />
                                                 ) : null}
                                             </TabPanel>
                                             <TabPanel
-                                                className={tabClassNames.tabPanel}
+                                                className={
+                                                    tabClassNames.tabPanel
+                                                }
                                             >
                                                 {soundsTabVisible ? (
                                                     <SoundTab
@@ -519,7 +583,9 @@ const GUIComponent = props => {
                                                 ) : null}
                                             </TabPanel>
                                             <TabPanel
-                                                className={tabClassNames.tabPanel}
+                                                className={
+                                                    tabClassNames.tabPanel
+                                                }
                                             >
                                                 {pythonTabVisible ? (
                                                     <PythonIde />
@@ -536,9 +602,9 @@ const GUIComponent = props => {
                                         className={classNames(
                                             styles.stageAndTargetWrapper,
                                             styles[stageSize],
-                                            isRealtimeMode ?
-                                                styles.showStage :
-                                                styles.hideStage,
+                                            isRealtimeMode
+                                                ? styles.showStage
+                                                : styles.hideStage,
                                         )}
                                     >
                                         <StageWrapper
@@ -561,9 +627,9 @@ const GUIComponent = props => {
                                         <HardwareHeader vm={vm} />
                                     ) : null}
                                     {isRealtimeMode === false &&
-                                stageSizeMode !== STAGE_SIZE_MODES.hide ? (
-                                    <Hardware vm={vm} />
-                                        ) : null}
+                                    stageSizeMode !== STAGE_SIZE_MODES.hide ? (
+                                        <Hardware vm={vm} />
+                                    ) : null}
                                 </Box>
                                 <DragLayer />
                             </Box>
@@ -651,12 +717,12 @@ GUIComponent.propTypes = {
     switchToMode: PropTypes.string,
     vm: PropTypes.instanceOf(VM).isRequired,
     isRealtimeMode: PropTypes.bool,
-    realtimeConnection: PropTypes.bool
+    realtimeConnection: PropTypes.bool,
 };
 GUIComponent.defaultProps = {
     backpackHost: null,
     backpackVisible: false,
-    basePath: './',
+    basePath: "./",
     canChangeLanguage: true,
     canCreateNew: false,
     canEditTitle: false,
@@ -671,12 +737,12 @@ GUIComponent.defaultProps = {
     isShared: false,
     loading: false,
     showComingSoon: false,
-    stageSizeMode: STAGE_SIZE_MODES.large
+    stageSizeMode: STAGE_SIZE_MODES.large,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
     // This is the button's mode, as opposed to the actual current state
-    stageSizeMode: state.scratchGui.stageSize.stageSize
+    stageSizeMode: state.scratchGui.stageSize.stageSize,
 });
 
 export default injectIntl(connect(mapStateToProps)(GUIComponent));

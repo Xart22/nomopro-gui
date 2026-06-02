@@ -56,6 +56,11 @@
     flex-direction: column;
 }
 
+.python-editor-wrapper {
+    min-width: 0;
+    flex-shrink: 1;
+}
+
 .tab-list {
     height: $stage-menu-height;
     width: 250px; /* Match width of the toolbox */
@@ -183,12 +188,15 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    min-height: 0;
 }
 
 .tab-panel {
     position: relative;
     flex-grow: 1;
     display: none;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .tab-panel.is-selected {

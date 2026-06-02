@@ -1,14 +1,14 @@
-import React, {useState, useEffect, useRef, useCallback} from 'react';
-import Box from '../box/box.jsx';
-import styles from './desktop-tools.module.css';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import Box from "../box/box.jsx";
+import styles from "./desktop-tools.module.css";
 
-const TABS = ['pip', 'project-deps', 'diagnostic', 'recovery'];
+const TABS = ["pip", "project-deps", "diagnostic", "recovery"];
 
 const TAB_LABELS = {
-    'pip': '📦 Pip Packages',
-    'project-deps': '📋 Project Deps',
-    'diagnostic': '🔍 Diagnostics',
-    'recovery': '🔧 Recovery'
+    pip: "📦 Pip Packages",
+    "project-deps": "📋 Project Deps",
+    diagnostic: "🔍 Diagnostics",
+    recovery: "🔧 Recovery",
 };
 
 // ============================================================================
@@ -18,7 +18,7 @@ const PipTab = () => {
     const [packages, setPackages] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [installName, setInstallName] = useState('');
+    const [installName, setInstallName] = useState("");
     const [installProgress, setInstallProgress] = useState([]);
     const [installing, setInstalling] = useState(false);
     const [classification, setClassification] = useState(null);
@@ -79,7 +79,6 @@ const PipTab = () => {
             return () => clearTimeout(t);
         }
         setClassification(null);
-    
     }, [installName]);
 
     const handleInstall = async () => {
@@ -89,22 +88,28 @@ const PipTab = () => {
         setError(null);
 
         if (pip.onProgress) {
-            progressCleanupRef.current = pip.onProgress(data => {
-                setInstallProgress(prev => [...prev, data]);
+            progressCleanupRef.current = pip.onProgress((data) => {
+                setInstallProgress((prev) => [...prev, data]);
             });
         }
 
         try {
             const r = await pip.install(installName.trim());
             if (r.success) {
-                setInstallProgress(prev => [...prev, {type: 'done', message: `✅ Installed ${installName.trim()}`}]);
-                setInstallName('');
+                setInstallProgress((prev) => [
+                    ...prev,
+                    {
+                        type: "done",
+                        message: `✅ Installed ${installName.trim()}`,
+                    },
+                ]);
+                setInstallName("");
                 fetchPackages();
                 fetchCacheInfo();
             } else if (r.locked) {
-                setError('Another pip operation is in progress. Please wait.');
+                setError("Another pip operation is in progress. Please wait.");
             } else {
-                setError(r.error || 'Install failed');
+                setError(r.error || "Install failed");
             }
         } catch (e) {
             setError(e.message);
@@ -117,7 +122,7 @@ const PipTab = () => {
         }
     };
 
-    const handleUninstall = async name => {
+    const handleUninstall = async (name) => {
         if (!pip) return;
         setLoading(true);
         try {
@@ -148,8 +153,14 @@ const PipTab = () => {
         }
     };
 
-    const clsIcon = lvl =>
-        (lvl === 'safe' ? '🟢' : lvl === 'risky' ? '🟡' : lvl === 'blocked' ? '🔴' : '⚪');
+    const clsIcon = (lvl) =>
+        lvl === "safe"
+            ? "🟢"
+            : lvl === "risky"
+              ? "🟡"
+              : lvl === "blocked"
+                ? "🔴"
+                : "⚪";
 
     return (
         <Box className={styles.tabContent}>
@@ -159,7 +170,9 @@ const PipTab = () => {
                     <button
                         className={styles.errorDismiss}
                         onClick={() => setError(null)}
-                    >✕</button>
+                    >
+                        ✕
+                    </button>
                 </Box>
             )}
 
@@ -171,8 +184,8 @@ const PipTab = () => {
                         className={styles.input}
                         placeholder="Package name (e.g. requests)"
                         value={installName}
-                        onChange={e => setInstallName(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && handleInstall()}
+                        onChange={(e) => setInstallName(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleInstall()}
                         disabled={installing}
                     />
                     <button
@@ -180,28 +193,36 @@ const PipTab = () => {
                         onClick={handleInstall}
                         disabled={installing || !installName.trim()}
                     >
-                        {installing ? '⏳' : 'Install'}
+                        {installing ? "⏳" : "Install"}
                     </button>
                 </Box>
 
                 {classification && (
                     <Box className={styles.classification}>
                         <span>{clsIcon(classification.level)}</span>
-                        <span><strong>{classification.level.toUpperCase()}</strong>: {classification.reason}</span>
+                        <span>
+                            <strong>
+                                {classification.level.toUpperCase()}
+                            </strong>
+                            : {classification.reason}
+                        </span>
                     </Box>
                 )}
 
                 {installProgress.length > 0 && (
                     <Box className={styles.progressLog}>
                         {installProgress.map((p, i) => (
-                            <Box
-                                key={i}
-                                className={styles.progressLine}
-                            >
-                                {p.type === 'install-output' ? p.data : p.message || p.type}
+                            <Box key={i} className={styles.progressLine}>
+                                {p.type === "install-output"
+                                    ? p.data
+                                    : p.message || p.type}
                             </Box>
                         ))}
-                        {installing && <Box className={styles.progressLine}>⏳ Running...</Box>}
+                        {installing && (
+                            <Box className={styles.progressLine}>
+                                ⏳ Running...
+                            </Box>
+                        )}
                     </Box>
                 )}
             </Box>
@@ -213,7 +234,9 @@ const PipTab = () => {
                         className={styles.linkBtn}
                         onClick={fetchPackages}
                         disabled={loading}
-                    >🔄</button>
+                    >
+                        🔄
+                    </button>
                 </Box>
                 {loading ? (
                     <Box className={styles.muted}>Loading...</Box>
@@ -221,17 +244,21 @@ const PipTab = () => {
                     <Box className={styles.muted}>No packages installed.</Box>
                 ) : (
                     <Box className={styles.pkgList}>
-                        {packages.map(p => (
-                            <Box
-                                key={p.name}
-                                className={styles.pkgItem}
-                            >
-                                <Box><strong>{p.name}</strong> <span className={styles.muted}>{p.version}</span></Box>
+                        {packages.map((p) => (
+                            <Box key={p.name} className={styles.pkgItem}>
+                                <Box>
+                                    <strong>{p.name}</strong>{" "}
+                                    <span className={styles.muted}>
+                                        {p.version}
+                                    </span>
+                                </Box>
                                 <button
                                     className={styles.iconBtn}
                                     onClick={() => handleUninstall(p.name)}
                                     title="Uninstall"
-                                >🗑️</button>
+                                >
+                                    🗑️
+                                </button>
                             </Box>
                         ))}
                     </Box>
@@ -244,13 +271,20 @@ const PipTab = () => {
                     <button
                         className={styles.linkBtn}
                         onClick={handleClearCache}
-                    >🗑️ Clear</button>
+                    >
+                        🗑️ Clear
+                    </button>
                 </Box>
                 {cacheLoading ? (
                     <Box className={styles.muted}>Loading...</Box>
                 ) : cacheInfo ? (
                     <Box className={styles.cacheInfo}>
-                        <Box>Size: {cacheInfo.cacheSize ? `${(cacheInfo.cacheSize / 1024 / 1024).toFixed(2)} MB` : '0 B'}</Box>
+                        <Box>
+                            Size:{" "}
+                            {cacheInfo.cacheSize
+                                ? `${(cacheInfo.cacheSize / 1024 / 1024).toFixed(2)} MB`
+                                : "0 B"}
+                        </Box>
                         <Box>Files: {cacheInfo.cacheCount ?? 0}</Box>
                     </Box>
                 ) : (
@@ -268,8 +302,8 @@ const ProjectDepsTab = () => {
     const [profiles, setProfiles] = useState([]);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null);
-    const [projectId, setProjectId] = useState('default');
-    const [requirementsText, setRequirementsText] = useState('');
+    const [projectId, setProjectId] = useState("default");
+    const [requirementsText, setRequirementsText] = useState("");
     const [diffResult, setDiffResult] = useState(null);
     const projectDeps = window.electronAPI?.projectDeps;
 
@@ -298,7 +332,7 @@ const ProjectDepsTab = () => {
             const r = await projectDeps.generate(projectId);
             if (r.success) {
                 setMessage(`✅ Generated ${r.packageCount} packages`);
-                setRequirementsText(r.requirements || '');
+                setRequirementsText(r.requirements || "");
                 listProfiles();
             } else {
                 setMessage(`Error: ${r.error}`);
@@ -316,7 +350,9 @@ const ProjectDepsTab = () => {
         setMessage(null);
         try {
             const r = await projectDeps.install(projectId, requirementsText);
-            setMessage(r.success ? '✅ Requirements installed' : `Error: ${r.error}`);
+            setMessage(
+                r.success ? "✅ Requirements installed" : `Error: ${r.error}`,
+            );
         } catch (e) {
             setMessage(`Error: ${e.message}`);
         } finally {
@@ -332,7 +368,9 @@ const ProjectDepsTab = () => {
             const r = await projectDeps.diff(projectId);
             if (r.success) {
                 setDiffResult(r);
-                setMessage(`📊 ${r.installCount} to install, ${r.removeCount} to remove, ${r.matchCount} match`);
+                setMessage(
+                    `📊 ${r.installCount} to install, ${r.removeCount} to remove, ${r.matchCount} match`,
+                );
             } else {
                 setMessage(`Error: ${r.error}`);
             }
@@ -343,7 +381,7 @@ const ProjectDepsTab = () => {
         }
     };
 
-    const handleDelete = async pid => {
+    const handleDelete = async (pid) => {
         if (!projectDeps) return;
         setLoading(true);
         try {
@@ -362,8 +400,10 @@ const ProjectDepsTab = () => {
         try {
             const r = await projectDeps.export(projectId);
             if (r.success) {
-                setRequirementsText(r.requirements || '');
-                setMessage(r.exists ? '📋 Exported' : 'No requirements file found');
+                setRequirementsText(r.requirements || "");
+                setMessage(
+                    r.exists ? "📋 Exported" : "No requirements file found",
+                );
             }
         } catch (e) {
             setMessage(`Error: ${e.message}`);
@@ -380,19 +420,25 @@ const ProjectDepsTab = () => {
                     <button
                         className={styles.errorDismiss}
                         onClick={() => setMessage(null)}
-                    >✕</button>
+                    >
+                        ✕
+                    </button>
                 </Box>
             )}
 
             <Box className={styles.section}>
-                <Box className={styles.sectionTitle}>Project Dependency Profile</Box>
+                <Box className={styles.sectionTitle}>
+                    Project Dependency Profile
+                </Box>
                 <Box className={styles.installRow}>
                     <input
                         type="text"
                         className={styles.input}
                         placeholder="Project ID (default)"
                         value={projectId}
-                        onChange={e => setProjectId(e.target.value || 'default')}
+                        onChange={(e) =>
+                            setProjectId(e.target.value || "default")
+                        }
                     />
                     <button
                         className={styles.installBtn}
@@ -421,7 +467,7 @@ const ProjectDepsTab = () => {
                     rows={4}
                     placeholder="Requirements content (paste here)..."
                     value={requirementsText}
-                    onChange={e => setRequirementsText(e.target.value)}
+                    onChange={(e) => setRequirementsText(e.target.value)}
                 />
                 <button
                     className={styles.installBtn}
@@ -437,26 +483,36 @@ const ProjectDepsTab = () => {
                     <Box className={styles.sectionTitle}>Diff Result</Box>
                     {diffResult.installCount > 0 && (
                         <Box>
-                            <Box className={styles.muted}>To install ({diffResult.installCount}):</Box>
+                            <Box className={styles.muted}>
+                                To install ({diffResult.installCount}):
+                            </Box>
                             {diffResult.toInstall.slice(0, 10).map((l, i) => (
-                                <Box
-                                    key={i}
-                                    className={styles.diffLine}
-                                >+ {l}</Box>
+                                <Box key={i} className={styles.diffLine}>
+                                    + {l}
+                                </Box>
                             ))}
-                            {diffResult.installCount > 10 && <Box className={styles.muted}>...and {diffResult.installCount - 10} more</Box>}
+                            {diffResult.installCount > 10 && (
+                                <Box className={styles.muted}>
+                                    ...and {diffResult.installCount - 10} more
+                                </Box>
+                            )}
                         </Box>
                     )}
                     {diffResult.removeCount > 0 && (
                         <Box>
-                            <Box className={styles.muted}>To remove ({diffResult.removeCount}):</Box>
+                            <Box className={styles.muted}>
+                                To remove ({diffResult.removeCount}):
+                            </Box>
                             {diffResult.toRemove.slice(0, 10).map((l, i) => (
-                                <Box
-                                    key={i}
-                                    className={styles.diffLine}
-                                >- {l}</Box>
+                                <Box key={i} className={styles.diffLine}>
+                                    - {l}
+                                </Box>
                             ))}
-                            {diffResult.removeCount > 10 && <Box className={styles.muted}>...and {diffResult.removeCount - 10} more</Box>}
+                            {diffResult.removeCount > 10 && (
+                                <Box className={styles.muted}>
+                                    ...and {diffResult.removeCount - 10} more
+                                </Box>
+                            )}
                         </Box>
                     )}
                 </Box>
@@ -465,25 +521,26 @@ const ProjectDepsTab = () => {
             <Box className={styles.section}>
                 <Box className={styles.sectionTitle}>
                     Profiles ({profiles.length})
-                    <button
-                        className={styles.linkBtn}
-                        onClick={listProfiles}
-                    >🔄</button>
+                    <button className={styles.linkBtn} onClick={listProfiles}>
+                        🔄
+                    </button>
                 </Box>
                 {profiles.length === 0 ? (
                     <Box className={styles.muted}>No profiles yet.</Box>
                 ) : (
-                    profiles.map(p => (
-                        <Box
-                            key={p.projectId}
-                            className={styles.profileItem}
-                        >
-                            <Box><strong>{p.projectId}</strong> ({p.packageCount} packages)</Box>
+                    profiles.map((p) => (
+                        <Box key={p.projectId} className={styles.profileItem}>
+                            <Box>
+                                <strong>{p.projectId}</strong> ({p.packageCount}{" "}
+                                packages)
+                            </Box>
                             <button
                                 className={styles.iconBtn}
                                 onClick={() => handleDelete(p.projectId)}
                                 title="Delete"
-                            >🗑️</button>
+                            >
+                                🗑️
+                            </button>
                         </Box>
                     ))
                 )}
@@ -510,7 +567,7 @@ const DiagnosticTab = () => {
             const r = await diagnostic.collect();
             if (r.success) {
                 setReport(r.bundle);
-                setMessage('✅ Diagnostic collected');
+                setMessage("✅ Diagnostic collected");
             } else {
                 setMessage(`Error: ${r.error}`);
             }
@@ -545,7 +602,7 @@ const DiagnosticTab = () => {
             const r = await diagnostic.generateReport();
             if (r.success) {
                 setReport(r.bundle);
-                setMessage('✅ Report generated');
+                setMessage("✅ Report generated");
             } else {
                 setMessage(`Error: ${r.error}`);
             }
@@ -564,7 +621,9 @@ const DiagnosticTab = () => {
                     <button
                         className={styles.errorDismiss}
                         onClick={() => setMessage(null)}
-                    >✕</button>
+                    >
+                        ✕
+                    </button>
                 </Box>
             )}
 
@@ -603,20 +662,50 @@ const DiagnosticTab = () => {
                             className={styles.linkBtn}
                             onClick={() => setExpanded(!expanded)}
                         >
-                            {expanded ? '▲ Collapse' : '▼ Expand'}
+                            {expanded ? "▲ Collapse" : "▼ Expand"}
                         </button>
                     </Box>
                     <Box className={styles.diagGrid}>
-                        <Box className={styles.diagRow}><span>OS:</span><span>{report.platform?.os}</span></Box>
-                        <Box className={styles.diagRow}><span>App Version:</span><span>{report.app?.version}</span></Box>
-                        <Box className={styles.diagRow}><span>Python:</span><span>{report.python?.version || 'N/A'}</span></Box>
-                        <Box className={styles.diagRow}><span>Venv:</span><span>{report.venv?.exists ? `✅ (${report.venv.packageCount || 0} packages)` : '❌ Not created'}</span></Box>
-                        <Box className={styles.diagRow}><span>File Storage:</span><span>{report.fileStorage?.exists ? `✅ (${report.fileStorage.fileCount || 0} files)` : '❌'}</span></Box>
-                        <Box className={styles.diagRow}><span>Bundled Python:</span><span>{report.python?.bundledExists ? '✅' : '❌'}</span></Box>
+                        <Box className={styles.diagRow}>
+                            <span>OS:</span>
+                            <span>{report.platform?.os}</span>
+                        </Box>
+                        <Box className={styles.diagRow}>
+                            <span>App Version:</span>
+                            <span>{report.app?.version}</span>
+                        </Box>
+                        <Box className={styles.diagRow}>
+                            <span>Python:</span>
+                            <span>{report.python?.version || "N/A"}</span>
+                        </Box>
+                        <Box className={styles.diagRow}>
+                            <span>Venv:</span>
+                            <span>
+                                {report.venv?.exists
+                                    ? `✅ (${report.venv.packageCount || 0} packages)`
+                                    : "❌ Not created"}
+                            </span>
+                        </Box>
+                        <Box className={styles.diagRow}>
+                            <span>File Storage:</span>
+                            <span>
+                                {report.fileStorage?.exists
+                                    ? `✅ (${report.fileStorage.fileCount || 0} files)`
+                                    : "❌"}
+                            </span>
+                        </Box>
+                        <Box className={styles.diagRow}>
+                            <span>Bundled Python:</span>
+                            <span>
+                                {report.python?.bundledExists ? "✅" : "❌"}
+                            </span>
+                        </Box>
                     </Box>
 
                     {expanded && (
-                        <pre className={styles.diagRaw}>{JSON.stringify(report, null, 2)}</pre>
+                        <pre className={styles.diagRaw}>
+                            {JSON.stringify(report, null, 2)}
+                        </pre>
                     )}
                 </Box>
             )}
@@ -640,7 +729,13 @@ const RecoveryTab = () => {
         try {
             const r = await recovery.verifyPython();
             if (r.success) setStatus(r);
-            setMessage(r.success ? (r.healthy ? '✅ Python runtime is healthy' : '⚠️ Issues found') : `Error: ${r.error}`);
+            setMessage(
+                r.success
+                    ? r.healthy
+                        ? "✅ Python runtime is healthy"
+                        : "⚠️ Issues found"
+                    : `Error: ${r.error}`,
+            );
         } catch (e) {
             setMessage(`Error: ${e.message}`);
         } finally {
@@ -654,7 +749,13 @@ const RecoveryTab = () => {
         setMessage(null);
         try {
             const r = await recovery.restorePython();
-            setMessage(r.success ? '✅ Python restored from backup' : (r.requiresRedownload ? '⚠️ No backup. Run install script.' : `Error: ${r.error}`));
+            setMessage(
+                r.success
+                    ? "✅ Python restored from backup"
+                    : r.requiresRedownload
+                      ? "⚠️ No backup. Run install script."
+                      : `Error: ${r.error}`,
+            );
             if (r.success) handleVerify();
         } catch (e) {
             setMessage(`Error: ${e.message}`);
@@ -669,7 +770,11 @@ const RecoveryTab = () => {
         setMessage(null);
         try {
             const r = await recovery.createBackup();
-            setMessage(r.success ? `✅ Backup created (${r.sizeMB || '?'} MB)` : `Error: ${r.error}`);
+            setMessage(
+                r.success
+                    ? `✅ Backup created (${r.sizeMB || "?"} MB)`
+                    : `Error: ${r.error}`,
+            );
         } catch (e) {
             setMessage(`Error: ${e.message}`);
         } finally {
@@ -685,12 +790,16 @@ const RecoveryTab = () => {
                     <button
                         className={styles.errorDismiss}
                         onClick={() => setMessage(null)}
-                    >✕</button>
+                    >
+                        ✕
+                    </button>
                 </Box>
             )}
 
             <Box className={styles.section}>
-                <Box className={styles.sectionTitle}>Python Runtime Recovery</Box>
+                <Box className={styles.sectionTitle}>
+                    Python Runtime Recovery
+                </Box>
                 <Box className={styles.btnRow}>
                     <button
                         className={styles.installBtn}
@@ -718,23 +827,42 @@ const RecoveryTab = () => {
 
             {status && (
                 <Box className={styles.section}>
-                    <Box className={styles.sectionTitle}>Verification Result</Box>
+                    <Box className={styles.sectionTitle}>
+                        Verification Result
+                    </Box>
                     <Box className={styles.diagGrid}>
-                        <Box className={styles.diagRow}><span>Exists:</span><span>{status.exists ? '✅' : '❌'}</span></Box>
-                        <Box className={styles.diagRow}><span>Python exe:</span><span>{status.pythonExe || '❌'}</span></Box>
-                        <Box className={styles.diagRow}><span>Version:</span><span>{status.pythonVersion || 'N/A'}</span></Box>
-                        <Box className={styles.diagRow}><span>Corrupt:</span><span>{status.corrupt ? '⚠️ Yes' : '✅ No'}</span></Box>
-                        <Box className={styles.diagRow}><span>Healthy:</span><span>{status.healthy ? '✅ Yes' : '❌ No'}</span></Box>
-                        <Box className={styles.diagRow}><span>Size:</span><span>{status.totalSizeMB || '?'} MB</span></Box>
+                        <Box className={styles.diagRow}>
+                            <span>Exists:</span>
+                            <span>{status.exists ? "✅" : "❌"}</span>
+                        </Box>
+                        <Box className={styles.diagRow}>
+                            <span>Python exe:</span>
+                            <span>{status.pythonExe || "❌"}</span>
+                        </Box>
+                        <Box className={styles.diagRow}>
+                            <span>Version:</span>
+                            <span>{status.pythonVersion || "N/A"}</span>
+                        </Box>
+                        <Box className={styles.diagRow}>
+                            <span>Corrupt:</span>
+                            <span>{status.corrupt ? "⚠️ Yes" : "✅ No"}</span>
+                        </Box>
+                        <Box className={styles.diagRow}>
+                            <span>Healthy:</span>
+                            <span>{status.healthy ? "✅ Yes" : "❌ No"}</span>
+                        </Box>
+                        <Box className={styles.diagRow}>
+                            <span>Size:</span>
+                            <span>{status.totalSizeMB || "?"} MB</span>
+                        </Box>
                     </Box>
                     {status.issues?.length > 0 && (
                         <Box>
                             <Box className={styles.muted}>Issues:</Box>
                             {status.issues.map((iss, i) => (
-                                <Box
-                                    key={i}
-                                    className={styles.issueLine}
-                                >⚠️ {iss}</Box>
+                                <Box key={i} className={styles.issueLine}>
+                                    ⚠️ {iss}
+                                </Box>
                             ))}
                         </Box>
                     )}
@@ -747,46 +875,57 @@ const RecoveryTab = () => {
 // ============================================================================
 // Main DesktopTools Component
 // ============================================================================
-const DesktopTools = ({isOpen, onClose}) => {
-    const [activeTab, setActiveTab] = useState('pip');
+const DesktopTools = ({ isOpen, onClose }) => {
+    const [activeTab, setActiveTab] = useState("pip");
 
     const isDesktop =
-    typeof window !== 'undefined' &&
-    (window.electronAPI?.pip || window.electronAPI?.diagnostic);
+        typeof window !== "undefined" &&
+        (window.electronAPI?.pip || window.electronAPI?.diagnostic);
 
     if (!isOpen) return null;
 
     return (
-        <Box
-            className={styles.overlay}
-            onClick={onClose}
-        >
-            <Box
-                className={styles.modal}
-                onClick={e => e.stopPropagation()}
-            >
+        <Box className={styles.overlay} onClick={onClose}>
+            <Box className={styles.modal} onClick={(e) => e.stopPropagation()}>
                 <Box className={styles.header}>
                     <span className={styles.title}>🛠️ Desktop Tools</span>
-                    <button
-                        className={styles.closeBtn}
-                        onClick={onClose}
-                    >
+                    <button className={styles.closeBtn} onClick={onClose}>
                         ✕
                     </button>
                 </Box>
 
                 {!isDesktop ? (
                     <Box className={styles.notAvailable}>
-                        <p>Desktop Tools are only available in the desktop app.</p>
-                        <p>Please use the desktop version of Nomopro for package management and system tools.</p>
+                        <p>
+                            Desktop Tools are only available in the desktop app.
+                        </p>
+                        <p>
+                            Please use the desktop version of Nomopro for
+                            package management and system tools.
+                        </p>
+                        <p>Features include:</p>
+                        <ul>
+                            <li>
+                                📦 Manage pip packages with install/uninstall
+                                and cache control
+                            </li>
+                            <li>
+                                📋 Project dependency profiling and requirements
+                                management
+                            </li>
+                            <li>
+                                🔍 Collect diagnostic information and generate
+                                reports
+                            </li>
+                        </ul>
                     </Box>
                 ) : (
                     <>
                         <Box className={styles.tabs}>
-                            {TABS.map(tab => (
+                            {TABS.map((tab) => (
                                 <button
                                     key={tab}
-                                    className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
+                                    className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ""}`}
                                     onClick={() => setActiveTab(tab)}
                                 >
                                     {TAB_LABELS[tab]}
@@ -794,10 +933,10 @@ const DesktopTools = ({isOpen, onClose}) => {
                             ))}
                         </Box>
 
-                        {activeTab === 'pip' && <PipTab />}
-                        {activeTab === 'project-deps' && <ProjectDepsTab />}
-                        {activeTab === 'diagnostic' && <DiagnosticTab />}
-                        {activeTab === 'recovery' && <RecoveryTab />}
+                        {activeTab === "pip" && <PipTab />}
+                        {activeTab === "project-deps" && <ProjectDepsTab />}
+                        {activeTab === "diagnostic" && <DiagnosticTab />}
+                        {activeTab === "recovery" && <RecoveryTab />}
                     </>
                 )}
             </Box>

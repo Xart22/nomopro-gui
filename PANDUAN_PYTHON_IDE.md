@@ -1,6 +1,7 @@
 # 🐍 Panduan Lengkap Python IDE for Kids & Students
 
 ## 📚 Daftar Isi
+
 1. [Pengenalan Python IDE](#1-pengenalan-python-ide)
 2. [Mode 1: Upload (Flash Firmware)](#2-mode-1-upload-flash-firmware)
 3. [Mode 2: Realtime (Live Coding)](#3-mode-2-realtime-live-coding)
@@ -15,20 +16,21 @@
 ## 1. 🎯 Pengenalan Python IDE
 
 ### Apa itu Python IDE?
+
 Python IDE (Integrated Development Environment) adalah aplikasi untuk menulis dan menjalankan kode Python. IDE ini bisa bekerja dengan berbagai perangkat keras seperti:
-- 🟦 **Arduino** (Arduino Uno, Nano, Mega, dll)
+
+- 🟦 **Arduino** (Arduino Uno, Nano, Mega)
 - 🟩 **ESP32** (ESP32, ESP8266, ESP32-CAM)
-- 🟨 **Micro:bit** (Micro:bit V1 & V2)
+- 🟨 **Micro:bit** (Micro:bit V2)
 - 🟪 **Raspberry Pi Pico**
-- 🤖 **NomoBot** (NomoBot, NomoBot AI, NomoBot Basic Kit)
 
 ### Tiga Mode Utama
 
-| Mode | Fungsi | Kapan Digunakan |
-|------|--------|-----------------|
-| **Upload Mode** | Flash firmware MicroPython ke board | Saat pertama kali menggunakan board baru |
-| **Realtime Mode** | Jalankan kode Python secara langsung di VM | Untuk simulasi dan testing cepat |
-| **REPL Mode** | Interaksi langsung dengan board via serial | Untuk debugging dan testing kode |
+| Mode              | Fungsi                                     | Kapan Digunakan                          | Runtime                         |
+| ----------------- | ------------------------------------------ | ---------------------------------------- | ------------------------------- | ------------ |
+| **Upload Mode**   | Flash firmware MicroPython ke board        | Saat pertama kali menggunakan board baru | Saat ingin memperbarui firmware | Desktop Mode |
+| **Realtime Mode** | Jalankan kode Python secara langsung di VM | Untuk simulasi dan testing cepat         | Untuk melihat hasil langsung    | Desktop Mode |
+| **REPL Mode**     | Interaksi langsung dengan board via serial | Untuk debugging dan testing kode         | Untuk eksperimen interaktif     | Desktop Mode |
 
 ### 🎁 Built-in Functions yang Tersedia
 
@@ -58,32 +60,33 @@ Python IDE ini dilengkapi dengan **200+ built-in functions** yang terbagi dalam 
 
 Python IDE dapat berjalan di **Web (browser)** maupun **Desktop (Electron app)**. Beberapa fitur hanya tersedia di Desktop karena membutuhkan akses ke sistem file dan proses Python native.
 
-| Fitur | Web (Browser/Pyodide) | Desktop (Electron) |
-|-------|-----------------------|-------------------|
-| **Eksekusi Python** | ✅ Pyodide (di browser) | ✅ Native Python (subprocess) |
-| **Sprite Control** | ✅ `move()`, `say()`, dll | ✅ Sama |
-| **Pen Drawing** | ✅ `pen_down()`, `pen_up()`, dll | ✅ Sama |
-| **Text to Speech** | ✅ `speak()`, `set_voice()` | ✅ Sama |
-| **Video Sensing** | ✅ `video_toggle()`, `set_video_transparency()` | ✅ Sama |
-| **Music** | ✅ COMMAND blocks (`play_drum`, `play_note`, dll) | ✅ Sama |
-| **Handpose** | ✅ COMMAND blocks (`handpose_video`, dll) | ✅ Sama |
-| **Speech to Text** | ✅ `listen()` | ✅ Sama |
-| **ML/AI (COMMANDs)** | ✅ `ml_add_example1()`, `ml_train()`, dll | ✅ Sama |
-| **OB2/TM2/TMPose (COMMANDs)** | ✅ `ob2_analyse()`, `tm2_classify_image()`, dll | ✅ Sama |
-| | | |
-| **REPORTER (return value)** | ❌ **Return `None`** | ✅ **Return value asli** |
-| **Device Control (realtime)** | ❌ **Return `None`** | ✅ `digitalRead()`, `analogRead()` |
-| **Translate** | ❌ **Return `None`** | ✅ `translate_text()`, `get_viewer_language()` |
-| **get_tempo()** | ❌ **Return `None`** | ✅ Return BPM |
-| **handpose_get_x/y/z()** | ❌ **Return `None`** | ✅ Return koordinat |
-| **get_speech()** | ❌ **Return `None`** | ✅ Return text |
-| **ob2_get_counts/is_detected()** | ❌ **Return `None`** | ✅ Return nilai |
-| **ml_get_label/get_count()** | ❌ **Return `None`** | ✅ Return nilai |
-| **tm2/tmpose confidence/threshold** | ❌ **Return `None`** | ✅ Return nilai |
+| Fitur                               | Web (Browser/Pyodide)                             | Desktop (Electron)                             |
+| ----------------------------------- | ------------------------------------------------- | ---------------------------------------------- |
+| **Eksekusi Python**                 | ✅ Pyodide (di browser)                           | ✅ Native Python (subprocess)                  |
+| **Sprite Control**                  | ✅ `move()`, `say()`, dll                         | ✅ Sama                                        |
+| **Pen Drawing**                     | ✅ `pen_down()`, `pen_up()`, dll                  | ✅ Sama                                        |
+| **Text to Speech**                  | ✅ `speak()`, `set_voice()`                       | ✅ Sama                                        |
+| **Video Sensing**                   | ✅ `video_toggle()`, `set_video_transparency()`   | ✅ Sama                                        |
+| **Music**                           | ✅ COMMAND blocks (`play_drum`, `play_note`, dll) | ✅ Sama                                        |
+| **Handpose**                        | ✅ COMMAND blocks (`handpose_video`, dll)         | ✅ Sama                                        |
+| **Speech to Text**                  | ✅ `listen()`                                     | ✅ Sama                                        |
+| **ML/AI (COMMANDs)**                | ✅ `ml_add_example1()`, `ml_train()`, dll         | ✅ Sama                                        |
+| **OB2/TM2/TMPose (COMMANDs)**       | ✅ `ob2_analyse()`, `tm2_classify_image()`, dll   | ✅ Sama                                        |
+|                                     |                                                   |                                                |
+| **REPORTER (return value)**         | ❌ **Return `None`**                              | ✅ **Return value asli**                       |
+| **Device Control (realtime)**       | ❌ **Return `None`**                              | ✅ `digitalRead()`, `analogRead()`             |
+| **Translate**                       | ❌ **Return `None`**                              | ✅ `translate_text()`, `get_viewer_language()` |
+| **get_tempo()**                     | ❌ **Return `None`**                              | ✅ Return BPM                                  |
+| **handpose_get_x/y/z()**            | ❌ **Return `None`**                              | ✅ Return koordinat                            |
+| **get_speech()**                    | ❌ **Return `None`**                              | ✅ Return text                                 |
+| **ob2_get_counts/is_detected()**    | ❌ **Return `None`**                              | ✅ Return nilai                                |
+| **ml_get_label/get_count()**        | ❌ **Return `None`**                              | ✅ Return nilai                                |
+| **tm2/tmpose confidence/threshold** | ❌ **Return `None`**                              | ✅ Return nilai                                |
 
 > **Mengapa REPORTER tidak work di Web?** Di Web (Pyodide), Python berjalan di dalam browser worker tanpa akses stdin/stdout pipe yang diperlukan untuk komunikasi dua arah (request-response). Desktop mode menggunakan native Python subprocess dengan stdin/stdout pipe penuh.
 
 **Rekomendasi:**
+
 - Gunakan **Web mode** untuk belajar, testing, dan COMMAND blocks
 - Gunakan **Desktop mode** jika perlu REPORTER blocks (return value) atau device control
 
@@ -92,9 +95,11 @@ Python IDE dapat berjalan di **Web (browser)** maupun **Desktop (Electron app)**
 ## 2. 📤 Mode 1: Upload (Flash Firmware)
 
 ### Kapan Menggunakan Upload Mode?
+
 Upload mode digunakan untuk **memasang firmware MicroPython** ke board yang belum memiliki MicroPython.
 
 **Contoh:**
+
 - ESP32 yang baru dibeli
 - Arduino yang ingin diubah ke MicroPython
 - Micro:bit V2 yang perlu diupdate
@@ -102,19 +107,22 @@ Upload mode digunakan untuk **memasang firmware MicroPython** ke board yang belu
 ### Cara Menggunakan Upload Mode
 
 #### Langkah 1: Hubungkan Perangkat
+
 1. Hubungkan board ke komputer via USB
 2. Buka Python IDE
 3. Pilih device di menu Connection
 4. Klik **Connect** untuk menghubungkan
 
 #### Langkah 2: Pilih Upload Mode
+
 1. Di Python IDE, klik tab **Upload** (ikon ⬆️)
 2. Anda akan melihat status firmware:
-   - 🔵 **Unknown** = Belum terdeteksi
-   - 🟢 **MicroPython Ready** = Sudah punya MicroPython
-   - 🟡 **Arduino Firmware** = Perlu di-flash
+    - 🔵 **Unknown** = Belum terdeteksi
+    - 🟢 **MicroPython Ready** = Sudah punya MicroPython
+    - 🟡 **Arduino Firmware** = Perlu di-flash
 
 #### Langkah 3: Flash Firmware
+
 Jika firmware belum ada atau perlu diupdate:
 
 1. Klik tombol **Flash Firmware**
@@ -123,6 +131,7 @@ Jika firmware belum ada atau perlu diupdate:
 4. Setelah selesai, status akan berubah jadi **MicroPython Ready** ✅
 
 #### Langkah 4: Upload Kode
+
 Setelah firmware terflash:
 
 1. Tulis kode Python di editor
@@ -147,6 +156,7 @@ while True:
 ```
 
 ### Tips Upload Mode
+
 - ✅ Pastikan board terhubung dengan baik
 - ✅ Gunakan kabel USB yang bagus
 - ⚠️ Jangan cabut kabel saat sedang flash
@@ -158,9 +168,11 @@ while True:
 ## 3. ⚡ Mode 2: Realtime (Live Coding)
 
 ### Kapan Menggunakan Realtime Mode?
+
 Realtime mode untuk **menjalankan kode Python secara langsung** di Virtual Machine (VM) browser. Mode ini **tidak** memerlukan koneksi ke board.
 
 **Cocok untuk:**
+
 - ✅ Testing kode dengan cepat
 - ✅ Debugging tanpa board
 - ✅ Belajar dasar-dasar Python
@@ -169,15 +181,18 @@ Realtime mode untuk **menjalankan kode Python secara langsung** di Virtual Machi
 ### Cara Menggunakan Realtime Mode
 
 #### Langkah 1: Pilih Unselect Device
+
 1. Di menu Connection, pilih **Unselect Device**
 2. Ini akan kembali ke mode Scratch murni (tanpa hardware)
 
 #### Langkah 2: Tulis Kode Python
+
 1. Buka Python IDE
 2. Tulis kode Python di editor
 3. Kode akan dijalankan di VM browser
 
 #### Langkah 3: Jalankan Kode
+
 1. Klik tombol **▶ Run** untuk menjalankan kode saat ini
 2. Klik **▶▶ Run All** untuk menjalankan semua file
 3. Lihat output di tab **Output**
@@ -200,15 +215,16 @@ print(f"Hasil: {angka}")  # Output: 20
 
 ### Perbandingan: Realtime vs Upload
 
-| Fitur | Realtime Mode | Upload Mode |
-|-------|---------------|-------------|
-| Butuh hardware? | ❌ Tidak | ✅ Ya |
-| Kecepatan | ⚡ Sangat cepat | 🐢 Lebih lambat |
-| Debugging | ✅ Mudah | ⚠️ Sulit |
-| Testing kode | ✅ Bagus | ⚠️ Terbatas |
-| Hardware control | ❌ Tidak bisa | ✅ Bisa |
+| Fitur            | Realtime Mode   | Upload Mode     |
+| ---------------- | --------------- | --------------- |
+| Butuh hardware?  | ❌ Tidak        | ✅ Ya           |
+| Kecepatan        | ⚡ Sangat cepat | 🐢 Lebih lambat |
+| Debugging        | ✅ Mudah        | ⚠️ Sulit        |
+| Testing kode     | ✅ Bagus        | ⚠️ Terbatas     |
+| Hardware control | ❌ Tidak bisa   | ✅ Bisa         |
 
 ### Tips Realtime Mode
+
 - ✅ Cocok untuk belajar dasar Python
 - ✅ Tidak perlu driver atau kabel USB
 - ⚠️ Tidak bisa kontrol hardware (LED, sensor, dll)
@@ -219,9 +235,11 @@ print(f"Hasil: {angka}")  # Output: 20
 ## 4. 💬 Mode 3: REPL (Interactive Shell)
 
 ### Kapan Menggunakan REPL Mode?
+
 REPL (Read-Eval-Print Loop) adalah **terminal interaktif** yang terhubung langsung ke board MicroPython.
 
 **Cocok untuk:**
+
 - ✅ Testing kode secara interaktif
 - ✅ Debugging kode di board
 - ✅ Mengecek nilai sensor
@@ -230,16 +248,19 @@ REPL (Read-Eval-Print Loop) adalah **terminal interaktif** yang terhubung langsu
 ### Cara Menggunakan REPL Mode
 
 #### Langkah 1: Hubungkan Board
+
 1. Hubungkan board (ESP32, Micro:bit, dll) ke komputer
 2. Pastikan firmware MicroPython sudah terinstall
 3. Di Python IDE, pilih device yang terhubung
 
 #### Langkah 2: Buka REPL Tab
+
 1. Klik tab **REPL** (ikon ⌨️) di terminal
 2. Tunggu sampai muncul prompt `>>>`
 3. Status akan berubah jadi **REPL: Connected** 🟢
 
 #### Langkah 3: Ketik Kode
+
 Ketik kode Python dan tekan **Enter**:
 
 ```python
@@ -254,6 +275,7 @@ Hello REPL!
 ```
 
 #### Langkah 4: Upload File
+
 Untuk upload file `.py` ke board:
 
 1. Tekan **Ctrl+E** atau klik **Paste Mode**
@@ -263,13 +285,13 @@ Untuk upload file `.py` ke board:
 
 ### Shortcut REPL
 
-| Shortcut | Fungsi |
-|----------|--------|
-| **Enter** | Jalankan kode |
+| Shortcut   | Fungsi                      |
+| ---------- | --------------------------- |
+| **Enter**  | Jalankan kode               |
 | **Ctrl+C** | Interrupt (hentikan proses) |
-| **Ctrl+D** | Soft reboot (reset board) |
-| **Ctrl+E** | Paste mode (upload file) |
-| **↑/↓** | History command |
+| **Ctrl+D** | Soft reboot (reset board)   |
+| **Ctrl+E** | Paste mode (upload file)    |
+| **↑/↓**    | History command             |
 
 ### Contoh Interactive REPL
 
@@ -295,6 +317,7 @@ Iterasi 2
 ```
 
 ### Tips REPL Mode
+
 - ✅ Ideal untuk debugging
 - ✅ Bisa test kode sebelum upload
 - ⚠️ Harus ada koneksi serial
@@ -308,12 +331,14 @@ Iterasi 2
 ### Untuk Siswa SD
 
 #### Mulai dari yang Mudah
+
 1. **Gunakan Realtime Mode dulu** - belajar dasar Python tanpa hardware
 2. **Lihat contoh kode** - copy-paste contoh, lalu ubah angkanya
 3. **Print banyak-banyak** - lihat output di console
 4. **Mainkan dengan angka** - coba tambah, kurang, kali, bagi
 
 #### Contoh Belajar Dasar
+
 ```python
 # 1. Print sederhana
 print("Halo Dunia!")
@@ -339,6 +364,7 @@ else:
 #### Proyek Sederhana
 
 **1. Game Tebak Angka:**
+
 ```python
 import random
 
@@ -360,6 +386,7 @@ while True:
 ```
 
 **2. Gerakan Sprite (Realtime Mode):**
+
 ```python
 from nomoproSDKPython import sprite
 
@@ -375,6 +402,7 @@ def run():
 ```
 
 **3. Gambar Kotak dengan Pen:**
+
 ```python
 from nomoproSDKPython import sprite
 
@@ -389,6 +417,7 @@ def draw_square():
 ```
 
 **4. Kontrol LED (Upload Mode - ESP32/Arduino):**
+
 ```python
 from nomoproSDKPython import use, pinMode, digitalWrite, wait
 
@@ -404,6 +433,7 @@ def flash_led():
 ```
 
 **5. Sensor Suhu (Upload Mode - ESP32):**
+
 ```python
 from nomoproSDKPython import use, analogRead, wait
 import math
@@ -421,6 +451,7 @@ def read_temp():
 ```
 
 **6. List & Variable:**
+
 ```python
 from nomoproSDKPython import sprite, add_to_list, item_of_list, length_of_list
 
@@ -429,12 +460,13 @@ def shopping_list():
     add_to_list("apple", "fruits")
     add_to_list("banana", "fruits")
     add_to_list("orange", "fruits")
-    
+
     print(f"Ada {length_of_list('fruits')} buah!")
     print(f"Buah pertama: {item_of_list(1, 'fruits')}")
 ```
 
 **7. Event Handler - Key Press:**
+
 ```python
 from nomoproSDKPython import sprite, when_key_pressed, wait
 
@@ -453,64 +485,71 @@ def go_up():
 ### Untuk Mahasiswa
 
 #### Best Practices
+
 1. **Gunakan tipe data yang benar**
-   ```python
-   # ❌ Buruk
-   umur = "20"  # String, bukan angka
-   
-   # ✅ Bagus
-   umur = 20  # Integer
-   ```
+
+    ```python
+    # ❌ Buruk
+    umur = "20"  # String, bukan angka
+
+    # ✅ Bagus
+    umur = 20  # Integer
+    ```
 
 2. **Komentar kode**
-   ```python
-   # Hitung luas persegi panjang
-   panjang = 10
-   lebar = 5
-   luas = panjang * lebar
-   print(f"Luas = {luas}")
-   ```
+
+    ```python
+    # Hitung luas persegi panjang
+    panjang = 10
+    lebar = 5
+    luas = panjang * lebar
+    print(f"Luas = {luas}")
+    ```
 
 3. **Error handling**
-   ```python
-   try:
-       angka = int(input("Masukkan angka: "))
-       hasil = 100 / angka
-       print(f"Hasil: {hasil}")
-   except ZeroDivisionError:
-       print("Tidak bisa bagi dengan 0!")
-   except ValueError:
-       print("Masukkan angka yang valid!")
-   ```
+    ```python
+    try:
+        angka = int(input("Masukkan angka: "))
+        hasil = 100 / angka
+        print(f"Hasil: {hasil}")
+    except ZeroDivisionError:
+        print("Tidak bisa bagi dengan 0!")
+    except ValueError:
+        print("Masukkan angka yang valid!")
+    ```
 
 #### Debugging Tips
+
 1. **Gunakan print() untuk debugging**
-   ```python
-   print(f"Debug: nilai x = {x}")
-   print(f"Debug: nilai y = {y}")
-   ```
+
+    ```python
+    print(f"Debug: nilai x = {x}")
+    print(f"Debug: nilai y = {y}")
+    ```
 
 2. **Gunakan REPL untuk inspection**
-   ```python
-   # Di REPL
-   >>> x
-   10
-   >>> y
-   20
-   >>> x + y
-   30
-   ```
+
+    ```python
+    # Di REPL
+    >>> x
+    10
+    >>> y
+    20
+    >>> x + y
+    30
+    ```
 
 3. **Cek hardware status**
-   ```python
-   # ESP32
-   >>> import machine
-   >>> pin = machine.Pin(2)
-   >>> pin.value()
-   1
-   ```
+    ```python
+    # ESP32
+    >>> import machine
+    >>> pin = machine.Pin(2)
+    >>> pin.value()
+    1
+    ```
 
 #### Optimasi Kode
+
 ```python
 # ❌ Loop tidak perlu
 for i in range(1000000):
@@ -524,6 +563,7 @@ sys.stdout.write('\n'.join(map(str, range(1000000))))
 #### Contoh Lengkap: Game Snake Sederhana
 
 **Realtime Mode:**
+
 ```python
 from nomoproSDKPython import sprite, when_green_flag_clicked, wait, broadcast, when_i_receive
 import random
@@ -533,7 +573,7 @@ import random
 def start_game():
     sprite.hide()
     broadcast("game_start")
-    
+
     # Main loop
     while sprite.visible:
         # Get key input
@@ -545,15 +585,15 @@ def start_game():
             sprite.turn_left(90)
         elif key_pressed("right"):
             sprite.turn_right(90)
-        
+
         # Move
         sprite.move(10)
-        
+
         # Check edge
         if touching("edge"):
             sprite.show()
             break
-        
+
         wait(0.1)
 
 # Handle broadcast
@@ -565,6 +605,7 @@ def on_start():
 ```
 
 **Upload Mode (ESP32 - LED Blinking Pattern):**
+
 ```python
 from nomoproSDKPython import use, pinMode, digitalWrite, wait, analogRead, arduinoEsp32
 
@@ -576,20 +617,20 @@ def pattern():
     pinMode(2, "OUTPUT")   # LED
     pinMode(4, "INPUT")    # Button
     pinMode(34, "INPUT")   # Temperature sensor
-    
+
     # Main loop
     while True:
         # Read button
         button = digitalRead(4)
-        
+
         # Read temperature
         temp = analogRead(34)
         voltage = temp * 3.3 / 4095
-        
+
         # Print to serial
         serialPrint(f"Temp: {voltage:.2f}V, Button: {button}")
         serialPrintln()
-        
+
         # LED pattern
         digitalWrite(2, True)
         wait(0.5)
@@ -598,6 +639,7 @@ def pattern():
 ```
 
 **Upload Mode (Micro:bit - Matrix Display):**
+
 ```python
 from micropython import machine
 import time
@@ -627,6 +669,7 @@ display_message("Python!")
 ### Workflow Rekomendasi
 
 #### Belajar Baru
+
 ```
 1. Realtime Mode → Belajar dasar Python
 2. Upload Mode → Flash MicroPython ke board
@@ -635,6 +678,7 @@ display_message("Python!")
 ```
 
 #### Debugging
+
 ```
 1. Lihat error di tab Error
 2. Buka REPL untuk inspection
@@ -644,6 +688,7 @@ display_message("Python!")
 ```
 
 #### Development
+
 ```
 1. Tulis kode di editor
 2. Test di Realtime Mode
@@ -659,60 +704,75 @@ display_message("Python!")
 ### Masalah Umum & Solusi
 
 #### "Device not connected"
+
 **Penyebab:**
+
 - Kabel USB rusak
 - Driver tidak terinstall
 - Port USB tidak aktif
 
 **Solusi:**
+
 1. Ganti kabel USB
 2. Install driver (CH340 untuk ESP32, FTDI untuk Micro:bit)
 3. Cek Device Manager (Windows) / System Information (Mac/Linux)
 4. Coba port USB lain
 
 #### "Timeout waiting for MicroPython prompt"
+
 **Penyebab:**
+
 - Baudrate tidak cocok
 - Board tidak merespon
 - Kabel serial rusak
 
 **Solusi:**
+
 1. Cek baudrate di settings (default 115200 untuk ESP32, 9600 untuk Micro:bit)
 2. Pastikan firmware MicroPython sudah terinstall
 3. Coba kabel serial yang berbeda
 4. Restart board
 
 #### "Flash Firmware failed"
+
 **Penyebab:**
+
 - Board tidak terdeteksi
 - Voltage tidak cukup
 - Boot mode salah
 
 **Solusi:**
+
 1. Pastikan board terhubung dengan baik
 2. Untuk ESP32, tekan tombol BOOT saat connect
 3. Gunakan power supply terpisah (jika ada)
 4. Cek log error di terminal
 
 #### "Syntax error"
+
 **Penyebab:**
+
 - Kurang indentasi (Python butuh indentasi!)
 - Kurang tanda titik koma
 - Nama variabel salah
 
 **Solusi:**
+
 1. Gunakan tab/spasi konsisten (4 spasi)
 2. Cek tanda kurung: `(` harus ada `)`
 3. Cek tanda kutip: `'` harus ada `'`
 4. Gunakan Auto-format di editor
 
 #### "Import error"
+
 **Penyebab:**
+
 - Library tidak ada di board
 - Nama library salah
 - Import order salah
 
 **Solusi:**
+
 1. Untuk library standar: `import machine`, `import time`, `import random`
 2. Untuk library custom: upload file `.py` dulu via REPL
 3. Cek spelling nama library
@@ -720,6 +780,7 @@ display_message("Python!")
 ### Checklist Koneksi
 
 #### ESP32
+
 - [ ] Driver CH340/CP2102 terinstall
 - [ ] Kabel USB terhubung
 - [ ] Port COM/USB-SERIAL terdeteksi
@@ -728,6 +789,7 @@ display_message("Python!")
 - [ ] Tombol BOOT ditekan (untuk flash)
 
 #### Micro:bit V2
+
 - [ ] Kabel USB-C terhubung
 - [ ] Port COM terdeteksi
 - [ ] Baudrate 9600
@@ -735,6 +797,7 @@ display_message("Python!")
 - [ ] LED berkedip saat connect (jika ada)
 
 #### Raspberry Pi Pico
+
 - [ ] Mode USB Drive aktif
 - [ ] File `boot.py` dan `code.py` di drive
 - [ ] Copy file ke board
@@ -743,6 +806,7 @@ display_message("Python!")
 ### Tips Maintenance
 
 #### Update Firmware
+
 ```bash
 # Untuk ESP32 via esptool (dari command line)
 esptool.py --port COM3 --baud 115200 write_flash 0x1000 firmware.bin
@@ -752,11 +816,13 @@ microbit-python flash main.py
 ```
 
 #### Backup Kode
+
 1. Export project dari Python IDE
 2. Simpan file JSON di tempat aman
 3. Version control dengan Git
 
 #### Reset Board
+
 - **Soft reset**: Ctrl+D di REPL
 - **Hard reset**: Cabut dan pasang USB lagi
 - **Factory reset**: Tahan tombol reset 10 detik
@@ -766,45 +832,53 @@ microbit-python flash main.py
 ## 🔧 Troubleshooting untuk Siswa SD
 
 ### "Warna Kuning/Orange di Editor"
+
 **Artinya:** Ada error syntax!
 
 **Penyebab:**
+
 - Kurang indentasi (spasi/tab)
 - Kurang tanda kurung `(` atau `)`
 - Kurang tanda kutip `'` atau `"`
 
 **Cara Fix:**
+
 1. Klik kanan → **Auto-format**
 2. Atau perbaiki manual:
-   ```python
-   # ❌ Salah (kurang kurung)
-   print("Hello"
-   
-   # ✅ Benar
-   print("Hello")
-   
-   # ❌ Salah (kurang kurung tutup)
-   if x > 5:
-       print("Besar")
-   
-   # ✅ Benar
-   if x > 5:
-       print("Besar")
-   ```
+
+    ```python
+    # ❌ Salah (kurang kurung)
+    print("Hello"
+
+    # ✅ Benar
+    print("Hello")
+
+    # ❌ Salah (kurang kurung tutup)
+    if x > 5:
+        print("Besar")
+
+    # ✅ Benar
+    if x > 5:
+        print("Besar")
+    ```
 
 ### "Device not connected"
+
 **Artinya:** Board belum terhubung dengan komputer
 
 **Cara Fix:**
+
 1. Cek kabel USB sudah masuk?
 2. Coba port USB lain
 3. Install driver (lihat di Troubleshooting lengkap)
 4. Untuk ESP32: tekan tombol BOOT saat connect
 
 ### "SyntaxError: invalid indent"
+
 **Artinya:** Python butuh indentasi (spasi/tab) yang benar!
 
 **Cara Fix:**
+
 ```python
 # ❌ Salah
 if x > 5:
@@ -818,9 +892,11 @@ if x > 5:
 **Tips:** Gunakan **Tab** atau **4 spasi** untuk indentasi!
 
 ### "NameError: name 'x' is not defined"
+
 **Artinya:** Variabel `x` belum dibuat
 
 **Cara Fix:**
+
 ```python
 # ❌ Salah
 print(x)  # x belum dibuat!
@@ -831,9 +907,11 @@ print(x)
 ```
 
 ### "ImportError"
+
 **Artinya:** Library tidak ditemukan
 
 **Cara Fix:**
+
 ```python
 # Untuk library standar (sudah ada):
 import math
@@ -846,9 +924,11 @@ import time
 ```
 
 ### "Timeout waiting for MicroPython prompt"
+
 **Artinya:** Board tidak merespon
 
 **Cara Fix:**
+
 1. Restart board (cabut USB, pasang lagi)
 2. Cek kabel serial
 3. Ganti baudrate (115200 → 9600 atau sebaliknya)
@@ -859,9 +939,11 @@ import time
 ## 🔧 Troubleshooting untuk Mahasiswa
 
 ### "ModuleNotFoundError: No module named 'x'"
+
 **Penyebab:** Library belum terinstall
 
 **Solusi:**
+
 ```python
 # Install library
 import sys
@@ -872,9 +954,11 @@ sys.path.append('/path/to/library')
 ```
 
 ### "Connection refused / Device not responding"
+
 **Penyebab:** Board tidak connect atau baudrate salah
 
 **Solusi:**
+
 ```python
 # 1. Cek connection di Python IDE
 # 2. Ganti baudrate di settings
@@ -884,9 +968,11 @@ time.sleep(1)  # Tunggu 1 detik sebelum akses hardware
 ```
 
 ### "RuntimeError: Device already in use"
+
 **Penyebab:** Device sedang digunakan oleh kode lain
 
 **Solusi:**
+
 ```python
 # Clear device sebelum pakai
 clear_device()
@@ -896,9 +982,11 @@ use(arduinoNano())  # Ganti device
 ```
 
 ### "IndentationError: expected an indented block"
+
 **Penyebab:** Kurang indentasi setelah `if`, `for`, `def`, dll
 
 **Solusi:**
+
 ```python
 # ❌ Salah
 if x > 5:
@@ -910,9 +998,11 @@ if x > 5:
 ```
 
 ### "TypeError: 'int' object is not subscriptable"
+
 **Penyebab:** Coba index number seperti string/list
 
 **Solusi:**
+
 ```python
 # ❌ Salah
 x = 10
@@ -924,9 +1014,11 @@ print(x[0])  # List bisa di-index
 ```
 
 ### "ValueError: invalid literal for int() with base 10"
+
 **Penyebab:** Convert string ke int gagal
 
 **Solusi:**
+
 ```python
 # ❌ Salah
 x = "abc"
@@ -944,6 +1036,7 @@ except ValueError:
 ## 💡 Tips Debugging
 
 ### 1. Gunakan print() untuk debugging
+
 ```python
 print(f"Debug: x = {x}")
 print(f"Debug: y = {y}")
@@ -951,6 +1044,7 @@ print(f"Debug: result = {result}")
 ```
 
 ### 2. Gunakan REPL untuk inspection
+
 ```python
 # Di REPL
 >>> x
@@ -962,6 +1056,7 @@ print(f"Debug: result = {result}")
 ```
 
 ### 3. Tambahkan comment untuk penjelasan
+
 ```python
 # Hitung luas persegi panjang
 panjang = 10
@@ -971,6 +1066,7 @@ print(f"Luas = {luas}")  # Output: Luas = 50
 ```
 
 ### 4. Gunakan try-except untuk error handling
+
 ```python
 try:
     angka = int(input("Masukkan angka: "))
@@ -982,33 +1078,23 @@ except ValueError:
     print("Masukkan angka yang valid!")
 ```
 
----
-
-## 📞 Kontak & Dukungan
-
-Jika ada masalah atau pertanyaan:
-- 📧 Email: support@nomopro.com
-- 💬 Discord: https://discord.gg/nomopro
-- 📚 Dokumentasi: https://docs.nomopro.com
-
----
-
 ## 📚 Appendix A: Built-in Functions Reference
 
 ### 🎯 Fungsi untuk Sprite Control (Pergerakan & Aksi)
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `move(value)` | Bergerak `value` langkah ke arah yang dituju | `move(10)` |
-| `goto(x, y)` | Pindah ke koordinat (x, y) | `goto(100, 200)` |
-| `turn_right(value)` | Putar kanan `value` derajat | `turn_right(90)` |
-| `turn_left(value)` | Putar kiri `value` derajat | `turn_left(45)` |
-| `point(direction)` | Arahkan ke sudut tertentu | `point(90)` (ke kanan) |
-| `x_position()` | Ambil posisi X saat ini | `print(x_position())` |
-| `y_position()` | Ambil posisi Y saat ini | `print(y_position())` |
-| `direction()` | Ambil arah saat ini (0-360°) | `print(direction())` |
+| Fungsi              | Deskripsi                                    | Contoh                 |
+| ------------------- | -------------------------------------------- | ---------------------- |
+| `move(value)`       | Bergerak `value` langkah ke arah yang dituju | `move(10)`             |
+| `goto(x, y)`        | Pindah ke koordinat (x, y)                   | `goto(100, 200)`       |
+| `turn_right(value)` | Putar kanan `value` derajat                  | `turn_right(90)`       |
+| `turn_left(value)`  | Putar kiri `value` derajat                   | `turn_left(45)`        |
+| `point(direction)`  | Arahkan ke sudut tertentu                    | `point(90)` (ke kanan) |
+| `x_position()`      | Ambil posisi X saat ini                      | `print(x_position())`  |
+| `y_position()`      | Ambil posisi Y saat ini                      | `print(y_position())`  |
+| `direction()`       | Ambil arah saat ini (0-360°)                 | `print(direction())`   |
 
 **Contoh:**
+
 ```python
 # Sprite bergerak dalam lingkaran
 for i in range(4):
@@ -1020,16 +1106,17 @@ for i in range(4):
 
 ### 🎨 Fungsi untuk Costume & Backdrop
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `switch_costume(name)` | Ganti costume sprite | `switch_costume("running")` |
-| `next_costume()` | Pindah ke costume berikutnya | `next_costume()` |
-| `switch_backdrop_to(name)` | Ganti backdrop stage | `switch_backdrop_to("background2")` |
-| `next_backdrop()` | Pindah ke backdrop berikutnya | `next_backdrop()` |
-| `show()` | Tampilkan sprite/backdrop | `show()` |
-| `hide()` | Sembunyikan sprite/backdrop | `hide()` |
+| Fungsi                     | Deskripsi                     | Contoh                              |
+| -------------------------- | ----------------------------- | ----------------------------------- |
+| `switch_costume(name)`     | Ganti costume sprite          | `switch_costume("running")`         |
+| `next_costume()`           | Pindah ke costume berikutnya  | `next_costume()`                    |
+| `switch_backdrop_to(name)` | Ganti backdrop stage          | `switch_backdrop_to("background2")` |
+| `next_backdrop()`          | Pindah ke backdrop berikutnya | `next_backdrop()`                   |
+| `show()`                   | Tampilkan sprite/backdrop     | `show()`                            |
+| `hide()`                   | Sembunyikan sprite/backdrop   | `hide()`                            |
 
 **Contoh:**
+
 ```python
 # Animasi berjalan
 for i in range(3):
@@ -1041,14 +1128,15 @@ for i in range(3):
 
 ### 🔊 Fungsi untuk Suara & Efek
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `play_sound(name)` | Putar suara | `play_sound("laugh")` |
-| `set_effect(effect, value)` | Set efek (color, blur, etc) | `set_effect("color", 50)` |
-| `change_effect(effect, value)` | Ubah efek | `change_effect("blur", 10)` |
-| `clear_effects()` | Hapus semua efek | `clear_effects()` |
+| Fungsi                         | Deskripsi                   | Contoh                      |
+| ------------------------------ | --------------------------- | --------------------------- |
+| `play_sound(name)`             | Putar suara                 | `play_sound("laugh")`       |
+| `set_effect(effect, value)`    | Set efek (color, blur, etc) | `set_effect("color", 50)`   |
+| `change_effect(effect, value)` | Ubah efek                   | `change_effect("blur", 10)` |
+| `clear_effects()`              | Hapus semua efek            | `clear_effects()`           |
 
 **Contoh:**
+
 ```python
 # Animasi dengan efek
 switch_costume("magic")
@@ -1062,17 +1150,18 @@ clear_effects()
 
 ### ✏️ Fungsi untuk Pen (Tinta)
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `pen_down()` | Turunkan pensil | `pen_down()` |
-| `pen_up()` | Angkat pensil | `pen_up()` |
-| `set_pen_color(color)` | Set warna pensil | `set_pen_color("red")` |
-| `change_pen_size(delta)` | Ubah ukuran pensil | `change_pen_size(5)` |
-| `set_pen_size(size)` | Set ukuran pensil | `set_pen_size(10)` |
-| `pen_clear()` | Bersihkan semua jejak | `pen_clear()` |
-| `pen_stamp()` | Tempatkan sprite tanpa jejak | `pen_stamp()` |
+| Fungsi                   | Deskripsi                    | Contoh                 |
+| ------------------------ | ---------------------------- | ---------------------- |
+| `pen_down()`             | Turunkan pensil              | `pen_down()`           |
+| `pen_up()`               | Angkat pensil                | `pen_up()`             |
+| `set_pen_color(color)`   | Set warna pensil             | `set_pen_color("red")` |
+| `change_pen_size(delta)` | Ubah ukuran pensil           | `change_pen_size(5)`   |
+| `set_pen_size(size)`     | Set ukuran pensil            | `set_pen_size(10)`     |
+| `pen_clear()`            | Bersihkan semua jejak        | `pen_clear()`          |
+| `pen_stamp()`            | Tempatkan sprite tanpa jejak | `pen_stamp()`          |
 
 **Contoh:**
+
 ```python
 # Gambar kotak
 pen_down()
@@ -1088,13 +1177,14 @@ pen_clear()
 
 ### ⏱️ Fungsi untuk Waktu & Tunggu
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `wait(seconds)` | Tunggu `seconds` detik | `wait(2)` |
-| `timer()` | Ambil waktu sejak start | `print(timer())` |
-| `reset_timer()` | Reset timer | `reset_timer()` |
+| Fungsi          | Deskripsi               | Contoh           |
+| --------------- | ----------------------- | ---------------- |
+| `wait(seconds)` | Tunggu `seconds` detik  | `wait(2)`        |
+| `timer()`       | Ambil waktu sejak start | `print(timer())` |
+| `reset_timer()` | Reset timer             | `reset_timer()`  |
 
 **Contoh:**
+
 ```python
 # Tunggu sebelum lanjut
 move(100)
@@ -1106,16 +1196,17 @@ hide()
 
 ### 🎭 Fungsi untuk Event Handler
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `when_green_flag_clicked(handler)` | Jalankan saat flag hijau diklik | `@when_green_flag_clicked\ndef run():` |
-| `when_key_pressed(key)` | Jalankan saat tombol ditekan | `@when_key_pressed("space")` |
-| `when_this_sprite_clicked(handler)` | Jalankan saat sprite diklik | `@when_this_sprite_clicked\ndef on_click():` |
-| `when_stage_clicked(handler)` | Jalankan saat stage diklik | `@when_stage_clicked\ndef on_stage():` |
-| `when_backdrop_switches_to(name)` | Saat backdrop berubah | `@when_backdrop_switches_to("bg2")` |
-| `when_i_receive(message)` | Saat broadcast diterima | `@when_i_receive("hello")` |
+| Fungsi                              | Deskripsi                       | Contoh                                       |
+| ----------------------------------- | ------------------------------- | -------------------------------------------- |
+| `when_green_flag_clicked(handler)`  | Jalankan saat flag hijau diklik | `@when_green_flag_clicked\ndef run():`       |
+| `when_key_pressed(key)`             | Jalankan saat tombol ditekan    | `@when_key_pressed("space")`                 |
+| `when_this_sprite_clicked(handler)` | Jalankan saat sprite diklik     | `@when_this_sprite_clicked\ndef on_click():` |
+| `when_stage_clicked(handler)`       | Jalankan saat stage diklik      | `@when_stage_clicked\ndef on_stage():`       |
+| `when_backdrop_switches_to(name)`   | Saat backdrop berubah           | `@when_backdrop_switches_to("bg2")`          |
+| `when_i_receive(message)`           | Saat broadcast diterima         | `@when_i_receive("hello")`                   |
 
 **Contoh:**
+
 ```python
 @when_green_flag_clicked
 def run():
@@ -1128,14 +1219,15 @@ def run():
 
 ### 📢 Fungsi untuk Broadcast & Clone
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `broadcast(message)` | Kirim broadcast | `broadcast("start")` |
-| `broadcast_and_wait(message)` | Kirim dan tunggu | `broadcast_and_wait("done")` |
-| `create_clone(option)` | Buat clone sprite | `create_clone()` |
-| `delete_clone()` | Hapus clone | `delete_clone()` |
+| Fungsi                        | Deskripsi         | Contoh                       |
+| ----------------------------- | ----------------- | ---------------------------- |
+| `broadcast(message)`          | Kirim broadcast   | `broadcast("start")`         |
+| `broadcast_and_wait(message)` | Kirim dan tunggu  | `broadcast_and_wait("done")` |
+| `create_clone(option)`        | Buat clone sprite | `create_clone()`             |
+| `delete_clone()`              | Hapus clone       | `delete_clone()`             |
 
 **Contoh:**
+
 ```python
 # Broadcast ke semua sprite
 broadcast("start_animation")
@@ -1150,17 +1242,18 @@ for i in range(5):
 
 ### 🎲 Fungsi untuk Sensor & Input
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `ask(question)` | Tampilkan dialog tanya | `answer = ask("Nama?")` |
-| `touching(target)` | Cek sentuh target lain | `if touching("cat"): ...` |
-| `touching_color(color)` | Cek sentuh warna | `if touching_color("red"): ...` |
-| `key_pressed(key)` | Cek tombol ditekan | `if key_pressed("space"): ...` |
-| `mouse_down()` | Cek mouse ditekan | `if mouse_down(): ...` |
-| `mouse_x()` | Ambil posisi mouse X | `print(mouse_x())` |
-| `mouse_y()` | Ambil posisi mouse Y | `print(mouse_y())` |
+| Fungsi                  | Deskripsi              | Contoh                          |
+| ----------------------- | ---------------------- | ------------------------------- |
+| `ask(question)`         | Tampilkan dialog tanya | `answer = ask("Nama?")`         |
+| `touching(target)`      | Cek sentuh target lain | `if touching("cat"): ...`       |
+| `touching_color(color)` | Cek sentuh warna       | `if touching_color("red"): ...` |
+| `key_pressed(key)`      | Cek tombol ditekan     | `if key_pressed("space"): ...`  |
+| `mouse_down()`          | Cek mouse ditekan      | `if mouse_down(): ...`          |
+| `mouse_x()`             | Ambil posisi mouse X   | `print(mouse_x())`              |
+| `mouse_y()`             | Ambil posisi mouse Y   | `print(mouse_y())`              |
 
 **Contoh:**
+
 ```python
 # Game tebak angka
 answer = ask("Tebak angka 1-10!")
@@ -1172,19 +1265,20 @@ if int(answer) == 7:
 
 ### 📋 Fungsi untuk Variable & List
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `variable(name, default=0)` | Ambil variable | `score = variable("score")` |
-| `set_variable(name, value)` | Set variable | `set_variable("score", 10)` |
-| `change_variable_by(name, delta)` | Tambah variable | `change_variable_by("score", 5)` |
-| `list_value(name)` | Ambil list | `items = list_value("fruits")` |
-| `add_to_list(item, name)` | Tambah ke list | `add_to_list("apple", "fruits")` |
-| `item_of_list(index, name)` | Ambil item ke-n | `first = item_of_list(1, "fruits")` |
-| `length_of_list(name)` | Panjang list | `print(length_of_list("fruits"))` |
-| `delete_of_list(index, name)` | Hapus item ke-n | `delete_of_list(1, "fruits")` |
-| `delete_all_of_list(name)` | Hapus semua list | `delete_all_of_list("fruits")` |
+| Fungsi                            | Deskripsi        | Contoh                              |
+| --------------------------------- | ---------------- | ----------------------------------- |
+| `variable(name, default=0)`       | Ambil variable   | `score = variable("score")`         |
+| `set_variable(name, value)`       | Set variable     | `set_variable("score", 10)`         |
+| `change_variable_by(name, delta)` | Tambah variable  | `change_variable_by("score", 5)`    |
+| `list_value(name)`                | Ambil list       | `items = list_value("fruits")`      |
+| `add_to_list(item, name)`         | Tambah ke list   | `add_to_list("apple", "fruits")`    |
+| `item_of_list(index, name)`       | Ambil item ke-n  | `first = item_of_list(1, "fruits")` |
+| `length_of_list(name)`            | Panjang list     | `print(length_of_list("fruits"))`   |
+| `delete_of_list(index, name)`     | Hapus item ke-n  | `delete_of_list(1, "fruits")`       |
+| `delete_all_of_list(name)`        | Hapus semua list | `delete_all_of_list("fruits")`      |
 
 **Contoh:**
+
 ```python
 # List buah
 add_to_list("apple", "fruits")
@@ -1197,19 +1291,20 @@ print(f"Ada {length_of_list('fruits')} buah!")
 
 ### 📡 Fungsi untuk Device Control (Hardware)
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `use(device)` | Set device aktif | `use(arduinoUno())` |
-| `pinMode(pin, mode)` | Set pin (INPUT/OUTPUT) | `pinMode(2, "OUTPUT")` |
-| `digitalWrite(pin, value)` | Set pin HIGH/LOW | `digitalWrite(2, True)` |
-| `digitalRead(pin)` | Baca pin digital | `val = digitalRead(3)` |
-| `analogWrite(pin, value)` | PWM 0-255 | `analogWrite(9, 128)` |
-| `analogRead(pin)` | Baca analog 0-4095 | `val = analogRead(A0)` |
-| `servoWrite(pin, angle)` | Set servo 0-180° | `servoWrite(9, 90)` |
-| `serialPrint(text)` | Kirim via serial | `serialPrint("Hello")` |
-| `serialPrintln(text)` | Kirim + newline | `serialPrintln("Done")` |
+| Fungsi                     | Deskripsi              | Contoh                  |
+| -------------------------- | ---------------------- | ----------------------- |
+| `use(device)`              | Set device aktif       | `use(arduinoUno())`     |
+| `pinMode(pin, mode)`       | Set pin (INPUT/OUTPUT) | `pinMode(2, "OUTPUT")`  |
+| `digitalWrite(pin, value)` | Set pin HIGH/LOW       | `digitalWrite(2, True)` |
+| `digitalRead(pin)`         | Baca pin digital       | `val = digitalRead(3)`  |
+| `analogWrite(pin, value)`  | PWM 0-255              | `analogWrite(9, 128)`   |
+| `analogRead(pin)`          | Baca analog 0-4095     | `val = analogRead(A0)`  |
+| `servoWrite(pin, angle)`   | Set servo 0-180°       | `servoWrite(9, 90)`     |
+| `serialPrint(text)`        | Kirim via serial       | `serialPrint("Hello")`  |
+| `serialPrintln(text)`      | Kirim + newline        | `serialPrintln("Done")` |
 
 **Contoh:**
+
 ```python
 # Kontrol LED
 use(arduinoUno())
@@ -1223,33 +1318,34 @@ digitalWrite(13, False)
 
 ### 🎮 Fungsi untuk Scratch Extension
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `green_flag()` | Jalankan semua handler | `green_flag()` |
-| `trigger_key_pressed(key)` | Trigger key event | `trigger_key_pressed("a")` |
-| `trigger_sprite_clicked()` | Trigger sprite click | `trigger_sprite_clicked()` |
-| `trigger_stage_clicked()` | Trigger stage click | `trigger_stage_clicked()` |
-| `trigger_backdrop_switch(name)` | Trigger backdrop | `trigger_backdrop_switch("bg2")` |
-| `load_device(device_id, type)` | Load device extension | `load_device("esp32", "arduino")` |
-| `clear_device()` | Clear device | `clear_device()` |
+| Fungsi                          | Deskripsi              | Contoh                            |
+| ------------------------------- | ---------------------- | --------------------------------- |
+| `green_flag()`                  | Jalankan semua handler | `green_flag()`                    |
+| `trigger_key_pressed(key)`      | Trigger key event      | `trigger_key_pressed("a")`        |
+| `trigger_sprite_clicked()`      | Trigger sprite click   | `trigger_sprite_clicked()`        |
+| `trigger_stage_clicked()`       | Trigger stage click    | `trigger_stage_clicked()`         |
+| `trigger_backdrop_switch(name)` | Trigger backdrop       | `trigger_backdrop_switch("bg2")`  |
+| `load_device(device_id, type)`  | Load device extension  | `load_device("esp32", "arduino")` |
+| `clear_device()`                | Clear device           | `clear_device()`                  |
 
 ---
 
 ### 🎵 Fungsi untuk Music Extension
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `play_drum(drum, beats)` | Main drum | `play_drum(1, 0.5)` |
-| `play_note(note, beats)` | Main not dengan durasi | `play_note(60, 0.5)` |
-| `rest(beats)` | Diam `beats` ketukan | `rest(0.5)` |
-| `set_instrument(instrument)` | Pilih instrumen (0-20) | `set_instrument(1)` |
-| `set_tempo(tempo)` | Set tempo BPM | `set_tempo(120)` |
-| `change_tempo_by(delta)` | Ubah tempo ±BPM | `change_tempo_by(20)` |
-| `get_tempo()` | Ambil tempo saat ini | `print(get_tempo())` |
+| Fungsi                       | Deskripsi              | Contoh                |
+| ---------------------------- | ---------------------- | --------------------- |
+| `play_drum(drum, beats)`     | Main drum              | `play_drum(1, 0.5)`   |
+| `play_note(note, beats)`     | Main not dengan durasi | `play_note(60, 0.5)`  |
+| `rest(beats)`                | Diam `beats` ketukan   | `rest(0.5)`           |
+| `set_instrument(instrument)` | Pilih instrumen (0-20) | `set_instrument(1)`   |
+| `set_tempo(tempo)`           | Set tempo BPM          | `set_tempo(120)`      |
+| `change_tempo_by(delta)`     | Ubah tempo ±BPM        | `change_tempo_by(20)` |
+| `get_tempo()`                | Ambil tempo saat ini   | `print(get_tempo())`  |
 
 > **get_tempo()** hanya return nilai asli di Desktop mode. Di Web return `None`.
 
 **Contoh:**
+
 ```python
 # Main lagu sederhana
 set_instrument(1)        # Piano
@@ -1264,13 +1360,14 @@ play_drum(1, 1)          # Snare
 
 ### 🔊 Fungsi untuk Text to Speech (TTS)
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `speak(text)` | Ucapkan teks | `speak("Hello!")` |
-| `set_voice(voice)` | Pilih suara (alto/tenor/soprano) | `set_voice("alto")` |
-| `set_speech_language(lang)` | Pilih bahasa (id/en/ja/dll) | `set_speech_language("id")` |
+| Fungsi                      | Deskripsi                        | Contoh                      |
+| --------------------------- | -------------------------------- | --------------------------- |
+| `speak(text)`               | Ucapkan teks                     | `speak("Hello!")`           |
+| `set_voice(voice)`          | Pilih suara (alto/tenor/soprano) | `set_voice("alto")`         |
+| `set_speech_language(lang)` | Pilih bahasa (id/en/ja/dll)      | `set_speech_language("id")` |
 
 **Contoh:**
+
 ```python
 # Sapaan multi-bahasa
 set_voice("alto")
@@ -1284,12 +1381,13 @@ speak("Hello, welcome!")
 
 ### 🎥 Fungsi untuk Video Sensing
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `video_toggle(state)` | Nyalakan/matikan kamera | `video_toggle("on")` |
+| Fungsi                          | Deskripsi                       | Contoh                       |
+| ------------------------------- | ------------------------------- | ---------------------------- |
+| `video_toggle(state)`           | Nyalakan/matikan kamera         | `video_toggle("on")`         |
 | `set_video_transparency(value)` | Atur transparansi video (0-100) | `set_video_transparency(50)` |
 
 **Contoh:**
+
 ```python
 # Kamera sebagai background
 video_toggle("on")
@@ -1302,18 +1400,19 @@ video_toggle("off")
 
 ### 🖐️ Fungsi untuk Hand Pose Extension
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `handpose_video(state)` | Nyalakan/matikan deteksi tangan | `handpose_video("on")` |
-| `handpose_get_x(index)` | Posisi X landmark ke-n (0-20) | `x = handpose_get_x(0)` |
-| `handpose_get_y(index)` | Posisi Y landmark ke-n | `y = handpose_get_y(0)` |
-| `handpose_get_z(index)` | Posisi Z landmark ke-n | `z = handpose_get_z(0)` |
-| `handpose_video_toggle(state)` | Toggle video handpose | `handpose_video_toggle("on")` |
-| `handpose_set_video_transparency(value)` | Transparansi handpose video | `handpose_set_video_transparency(30)` |
+| Fungsi                                   | Deskripsi                       | Contoh                                |
+| ---------------------------------------- | ------------------------------- | ------------------------------------- |
+| `handpose_video(state)`                  | Nyalakan/matikan deteksi tangan | `handpose_video("on")`                |
+| `handpose_get_x(index)`                  | Posisi X landmark ke-n (0-20)   | `x = handpose_get_x(0)`               |
+| `handpose_get_y(index)`                  | Posisi Y landmark ke-n          | `y = handpose_get_y(0)`               |
+| `handpose_get_z(index)`                  | Posisi Z landmark ke-n          | `z = handpose_get_z(0)`               |
+| `handpose_video_toggle(state)`           | Toggle video handpose           | `handpose_video_toggle("on")`         |
+| `handpose_set_video_transparency(value)` | Transparansi handpose video     | `handpose_set_video_transparency(30)` |
 
 > **handpose_get_x/y/z()** hanya return nilai asli di Desktop mode. Di Web return `None`.
 
 **Contoh:**
+
 ```python
 # Deteksi posisi ujung jari
 handpose_video("on")
@@ -1326,14 +1425,15 @@ print(f"Jari di ({x}, {y})")
 
 ### 🎤 Fungsi untuk Speech to Text Extension
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `listen()` | Rekam suara (blocking) | `listen()` |
+| Fungsi         | Deskripsi               | Contoh                |
+| -------------- | ----------------------- | --------------------- |
+| `listen()`     | Rekam suara (blocking)  | `listen()`            |
 | `get_speech()` | Ambil hasil transkripsi | `text = get_speech()` |
 
 > **get_speech()** hanya return nilai asli di Desktop mode. Di Web return `None`.
 
 **Contoh:**
+
 ```python
 # Voice command
 say("Katakan sesuatu!")
@@ -1346,14 +1446,15 @@ say(f"Kamu bilang: {command}")
 
 ### 🌐 Fungsi untuk Translate Extension
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `translate_text(text)` | Terjemahkan teks | `result = translate_text("Hello")` |
-| `get_viewer_language()` | Ambil bahasa viewer | `lang = get_viewer_language()` |
+| Fungsi                  | Deskripsi           | Contoh                             |
+| ----------------------- | ------------------- | ---------------------------------- |
+| `translate_text(text)`  | Terjemahkan teks    | `result = translate_text("Hello")` |
+| `get_viewer_language()` | Ambil bahasa viewer | `lang = get_viewer_language()`     |
 
 > Kedua fungsi ini **hanya return nilai asli di Desktop mode**. Di Web return `None`.
 
 **Contoh:**
+
 ```python
 # Terjemahan otomatis
 lang = get_viewer_language()
@@ -1366,20 +1467,21 @@ say(terjemahan)
 
 ### 🤖 Fungsi untuk OB2Scratch Extension (Object Detection)
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `ob2_analyse()` | Analisis frame kamera | `ob2_analyse()` |
-| `ob2_get_count()` | Jumlah objek terdeteksi | `count = ob2_get_count()` |
-| `ob2_get_x(n)` | Posisi X objek ke-n | `x = ob2_get_x(0)` |
-| `ob2_get_y(n)` | Posisi Y objek ke-n | `y = ob2_get_y(0)` |
-| `ob2_get_width(n)` | Lebar objek ke-n | `w = ob2_get_width(0)` |
-| `ob2_get_height(n)` | Tinggi objek ke-n | `h = ob2_get_height(0)` |
-| `ob2_get_category(n)` | Label objek ke-n | `label = ob2_get_category(0)` |
-| `ob2_is_detected(n)` | Cek objek ke-n terdeteksi | `if ob2_is_detected(0):` |
+| Fungsi                | Deskripsi                 | Contoh                        |
+| --------------------- | ------------------------- | ----------------------------- |
+| `ob2_analyse()`       | Analisis frame kamera     | `ob2_analyse()`               |
+| `ob2_get_count()`     | Jumlah objek terdeteksi   | `count = ob2_get_count()`     |
+| `ob2_get_x(n)`        | Posisi X objek ke-n       | `x = ob2_get_x(0)`            |
+| `ob2_get_y(n)`        | Posisi Y objek ke-n       | `y = ob2_get_y(0)`            |
+| `ob2_get_width(n)`    | Lebar objek ke-n          | `w = ob2_get_width(0)`        |
+| `ob2_get_height(n)`   | Tinggi objek ke-n         | `h = ob2_get_height(0)`       |
+| `ob2_get_category(n)` | Label objek ke-n          | `label = ob2_get_category(0)` |
+| `ob2_is_detected(n)`  | Cek objek ke-n terdeteksi | `if ob2_is_detected(0):`      |
 
-> Fungsi **get_*** dan **is_detected** hanya return nilai asli di Desktop mode. **ob2_analyse()** work di semua mode.
+> Fungsi **get\_\*** dan **is_detected** hanya return nilai asli di Desktop mode. **ob2_analyse()** work di semua mode.
 
 **Contoh:**
+
 ```python
 # Deteksi objek real-time
 video_toggle("on")
@@ -1396,30 +1498,31 @@ for i in range(count):
 
 ### 🧠 Fungsi untuk Machine Learning Extension
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `ml_add_example1(label)` | Tambah contoh ke class 1 | `ml_add_example1("rock")` |
-| `ml_add_example2(label)` | Tambah contoh ke class 2 | `ml_add_example2("paper")` |
-| `ml_add_example3(label)` | Tambah contoh ke class 3 | `ml_add_example3("scissors")` |
-| `ml_add_example4(label)` | Tambah contoh ke class 4 | `ml_add_example4("spock")` |
-| `ml_add_example5(label)` | Tambah contoh ke class 5 | `ml_add_example5("lizard")` |
-| `ml_train()` | Latih model | `ml_train()` |
-| `ml_classify()` | Klasifikasikan input | `ml_classify()` |
-| `ml_get_label()` | Ambil label hasil klasifikasi | `label = ml_get_label()` |
-| `ml_get_count()` | Jumlah class terlatih | `count = ml_get_count()` |
-| `ml_set_confidence(threshold)` | Set threshold confidence | `ml_set_confidence(0.8)` |
-| `ml_get_confidence()` | Ambil confidence | `conf = ml_get_confidence()` |
-| `ml_clear()` | Reset semua contoh | `ml_clear()` |
-| `ml_when_example1_labeled()` | Event example 1 labeled | (HAT - otomatis) |
-| `ml_when_example2_labeled()` | Event example 2 labeled | (HAT - otomatis) |
-| `ml_when_example3_labeled()` | Event example 3 labeled | (HAT - otomatis) |
-| `ml_when_example4_labeled()` | Event example 4 labeled | (HAT - otomatis) |
-| `ml_when_example5_labeled()` | Event example 5 labeled | (HAT - otomatis) |
-| `ml_when_classify_done()` | Event klasifikasi selesai | (HAT - otomatis) |
+| Fungsi                         | Deskripsi                     | Contoh                        |
+| ------------------------------ | ----------------------------- | ----------------------------- |
+| `ml_add_example1(label)`       | Tambah contoh ke class 1      | `ml_add_example1("rock")`     |
+| `ml_add_example2(label)`       | Tambah contoh ke class 2      | `ml_add_example2("paper")`    |
+| `ml_add_example3(label)`       | Tambah contoh ke class 3      | `ml_add_example3("scissors")` |
+| `ml_add_example4(label)`       | Tambah contoh ke class 4      | `ml_add_example4("spock")`    |
+| `ml_add_example5(label)`       | Tambah contoh ke class 5      | `ml_add_example5("lizard")`   |
+| `ml_train()`                   | Latih model                   | `ml_train()`                  |
+| `ml_classify()`                | Klasifikasikan input          | `ml_classify()`               |
+| `ml_get_label()`               | Ambil label hasil klasifikasi | `label = ml_get_label()`      |
+| `ml_get_count()`               | Jumlah class terlatih         | `count = ml_get_count()`      |
+| `ml_set_confidence(threshold)` | Set threshold confidence      | `ml_set_confidence(0.8)`      |
+| `ml_get_confidence()`          | Ambil confidence              | `conf = ml_get_confidence()`  |
+| `ml_clear()`                   | Reset semua contoh            | `ml_clear()`                  |
+| `ml_when_example1_labeled()`   | Event example 1 labeled       | (HAT - otomatis)              |
+| `ml_when_example2_labeled()`   | Event example 2 labeled       | (HAT - otomatis)              |
+| `ml_when_example3_labeled()`   | Event example 3 labeled       | (HAT - otomatis)              |
+| `ml_when_example4_labeled()`   | Event example 4 labeled       | (HAT - otomatis)              |
+| `ml_when_example5_labeled()`   | Event example 5 labeled       | (HAT - otomatis)              |
+| `ml_when_classify_done()`      | Event klasifikasi selesai     | (HAT - otomatis)              |
 
-> Fungsi **get_*** hanya return nilai asli di Desktop mode. **add_example**, **train**, **classify**, **clear** work di semua mode.
+> Fungsi **get\_\*** hanya return nilai asli di Desktop mode. **add_example**, **train**, **classify**, **clear** work di semua mode.
 
 **Contoh:**
+
 ```python
 # Training model sederhana
 ml_add_example1("gunting")
@@ -1436,28 +1539,29 @@ say(f"Hasil: {label}")
 
 ### 📸 Fungsi untuk TM2Scratch Extension (Image Classification)
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `tm2_classify_image()` | Klasifikasikan gambar kamera | `tm2_classify_image()` |
-| `tm2_get_label(n)` | Ambil label class ke-n (0-2) | `label = tm2_get_label(0)` |
-| `tm2_get_confidence(n)` | Ambil confidence class ke-n | `conf = tm2_get_confidence(0)` |
-| `tm2_set_threshold(threshold)` | Set threshold | `tm2_set_threshold(0.8)` |
-| `tm2_get_threshold()` | Ambil threshold | `th = tm2_get_threshold()` |
-| `tm2_get_class_n(n)` | Ambil label + confidence class ke-n | `data = tm2_get_class_n(0)` |
-| `tm2_analyze_frame()` | Analisis frame (mirip classify) | `tm2_analyze_frame()` |
-| `tm2_get_image_width()` | Lebar gambar | `w = tm2_get_image_width()` |
-| `tm2_get_image_height()` | Tinggi gambar | `h = tm2_get_image_height()` |
-| `tm2_get_image_x()` | Posisi X gambar | `x = tm2_get_image_x()` |
-| `tm2_get_image_y()` | Posisi Y gambar | `y = tm2_get_image_y()` |
-| `tm2_set_label(n, label)` | Set label class ke-n | `tm2_set_label(0, "kucing")` |
-| `tm2_set_model(model)` | Set model URL/path | `tm2_set_model("model.json")` |
-| `tm2_load_model()` | Load model | `tm2_load_model()` |
-| `tm2_when_classify_done()` | Event klasifikasi selesai | (HAT - otomatis) |
-| `tm2_when_image_loaded()` | Event gambar selesai load | (HAT - otomatis) |
+| Fungsi                         | Deskripsi                           | Contoh                         |
+| ------------------------------ | ----------------------------------- | ------------------------------ |
+| `tm2_classify_image()`         | Klasifikasikan gambar kamera        | `tm2_classify_image()`         |
+| `tm2_get_label(n)`             | Ambil label class ke-n (0-2)        | `label = tm2_get_label(0)`     |
+| `tm2_get_confidence(n)`        | Ambil confidence class ke-n         | `conf = tm2_get_confidence(0)` |
+| `tm2_set_threshold(threshold)` | Set threshold                       | `tm2_set_threshold(0.8)`       |
+| `tm2_get_threshold()`          | Ambil threshold                     | `th = tm2_get_threshold()`     |
+| `tm2_get_class_n(n)`           | Ambil label + confidence class ke-n | `data = tm2_get_class_n(0)`    |
+| `tm2_analyze_frame()`          | Analisis frame (mirip classify)     | `tm2_analyze_frame()`          |
+| `tm2_get_image_width()`        | Lebar gambar                        | `w = tm2_get_image_width()`    |
+| `tm2_get_image_height()`       | Tinggi gambar                       | `h = tm2_get_image_height()`   |
+| `tm2_get_image_x()`            | Posisi X gambar                     | `x = tm2_get_image_x()`        |
+| `tm2_get_image_y()`            | Posisi Y gambar                     | `y = tm2_get_image_y()`        |
+| `tm2_set_label(n, label)`      | Set label class ke-n                | `tm2_set_label(0, "kucing")`   |
+| `tm2_set_model(model)`         | Set model URL/path                  | `tm2_set_model("model.json")`  |
+| `tm2_load_model()`             | Load model                          | `tm2_load_model()`             |
+| `tm2_when_classify_done()`     | Event klasifikasi selesai           | (HAT - otomatis)               |
+| `tm2_when_image_loaded()`      | Event gambar selesai load           | (HAT - otomatis)               |
 
-> Fungsi **get_*** hanya return nilai asli di Desktop mode. **classify**, **analyze_frame**, **set_model**, **load_model** work di semua mode.
+> Fungsi **get\_\*** hanya return nilai asli di Desktop mode. **classify**, **analyze_frame**, **set_model**, **load_model** work di semua mode.
 
 **Contoh:**
+
 ```python
 # Klasifikasi gambar dengan Teachable Machine
 tm2_set_model("https://storage.googleapis.com/model.json")
@@ -1473,23 +1577,24 @@ for i in range(3):
 
 ### 🧍 Fungsi untuk TMPose2Scratch Extension (Pose Classification)
 
-| Fungsi | Deskripsi | Contoh |
-|--------|-----------|--------|
-| `tmpose_classify()` | Klasifikasikan pose | `tmpose_classify()` |
-| `tmpose_get_label(n)` | Ambil label pose ke-n | `label = tmpose_get_label(0)` |
-| `tmpose_get_confidence(n)` | Ambil confidence pose ke-n | `conf = tmpose_get_confidence(0)` |
-| `tmpose_set_threshold(threshold)` | Set threshold | `tmpose_set_threshold(0.8)` |
-| `tmpose_get_threshold()` | Ambil threshold | `th = tmpose_get_threshold()` |
-| `tmpose_get_class_n(n)` | Ambil label + confidence | `data = tmpose_get_class_n(0)` |
-| `tmpose_analyze_frame()` | Analisis frame pose | `tmpose_analyze_frame()` |
-| `tmpose_set_label(n, label)` | Set label pose ke-n | `tmpose_set_label(0, "duduk")` |
-| `tmpose_set_model(model)` | Set model URL/path | `tmpose_set_model("model.json")` |
-| `tmpose_load_model()` | Load model pose | `tmpose_load_model()` |
-| `tmpose_when_classify_done()` | Event klasifikasi selesai | (HAT - otomatis) |
+| Fungsi                            | Deskripsi                  | Contoh                            |
+| --------------------------------- | -------------------------- | --------------------------------- |
+| `tmpose_classify()`               | Klasifikasikan pose        | `tmpose_classify()`               |
+| `tmpose_get_label(n)`             | Ambil label pose ke-n      | `label = tmpose_get_label(0)`     |
+| `tmpose_get_confidence(n)`        | Ambil confidence pose ke-n | `conf = tmpose_get_confidence(0)` |
+| `tmpose_set_threshold(threshold)` | Set threshold              | `tmpose_set_threshold(0.8)`       |
+| `tmpose_get_threshold()`          | Ambil threshold            | `th = tmpose_get_threshold()`     |
+| `tmpose_get_class_n(n)`           | Ambil label + confidence   | `data = tmpose_get_class_n(0)`    |
+| `tmpose_analyze_frame()`          | Analisis frame pose        | `tmpose_analyze_frame()`          |
+| `tmpose_set_label(n, label)`      | Set label pose ke-n        | `tmpose_set_label(0, "duduk")`    |
+| `tmpose_set_model(model)`         | Set model URL/path         | `tmpose_set_model("model.json")`  |
+| `tmpose_load_model()`             | Load model pose            | `tmpose_load_model()`             |
+| `tmpose_when_classify_done()`     | Event klasifikasi selesai  | (HAT - otomatis)                  |
 
-> Fungsi **get_*** hanya return nilai asli di Desktop mode. **classify**, **analyze_frame**, **set_model**, **load_model** work di semua mode.
+> Fungsi **get\_\*** hanya return nilai asli di Desktop mode. **classify**, **analyze_frame**, **set_model**, **load_model** work di semua mode.
 
 **Contoh:**
+
 ```python
 # Klasifikasi pose tubuh
 tmpose_set_model("pose_model.json")
@@ -1506,17 +1611,18 @@ say(f"Pose: {label} ({conf:.0%})")
 
 ### 🚀 Mode Selection
 
-| Mode | Gunakan Untuk | Butuh Hardware? |
-|------|---------------|-----------------|
-| **Upload** | Flash firmware ke board baru | ✅ Ya |
-| **Realtime** | Testing kode cepat, belajar dasar | ❌ Tidak |
-| **REPL** | Debugging, test interaktif | ✅ Ya |
+| Mode         | Gunakan Untuk                     | Butuh Hardware? |
+| ------------ | --------------------------------- | --------------- |
+| **Upload**   | Flash firmware ke board baru      | ✅ Ya           |
+| **Realtime** | Testing kode cepat, belajar dasar | ❌ Tidak        |
+| **REPL**     | Debugging, test interaktif        | ✅ Ya           |
 
 ### 📦 Built-in Functions Summary
 
 Python IDE ini dilengkapi **200+ built-in functions** dalam 15 kategori utama:
 
 #### 1. Movement (Pergerakan)
+
 ```python
 move(50)              # Bergerak 50 langkah
 goto(100, 200)        # Pindah ke koordinat
@@ -1529,6 +1635,7 @@ direction()           # Ambil arah (0-360°)
 ```
 
 #### 2. Appearance (Tampilan)
+
 ```python
 switch_costume("running")     # Ganti costume
 next_costume()                # Costume berikutnya
@@ -1539,6 +1646,7 @@ hide()                        # Sembunyikan
 ```
 
 #### 3. Pen Drawing (Menulis Gambar)
+
 ```python
 pen_down()           # Turunkan pensil
 pen_up()             # Angkat pensil
@@ -1549,6 +1657,7 @@ pen_stamp()          # Tempatkan sprite tanpa jejak
 ```
 
 #### 4. Sound & Effects (Suara & Efek)
+
 ```python
 play_sound("laugh")       # Putar suara
 set_effect("color", 50)   # Set efek warna
@@ -1557,6 +1666,7 @@ clear_effects()           # Hapus semua efek
 ```
 
 #### 5. Time & Waiting (Waktu)
+
 ```python
 wait(2)          # Tunggu 2 detik
 timer()          # Ambil waktu sejak start
@@ -1564,6 +1674,7 @@ reset_timer()    # Reset timer
 ```
 
 #### 6. Events (Peristiwa)
+
 ```python
 @when_green_flag_clicked
 def run():
@@ -1583,6 +1694,7 @@ def on_click():
 ```
 
 #### 7. Variables & Lists (Variabel & List)
+
 ```python
 score = variable("score", 0)
 set_variable("score", 10)
@@ -1595,6 +1707,7 @@ first_item = item_of_list(1, "fruits")
 ```
 
 #### 8. Device Control (Hardware)
+
 ```python
 use(arduinoUno())
 
@@ -1609,6 +1722,7 @@ serialPrint("Hello")      # Kirim serial
 ```
 
 #### 9. Music & Speech (Musik & Suara)
+
 ```python
 play_drum(1, 0.5)              # Main drum 0.5 detik
 play_note(60, 0.5)             # Main note C4
@@ -1621,12 +1735,14 @@ listen()                       # Merekam suara
 ```
 
 #### 10. Video Sensing (Video)
+
 ```python
 video_toggle("on")             # Nyalakan kamera
 set_video_transparency(50)     # Atur transparansi
 ```
 
 #### 11. Hand Pose (Tangan)
+
 ```python
 handpose_video("on")           # Nyalakan deteksi tangan
 handpose_get_x(0)              # Posisi X jari ke-0
@@ -1635,6 +1751,7 @@ handpose_get_z(0)              # Posisi Z jari ke-0
 ```
 
 #### 12. AI / ML (Kecerdasan Buatan)
+
 ```python
 ob2_analyse()                  # Analisis objek
 tm2_classify_image()           # Klasifikasi gambar
@@ -1645,32 +1762,32 @@ ml_add_example1("label")       # Tambah contoh
 
 ### ⌨️ Keyboard Shortcuts
 
-| Shortcut | Fungsi |
-|----------|--------|
-| **Enter** | Jalankan kode |
-| **Ctrl+C** | Interrupt (REPL) |
-| **Ctrl+D** | Soft reset board |
+| Shortcut   | Fungsi            |
+| ---------- | ----------------- |
+| **Enter**  | Jalankan kode     |
+| **Ctrl+C** | Interrupt (REPL)  |
+| **Ctrl+D** | Soft reset board  |
 | **Ctrl+E** | Paste mode (REPL) |
-| **↑/↓** | History command |
+| **↑/↓**    | History command   |
 
 ### 🛠️ Common Errors & Fixes
 
-| Error | Solusi |
-|-------|--------|
-| `Device not connected` | Cek kabel USB, install driver |
-| `Timeout waiting for prompt` | Cek baudrate, restart board |
-| `SyntaxError: invalid indent` | Tambah 4 spasi di dalam blok |
-| `NameError: name 'x' is not defined` | Deferensikan variabel dulu |
-| `ImportError` | Upload library via REPL |
+| Error                                | Solusi                        |
+| ------------------------------------ | ----------------------------- |
+| `Device not connected`               | Cek kabel USB, install driver |
+| `Timeout waiting for prompt`         | Cek baudrate, restart board   |
+| `SyntaxError: invalid indent`        | Tambah 4 spasi di dalam blok  |
+| `NameError: name 'x' is not defined` | Deferensikan variabel dulu    |
+| `ImportError`                        | Upload library via REPL       |
 
 ### 📱 Baudrate Settings
 
-| Device | Baudrate |
-|--------|----------|
-| ESP32 | 115200 |
-| Micro:bit V2 | 9600 |
-| Arduino Uno | 9600 |
-| Raspberry Pi Pico | 115200 |
+| Device            | Baudrate |
+| ----------------- | -------- |
+| ESP32             | 115200   |
+| Micro:bit V2      | 9600     |
+| Arduino Uno       | 9600     |
+| Raspberry Pi Pico | 115200   |
 
 ### 🔧 Device Functions
 
@@ -1696,9 +1813,10 @@ Untuk referensi lengkap semua built-in functions, lihat **Appendix A** di akhir 
 
 ## 🎉 Selamat Belajar!
 
-Python IDE ini dirancang untuk membuat belajar Python dan IoT menjadi menyenangkan! 
+Python IDE ini dirancang untuk membuat belajar Python dan IoT menjadi menyenangkan!
 
 **Ingat:**
+
 - ✅ Tidak ada pertanyaan yang bodoh
 - ✅ Error adalah bagian dari belajar
 - ✅ Konsisten lebih penting daripada cepat
