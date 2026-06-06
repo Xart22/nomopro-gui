@@ -4,7 +4,7 @@
 
 .hardware-header-wrapper {
     position: absolute;
-    top: $menu-bar-height;
+    top: 0;
     right: $space;
     justify-content: space-between;
 

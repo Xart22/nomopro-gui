@@ -19,18 +19,22 @@
 
 Python IDE (Integrated Development Environment) adalah aplikasi untuk menulis dan menjalankan kode Python. IDE ini bisa bekerja dengan berbagai perangkat keras seperti:
 
-- 🟦 **Arduino** (Arduino Uno, Nano, Mega)
-- 🟩 **ESP32** (ESP32, ESP8266, ESP32-CAM)
-- 🟨 **Micro:bit** (Micro:bit V2)
-- 🟪 **Raspberry Pi Pico**
+- 🟦 **Arduino** (Arduino Uno, Nano) Realtime Mode
+- 🟩 **ESP32** (ESP32, ESP8266) REPL|UPLOAD
+- 🟨 **Micro:bit** (Micro:bit V2) REPL|UPLOAD
+- 🟪 **Raspberry Pi Pico** REPL|UPLOAD
 
 ### Tiga Mode Utama
 
-| Mode              | Fungsi                                     | Kapan Digunakan                          | Runtime                         |
-| ----------------- | ------------------------------------------ | ---------------------------------------- | ------------------------------- | ------------ |
-| **Upload Mode**   | Flash firmware MicroPython ke board        | Saat pertama kali menggunakan board baru | Saat ingin memperbarui firmware | Desktop Mode |
-| **Realtime Mode** | Jalankan kode Python secara langsung di VM | Untuk simulasi dan testing cepat         | Untuk melihat hasil langsung    | Desktop Mode |
-| **REPL Mode**     | Interaksi langsung dengan board via serial | Untuk debugging dan testing kode         | Untuk eksperimen interaktif     | Desktop Mode |
+| Mode                             | Fungsi                                             | Device Support              | Butuh Flash Firmware?                            |
+| -------------------------------- | -------------------------------------------------- | --------------------------- | ------------------------------------------------ |
+| **Upload Mode**                  | Flash firmware MicroPython ke board                | ESP32, Micro:bit, Pico      | ✅ Flash MicroPython via **µPy Upload tab**      |
+| **Realtime Mode (non-hardware)** | Jalankan kode Python tanpa timeout (Scratch/print) | Semua (tanpa board)         | ❌ Tidak perlu                                   |
+| **Realtime Mode (hardware)**     | Kontrol board secara langsung via (realtime)       | **Arduino Nano & Uno saja** | ✅ Flash via **menu bar pojok kanan atas**       |
+| **REPL Mode**                    | Interaksi langsung dengan board via serial         | ESP32, Micro:bit, Pico      | ✅ Flash MicroPython dulu via **µPy Upload tab** |
+
+> **Ringkasan:** ESP32 / Micro:bit / Pico → flash **MicroPython** dulu via tab **µPy Upload** → lalu bisa Upload kode atau REPL.  
+> Arduino Nano / Uno → flash via menu bar pojok kanan atas → lalu bisa **Realtime Hardware**.
 
 ### 🎁 Built-in Functions yang Tersedia
 
@@ -98,11 +102,19 @@ Python IDE dapat berjalan di **Web (browser)** maupun **Desktop (Electron app)**
 
 Upload mode digunakan untuk **memasang firmware MicroPython** ke board yang belum memiliki MicroPython.
 
-**Contoh:**
+**PENTING:** Mode Upload dan REPL **membutuhkan MicroPython firmware** di board. Jika board baru/belum pernah dipakai, Anda harus flash firmware dulu melalui tab **µPy Upload** di Python IDE.
 
-- ESP32 yang baru dibeli
-- Arduino yang ingin diubah ke MicroPython
-- Micro:bit V2 yang perlu diupdate
+**Device yang menggunakan mode ini:**
+
+- ✅ **ESP32** — harus flash MicroPython dulu sebelum bisa REPL / Upload kode
+- ✅ **Micro:bit V2** — harus flash MicroPython dulu
+- ✅ **Raspberry Pi Pico** — harus flash MicroPython dulu
+- ❌ **Arduino Nano / Uno** — tidak pakai MicroPython, pakai **Realtime Hardware**
+
+> ⚠️ **Jangan tertukar!** Ada 2 tombol "Upload firmware":
+>
+> - **µPy Upload tab** (di dalam Python IDE) → **Flash Firmware** → untuk flash **MicroPython** (ESP32/Micro:bit/Pico)
+> - **Menu bar pojok kanan atas** → **Upload firmware** → untuk flash (Nano/Uno saja)
 
 ### Cara Menggunakan Upload Mode
 
@@ -110,25 +122,26 @@ Upload mode digunakan untuk **memasang firmware MicroPython** ke board yang belu
 
 1. Hubungkan board ke komputer via USB
 2. Buka Python IDE
-3. Pilih device di menu Connection
+3. Pilih device di menu Connection (misal ESP32)
 4. Klik **Connect** untuk menghubungkan
 
 #### Langkah 2: Pilih Upload Mode
 
-1. Di Python IDE, klik tab **Upload** (ikon ⬆️)
+1. Di Python IDE, klik tab **µPy Upload** (ikon ⬆️) di toolbar terminal
 2. Anda akan melihat status firmware:
-    - 🔵 **Unknown** = Belum terdeteksi
-    - 🟢 **MicroPython Ready** = Sudah punya MicroPython
-    - 🟡 **Arduino Firmware** = Perlu di-flash
+    - 🔵 **Unknown** = Belum terdeteksi / board baru
+    - 🟡 **Arduino Firmware** = Perlu di-flash MicroPython
+    - 🟢 **MicroPython Ready** = Sudah siap, bisa langsung Upload atau REPL
 
 #### Langkah 3: Flash Firmware
 
-Jika firmware belum ada atau perlu diupdate:
+> ⚠️ **Hanya perlu dilakukan sekali** (atau jika ingin update firmware)
 
 1. Klik tombol **Flash Firmware**
 2. Tunggu proses flash (bisa 1-5 menit)
 3. Lihat progress bar dan log di bawah
 4. Setelah selesai, status akan berubah jadi **MicroPython Ready** ✅
+5. Sekarang board siap digunakan untuk **Upload kode** atau **REPL**
 
 #### Langkah 4: Upload Kode
 
@@ -141,18 +154,17 @@ Setelah firmware terflash:
 #### Contoh Kode untuk ESP32
 
 ```python
-# Contoh: LED berkedip di ESP32
-import machine
+# Contoh: LED berkedip di ESP32 (Upload Mode)
+from machine import Pin
 import time
 
-# Setup LED di pin 2
-led = machine.Pin(2, machine.Pin.OUT)
+led = Pin(2, Pin.OUT)
 
 while True:
-    led.value(1)   # Nyalakan LED
-    time.sleep(1)  # Tunggu 1 detik
-    led.value(0)   # Matikan LED
-    time.sleep(1)  # Tunggu 1 detik
+    led.value(1)
+    time.sleep(1)
+    led.value(0)
+    time.sleep(1)
 ```
 
 ### Tips Upload Mode
@@ -167,68 +179,144 @@ while True:
 
 ## 3. ⚡ Mode 2: Realtime (Live Coding)
 
-### Kapan Menggunakan Realtime Mode?
+Realtime Mode memiliki **2 sub-mode**: **Non-Hardware** (untuk tes Scratch/print) dan **Hardware** (untuk kontrol board secara langsung).
 
-Realtime mode untuk **menjalankan kode Python secara langsung** di Virtual Machine (VM) browser. Mode ini **tidak** memerlukan koneksi ke board.
+---
+
+### 3A. Realtime Non-Hardware (Scratch / Python Biasa)
+
+#### Kapan Menggunakan?
+
+Untuk **menjalankan kode Python/Scratch tanpa timeout** di editor. Mode ini **tidak** memerlukan board.
 
 **Cocok untuk:**
 
-- ✅ Testing kode dengan cepat
+- ✅ Testing kode Scratch (move, say, turn_right, dll)
+- ✅ Belajar dasar Python
 - ✅ Debugging tanpa board
-- ✅ Belajar dasar-dasar Python
-- ⚠️ **Tidak** cocok untuk hardware testing
 
-### Cara Menggunakan Realtime Mode
-
-#### Langkah 1: Pilih Unselect Device
-
-1. Di menu Connection, pilih **Unselect Device**
-2. Ini akan kembali ke mode Scratch murni (tanpa hardware)
-
-#### Langkah 2: Tulis Kode Python
+#### Cara Menggunakan
 
 1. Buka Python IDE
-2. Tulis kode Python di editor
-3. Kode akan dijalankan di VM browser
+2. Centang checkbox **"Realtime"** di toolbar terminal
+3. Tulis kode Python/Scratch di editor
+4. Klik **▶ Run** untuk menjalankan
 
-#### Langkah 3: Jalankan Kode
-
-1. Klik tombol **▶ Run** untuk menjalankan kode saat ini
-2. Klik **▶▶ Run All** untuk menjalankan semua file
-3. Lihat output di tab **Output**
-
-#### Contoh Kode Realtime
+#### Contoh Kode
 
 ```python
 # Contoh: Print hello world
 print("Hello from Python!")
-print("Realtime mode tidak butuh hardware!")
+print("Realtime mode non-hardware!")
 
-# Contoh: Loop sederhana
-for i in range(5):
-    print(f"Iterasi ke-{i+1}")
+# Contoh: Gerakan sprite
+from nomoproSDKPython import move, turn_right, say, wait
 
-# Contoh: Matematika
-angka = 10 + 5 * 2
-print(f"Hasil: {angka}")  # Output: 20
+move(100)
+turn_right(90)
+say("Halo!")
+wait(1)
 ```
 
-### Perbandingan: Realtime vs Upload
+---
 
-| Fitur            | Realtime Mode   | Upload Mode     |
-| ---------------- | --------------- | --------------- |
-| Butuh hardware?  | ❌ Tidak        | ✅ Ya           |
-| Kecepatan        | ⚡ Sangat cepat | 🐢 Lebih lambat |
-| Debugging        | ✅ Mudah        | ⚠️ Sulit        |
-| Testing kode     | ✅ Bagus        | ⚠️ Terbatas     |
-| Hardware control | ❌ Tidak bisa   | ✅ Bisa         |
+### 3B. Realtime Hardware
 
-### Tips Realtime Mode
+#### Kapan Menggunakan?
 
-- ✅ Cocok untuk belajar dasar Python
-- ✅ Tidak perlu driver atau kabel USB
-- ⚠️ Tidak bisa kontrol hardware (LED, sensor, dll)
-- ⚠️ Output terbatas (hanya print ke console)
+Untuk **kontrol board secara langsung (realtime)** via protokol. Board akan merespon perintah secara live tanpa perlu upload ulang.
+
+**Hanya mendukung 2 device:**
+
+- ✅ **Arduino Nano** (`arduinoNano()`)
+- ✅ **Arduino Uno** (`arduinoUno()`)
+
+**Cocok untuk:**
+
+- ✅ Kontrol LED, servo, motor secara langsung
+- ✅ Membaca sensor secara realtime
+- ✅ Testing hardware tanpa upload berulang
+
+#### ⚠️ Syarat: Device Harus Di-Flash Firmware Dulu!
+
+Sebelum menggunakan Realtime Hardware, board harus sudah di-flash dengan **firmware**. Tanpa firmware ini, perintah `pinMode()`, `digitalWrite()`, dll tidak akan berfungsi.
+
+#### Cara Flash Firmware
+
+Tombol **Upload firmware** ada di **pojok kanan atas menu bar** (ikon panah atas ⬆️):
+
+1. Hubungkan board (Arduino Nano atau Uno) via USB
+2. Pilih device di menu **Connection**
+3. Klik **Connect** untuk menghubungkan
+4. Di **pojok kanan atas menu bar**, klik tombol **Upload firmware**
+5. Tunggu proses flashing selesai (progress bar akan muncul)
+6. Setelah selesai, board siap digunakan di Realtime Hardware mode
+
+> **Catatan:** Tombol ini hanya aktif ketika device sudah terhubung dan mode realtime aktif. Hanya Arduino Nano dan Uno yang mendukung Realtime Hardware (Micro:bit, ESP32, Pico tidak didukung).
+
+#### Cara Menggunakan
+
+1. Hubungkan board yang sudah di-flash firmware
+2. Pilih device di Connection dan klik Connect
+3. Tulis kode Python dengan pola SDK di bawah
+4. Klik **▶ Run** untuk menjalankan
+
+#### Contoh Kode Realtime Hardware
+
+```python
+from nomoproSDKPython import use, pinMode, digitalWrite, arduinoNano
+import time
+
+use(arduinoNano())
+pinMode(13, "OUTPUT")
+
+def flash_led():
+    digitalWrite(13, True)
+    time.sleep(1)
+    digitalWrite(13, False)
+    time.sleep(1)
+
+flash_led()
+```
+
+**Contoh READ sensor:**
+
+```python
+from nomoproSDKPython import use, pinMode, digitalRead, arduinoNano
+
+use(arduinoNano())
+pinMode(2, "INPUT")
+
+nilai = digitalRead(2)
+print(f"Nilai tombol: {nilai}")
+```
+
+#### Device Factory Functions yang Tersedia (Realtime Hardware)
+
+| Fungsi          | Device       |
+| --------------- | ------------ |
+| `arduinoNano()` | Arduino Nano |
+| `arduinoUno()`  | Arduino Uno  |
+
+### Perbandingan: Semua Mode
+
+| Fitur                   | Realtime Non-HW | Realtime Hardware | Upload Mode    | REPL Mode       |
+| ----------------------- | --------------- | ----------------- | -------------- | --------------- |
+| Butuh hardware?         | ❌ Tidak        | ✅ Ya             | ✅ Ya          | ✅ Ya           |
+| Butuh firmware?         | ❌ Tidak        | ✅ Firmware       | ✅ MicroPython | ✅ MicroPython  |
+| Kontrol LED/sensor      | ❌ Tidak bisa   | ✅ Bisa           | ✅ Bisa        | ✅ Bisa         |
+| Kecepatan eksekusi      | ⚡ Cepat        | ⚡ Cepat          | 🐢 Sedang      | ⚡ Cepat        |
+| Debugging               | ✅ Mudah        | ⚠️ Terbatas       | ⚠️ Sulit       | ✅ Sangat mudah |
+| Cocok untuk belajar Py? | ✅ Sangat       | ⚠️ Butuh HW       | ❌ Tidak       | ❌ Tidak        |
+
+### Tips Realtime Hardware
+
+- ✅ Pastikan board sudah di-flash firmware (klik **Upload firmware** di pojok kanan atas)
+- ✅ Hanya **Arduino Nano** dan **Arduino Uno** yang support mode ini
+- ✅ Gunakan `time.sleep()` untuk delay (bukan `wait()`)
+- ✅ Fungsi `digitalRead()`, `analogRead()` hanya work di Desktop mode
+- ⚠️ Jangan cabut kabel USB saat kode sedang berjalan
+- ⚠️ Jika board tidak merespon, flash ulang firmware
 
 ---
 
@@ -245,12 +333,14 @@ REPL (Read-Eval-Print Loop) adalah **terminal interaktif** yang terhubung langsu
 - ✅ Mengecek nilai sensor
 - ✅ Kontrol board secara langsung
 
+> ⚠️ **PENTING:** REPL hanya bisa digunakan jika board **sudah memiliki MicroPython firmware**. Jika board baru, flash dulu MicroPython melalui tab **µPy Upload → Flash Firmware** (lihat [Mode 1: Upload](#2-📤-mode-1-upload-flash-firmware)).
+
 ### Cara Menggunakan REPL Mode
 
 #### Langkah 1: Hubungkan Board
 
 1. Hubungkan board (ESP32, Micro:bit, dll) ke komputer
-2. Pastikan firmware MicroPython sudah terinstall
+2. **Pastikan firmware MicroPython sudah terinstall** (jika belum, buka tab **µPy Upload** → **Flash Firmware**)
 3. Di Python IDE, pilih device yang terhubung
 
 #### Langkah 2: Buka REPL Tab
@@ -416,38 +506,40 @@ def draw_square():
     sprite.pen_up()
 ```
 
-**4. Kontrol LED (Upload Mode - ESP32/Arduino):**
+**4. Kontrol LED (Realtime Hardware - Arduino Nano):**
 
 ```python
-from nomoproSDKPython import use, pinMode, digitalWrite, wait
+from nomoproSDKPython import use, pinMode, digitalWrite, arduinoNano
+import time
 
-use(arduinoUno())
+use(arduinoNano())
+pinMode(13, "OUTPUT")
 
-@when_green_flag_clicked
 def flash_led():
-    pinMode(13, "OUTPUT")
     digitalWrite(13, True)
-    wait(1)
+    time.sleep(1)
     digitalWrite(13, False)
-    wait(1)
+    time.sleep(1)
+
+flash_led()
 ```
 
-**5. Sensor Suhu (Upload Mode - ESP32):**
+**5. Sensor Suhu (Upload Mode - ESP32 via MicroPython):**
 
 ```python
-from nomoproSDKPython import use, analogRead, wait
-import math
+from machine import ADC, Pin
+import time
 
-use(arduinoEsp32())
+sensor = ADC(Pin(34))
+sensor.atten(ADC.ATTN_11DB)  # range 0-3.3V
 
-@when_green_flag_clicked
 def read_temp():
-    # Baca sensor suhu analog
-    raw = analogRead(34)
-    # Konversi ke Volt (range 0-3.3V)
+    raw = sensor.read()
     voltage = raw * 3.3 / 4095
     print(f"Voltage: {voltage:.2f}V")
-    wait(2)
+    time.sleep(2)
+
+read_temp()
 ```
 
 **6. List & Variable:**
@@ -604,38 +696,30 @@ def on_start():
     sprite.point(90)
 ```
 
-**Upload Mode (ESP32 - LED Blinking Pattern):**
+**Upload Mode (ESP32 - LED Blinking with Sensor):**
 
 ```python
-from nomoproSDKPython import use, pinMode, digitalWrite, wait, analogRead, arduinoEsp32
+from machine import Pin, ADC
+import time
 
-use(arduinoEsp32())
+led = Pin(2, Pin.OUT)
+button = Pin(4, Pin.IN, Pin.PULL_UP)
+sensor = ADC(Pin(34))
+sensor.atten(ADC.ATTN_11DB)
 
-@when_green_flag_clicked
-def pattern():
-    # Setup pins
-    pinMode(2, "OUTPUT")   # LED
-    pinMode(4, "INPUT")    # Button
-    pinMode(34, "INPUT")   # Temperature sensor
+def loop():
+    btn_val = button.value()
+    temp = sensor.read()
+    voltage = temp * 3.3 / 4095
 
-    # Main loop
-    while True:
-        # Read button
-        button = digitalRead(4)
+    print(f"Temp: {voltage:.2f}V, Button: {btn_val}")
 
-        # Read temperature
-        temp = analogRead(34)
-        voltage = temp * 3.3 / 4095
+    led.value(1)
+    time.sleep(0.5)
+    led.value(0)
+    time.sleep(0.5)
 
-        # Print to serial
-        serialPrint(f"Temp: {voltage:.2f}V, Button: {button}")
-        serialPrintln()
-
-        # LED pattern
-        digitalWrite(2, True)
-        wait(0.5)
-        digitalWrite(2, False)
-        wait(0.5)
+loop()
 ```
 
 **Upload Mode (Micro:bit - Matrix Display):**
@@ -668,13 +752,21 @@ display_message("Python!")
 
 ### Workflow Rekomendasi
 
-#### Belajar Baru
+#### Belajar Baru (ESP32 / Micro:bit / Pico)
 
 ```
-1. Realtime Mode → Belajar dasar Python
-2. Upload Mode → Flash MicroPython ke board
-3. REPL Mode → Test kode interaktif
-4. Upload & Run → Jalankan kode di hardware
+1. Realtime Mode → Belajar dasar Python (tanpa board)
+2. Hubungkan board → Buka tab µPy Upload → Flash Firmware ( MicroPython)
+3. Upload & Run → Jalankan kode di hardware
+4. REPL Mode → Debugging interaktif
+```
+
+#### Belajar Baru (Arduino Nano / Uno)
+
+```
+1. Realtime Mode → Belajar dasar Python (tanpa board)
+2. Hubungkan board → Klik Upload firmware di menu bar pojok kanan atas
+3. Realtime Hardware → Tulis kode use(arduinoNano()) dan Run
 ```
 
 #### Debugging
@@ -1289,16 +1381,18 @@ print(f"Ada {length_of_list('fruits')} buah!")
 
 ---
 
-### 📡 Fungsi untuk Device Control (Hardware)
+### 📡 Fungsi untuk Device Control (Realtime Hardware)
+
+> ⚠️ Fungsi-fungsi ini **hanya untuk Realtime Hardware** dan hanya bekerja di **Arduino Nano / Arduino Uno**. Untuk ESP32, Micro:bit, Pico gunakan **Upload Mode (MicroPython)**.
 
 | Fungsi                     | Deskripsi              | Contoh                  |
 | -------------------------- | ---------------------- | ----------------------- |
-| `use(device)`              | Set device aktif       | `use(arduinoUno())`     |
+| `use(device)`              | Set device aktif       | `use(arduinoNano())`    |
 | `pinMode(pin, mode)`       | Set pin (INPUT/OUTPUT) | `pinMode(2, "OUTPUT")`  |
 | `digitalWrite(pin, value)` | Set pin HIGH/LOW       | `digitalWrite(2, True)` |
 | `digitalRead(pin)`         | Baca pin digital       | `val = digitalRead(3)`  |
 | `analogWrite(pin, value)`  | PWM 0-255              | `analogWrite(9, 128)`   |
-| `analogRead(pin)`          | Baca analog 0-4095     | `val = analogRead(A0)`  |
+| `analogRead(pin)`          | Baca analog 0-4095     | `val = analogRead(34)`  |
 | `servoWrite(pin, angle)`   | Set servo 0-180°       | `servoWrite(9, 90)`     |
 | `serialPrint(text)`        | Kirim via serial       | `serialPrint("Hello")`  |
 | `serialPrintln(text)`      | Kirim + newline        | `serialPrintln("Done")` |
@@ -1306,11 +1400,14 @@ print(f"Ada {length_of_list('fruits')} buah!")
 **Contoh:**
 
 ```python
-# Kontrol LED
-use(arduinoUno())
+from nomoproSDKPython import use, pinMode, digitalWrite, arduinoNano
+import time
+
+use(arduinoNano())
 pinMode(13, "OUTPUT")
+
 digitalWrite(13, True)
-wait(2)
+time.sleep(2)
 digitalWrite(13, False)
 ```
 
@@ -1706,19 +1803,22 @@ length = length_of_list("fruits")
 first_item = item_of_list(1, "fruits")
 ```
 
-#### 8. Device Control (Hardware)
+#### 8. Device Control (Realtime Hardware - Nano/Uno saja)
 
 ```python
-use(arduinoUno())
+from nomoproSDKPython import use, pinMode, digitalWrite, digitalRead, \
+    analogRead, servoWrite, serialPrint, arduinoNano
+
+use(arduinoNano())
 
 pinMode(13, "OUTPUT")
-digitalWrite(13, True)    # Nyalakan LED
-digitalRead(13)           # Baca pin
+digitalWrite(13, True)      # Nyalakan LED
+digitalRead(13)             # Baca pin
 
-analogRead(A0)            # Baca sensor
-servoWrite(9, 90)         # Set servo
+analogRead(34)              # Baca sensor analog
+servoWrite(9, 90)           # Set servo
 
-serialPrint("Hello")      # Kirim serial
+serialPrint("Hello")        # Kirim serial
 ```
 
 #### 9. Music & Speech (Musik & Suara)
@@ -1792,17 +1892,27 @@ ml_add_example1("label")       # Tambah contoh
 ### 🔧 Device Functions
 
 ```python
-# Arduino/ESP32
-use(arduinoUno())
-use(arduinoEsp32())
-use(arduinoNano())
-
-# MicroPython
-from micropython import machine
+# Realtime Hardware − hanya utk Arduino Nano / Uno
+from nomoproSDKPython import use, pinMode, digitalWrite, arduinoNano
 import time
 
-machine.Pin(2, machine.Pin.OUT).value(1)
+use(arduinoNano())
+pinMode(13, "OUTPUT")
+digitalWrite(13, True)
 time.sleep(1)
+digitalWrite(13, False)
+
+# Device factory untuk Realtime Hardware:
+# arduinoNano(), arduinoUno()
+
+# MicroPython (Upload Mode) − utk ESP32 / Micro:bit / Pico
+from machine import Pin
+import time
+
+led = Pin(2, Pin.OUT)
+led.value(1)
+time.sleep(1)
+led.value(0)
 ```
 
 ### 📚 Full Reference

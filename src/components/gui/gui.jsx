@@ -651,7 +651,11 @@ const GUIComponent = (props) => {
                     </button>
                     <iframe
                         className={styles.juniorIframe}
-                        src="/nomokit-jr"
+                        src={
+                            window.electronAPI?.getAppPath
+                                ? `file:///${window.electronAPI.getAppPath().replace(/\\/g, '/')}/nomokitjr/index.html`
+                                : '/nomokitjr/index.html'
+                        }
                         title="Nomokit Jr"
                     />
                 </Box>
