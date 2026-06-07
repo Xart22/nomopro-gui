@@ -8,6 +8,7 @@ import {defineMessages, injectIntl, intlShape} from 'react-intl';
 
 import analytics from '../lib/analytics';
 import {setDeviceData} from '../reducers/device-data';
+import {PYTHON_TAB_INDEX} from '../reducers/editor-tab';
 
 import {makeDeviceLibrary} from '../lib/libraries/devices/index.jsx';
 
@@ -163,7 +164,18 @@ class DeviceLibrary extends React.PureComponent {
             // Render loading or placeholder component
             return <LoaderComponent messageId={'gui.loader.headlineDevice'} />;
         }
-        const deviceLibraryThumbnailData2 = this.props.deviceData.map(
+        const isPythonMode =
+            this.props.activeTabIndex === PYTHON_TAB_INDEX;
+        const filteredDeviceData = this.props.deviceData.filter(d => {
+            if (isPythonMode) {
+                return (
+                    (d.tags && d.tags.includes('microPython')) ||
+                    d.supportsMicroPython === true
+                );
+            }
+            return d.programLanguage && d.programLanguage.includes('block');
+        });
+        const deviceLibraryThumbnailData2 = filteredDeviceData.map(
             device => {
                 // Check if device's deviceId exists in fetchedData
                 const deviceExists =
@@ -199,6 +211,7 @@ class DeviceLibrary extends React.PureComponent {
 }
 
 DeviceLibrary.propTypes = {
+    activeTabIndex: PropTypes.number,
     deviceData: PropTypes.instanceOf(Array).isRequired,
     intl: intlShape.isRequired,
     onDeviceSelected: PropTypes.func,
@@ -208,6 +221,7 @@ DeviceLibrary.propTypes = {
 };
 
 const mapStateToProps = state => ({
+    activeTabIndex: state.scratchGui.editorTab.activeTabIndex,
     deviceData: state.scratchGui.deviceData.deviceData
 });
 
