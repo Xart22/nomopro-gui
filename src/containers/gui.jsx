@@ -466,7 +466,8 @@ class GUI extends React.Component {
         }
         if (
             this.props.isRealtimeMode !== true &&
-            this.props.activeTabIndex !== BLOCKS_TAB_INDEX
+            this.props.activeTabIndex !== BLOCKS_TAB_INDEX &&
+            this.props.inputMode !== MODE_PYTHON
         ) {
             this.props.onActivateBlocksTab();
         }

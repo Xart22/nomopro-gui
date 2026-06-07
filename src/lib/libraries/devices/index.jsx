@@ -1,57 +1,57 @@
-import React from 'react';
-import {FormattedMessage} from 'react-intl';
-import {defaults} from 'lodash';
-import log from '../../log';
-import {DeviceType} from '../../device';
+import React from "react";
+import { FormattedMessage } from "react-intl";
+import { defaults } from "lodash";
+import log from "../../log";
+import { DeviceType } from "../../device";
 
-import arduinoBaseToolBox from './baseToolbox/arduino';
-import microbitBaseToolBox from './baseToolbox/microbit';
+import arduinoBaseToolBox from "./baseToolbox/arduino";
+import microbitBaseToolBox from "./baseToolbox/microbit";
 
-import unselectDeviceIconURL from './unselectDevice/unselectDevice.png';
+import unselectDeviceIconURL from "./unselectDevice/unselectDevice.png";
 
-import arduinoUnoIconURL from './arduinoUno/arduinoUno.png';
-import arduinoUnoConnectionIconURLL from './arduinoUno/arduinoUno-illustration.svg';
-import arduinoUnoConnectionSmallIconURL from './arduinoUno/arduinoUno-small.svg';
+import arduinoUnoIconURL from "./arduinoUno/arduinoUno.png";
+import arduinoUnoConnectionIconURLL from "./arduinoUno/arduinoUno-illustration.svg";
+import arduinoUnoConnectionSmallIconURL from "./arduinoUno/arduinoUno-small.svg";
 
-import arduinoUnoR4WifiIconURL from './arduinoUnoR4Wifi/r4.png';
-import arduinoUnoR4WifiConnectionIconURLL from './arduinoUnoR4Wifi/r4-108.svg';
-import arduinoUnoR4WifiConnectionSmallIconURL from './arduinoUnoR4Wifi/r440.svg';
+import arduinoUnoR4WifiIconURL from "./arduinoUnoR4Wifi/r4.png";
+import arduinoUnoR4WifiConnectionIconURLL from "./arduinoUnoR4Wifi/r4-108.svg";
+import arduinoUnoR4WifiConnectionSmallIconURL from "./arduinoUnoR4Wifi/r440.svg";
 
-import arduinoNanoIconURL from './arduinoNano/arduinoNano.png';
-import arduinoNanoConnectionIconURLL from './arduinoNano/arduinoNano-illustration.svg';
-import arduinoNanoConnectionSmallIconURL from './arduinoNano/arduinoNano-small.svg';
+import arduinoNanoIconURL from "./arduinoNano/arduinoNano.png";
+import arduinoNanoConnectionIconURLL from "./arduinoNano/arduinoNano-illustration.svg";
+import arduinoNanoConnectionSmallIconURL from "./arduinoNano/arduinoNano-small.svg";
 
-import arduinoNano33IconURL from './arduinoNano33/nano33.png';
-import arduinoNano33ConnectionIconURLL from './arduinoNano33/nano33.svg';
-import arduinoNano33ConnectionSmallIconURL from './arduinoNano33/nano33-small.svg';
+import arduinoNano33IconURL from "./arduinoNano33/nano33.png";
+import arduinoNano33ConnectionIconURLL from "./arduinoNano33/nano33.svg";
+import arduinoNano33ConnectionSmallIconURL from "./arduinoNano33/nano33-small.svg";
 
-import arduinoLeonardoIconURL from './arduinoLeonardo/arduinoLeonardo.png';
-import arduinoLeonardoConnectionIconURLL from './arduinoLeonardo/arduinoLeonardo-illustration.svg';
-import arduinoLeonardoConnectionSmallIconURL from './arduinoLeonardo/arduinoLeonardo-small.svg';
+import arduinoLeonardoIconURL from "./arduinoLeonardo/arduinoLeonardo.png";
+import arduinoLeonardoConnectionIconURLL from "./arduinoLeonardo/arduinoLeonardo-illustration.svg";
+import arduinoLeonardoConnectionSmallIconURL from "./arduinoLeonardo/arduinoLeonardo-small.svg";
 
-import arduinoMega2560IconURL from './arduinoMega2560/arduinoMega2560.png';
-import arduinoMega2560ConnectionIconURLL from './arduinoMega2560/arduinoMega2560-illustration.svg';
-import arduinoMega2560ConnectionSmallIconURL from './arduinoMega2560/arduinoMega2560-small.svg';
+import arduinoMega2560IconURL from "./arduinoMega2560/arduinoMega2560.png";
+import arduinoMega2560ConnectionIconURLL from "./arduinoMega2560/arduinoMega2560-illustration.svg";
+import arduinoMega2560ConnectionSmallIconURL from "./arduinoMega2560/arduinoMega2560-small.svg";
 
-import microbitIconURL from './microbit/microbit.png';
-import microbitConnectionIconURLL from './microbit/microbit-illustration.svg';
-import microbitConnectionSmallIconURL from './microbit/microbit-small.svg';
+import microbitIconURL from "./microbit/microbit.png";
+import microbitConnectionIconURLL from "./microbit/microbit-illustration.svg";
+import microbitConnectionSmallIconURL from "./microbit/microbit-small.svg";
 
-import microbitV2IconURL from './microbitV2/microbitV2.png';
-import microbitV2ConnectionIconURLL from './microbitV2/microbitV2-illustration.svg';
-import microbitV2ConnectionSmallIconURL from './microbitV2/microbitV2-small.svg';
+import microbitV2IconURL from "./microbitV2/microbitV2.png";
+import microbitV2ConnectionIconURLL from "./microbitV2/microbitV2-illustration.svg";
+import microbitV2ConnectionSmallIconURL from "./microbitV2/microbitV2-small.svg";
 
-import esp32IconURL from './esp32/esp32.png';
-import esp32ConnectionIconURLL from './esp32/esp32-illustration.svg';
-import esp32ConnectionSmallIconURL from './esp32/esp32-small.svg';
+import esp32IconURL from "./esp32/esp32.png";
+import esp32ConnectionIconURLL from "./esp32/esp32-illustration.svg";
+import esp32ConnectionSmallIconURL from "./esp32/esp32-small.svg";
 
-import esp32CamIconURL from './esp32Cam/esp32Cam.png';
-import esp32CamConnectionIconURLL from './esp32Cam/esp32Cam.svg';
-import esp32CamConnectionSmallIconURL from './esp32Cam/esp32Cam-small.svg';
+import esp32CamIconURL from "./esp32Cam/esp32Cam.png";
+import esp32CamConnectionIconURLL from "./esp32Cam/esp32Cam.svg";
+import esp32CamConnectionSmallIconURL from "./esp32Cam/esp32Cam-small.svg";
 
-import esp8266NodeMCUIconURL from './esp8266NodeMCU/esp8266NodeMCU.png';
-import esp8266NodeMCUConnectionIconURL from './esp8266NodeMCU/esp8266NodeMCU-illustration.svg';
-import esp8266NodeMCUConnectionSmallIconURL from './esp8266NodeMCU/esp8266NodeMCU-small.svg';
+import esp8266NodeMCUIconURL from "./esp8266NodeMCU/esp8266NodeMCU.png";
+import esp8266NodeMCUConnectionIconURL from "./esp8266NodeMCU/esp8266NodeMCU-illustration.svg";
+import esp8266NodeMCUConnectionSmallIconURL from "./esp8266NodeMCU/esp8266NodeMCU-small.svg";
 
 // import k210MaixDockIconURL from "./k210MaixDock/k210MaixDock.png";
 // import k210MaixDockConnectionIconURLL from "./k210MaixDock/k210MaixDock-illustration.svg";
@@ -65,29 +65,29 @@ import esp8266NodeMCUConnectionSmallIconURL from './esp8266NodeMCU/esp8266NodeMC
 // import raspberryPiPicoConnectionIconURL from "./raspberryPiPico/raspberryPiPico-illustration.svg";
 // import raspberryPiPicoConnectionSmallIconURL from "./raspberryPiPico/raspberryPiPico-small.svg";
 
-import raspberryPiPicoIconURL from './raspberryPiPico/raspberryPiPico.png';
-import raspberryPiPicoConnectionIconURL from './raspberryPiPico/raspberryPiPico-illustration.svg';
-import raspberryPiPicoConnectionSmallIconURL from './raspberryPiPico/raspberryPiPico-small.svg';
+import raspberryPiPicoIconURL from "./raspberryPiPico/raspberryPiPico.png";
+import raspberryPiPicoConnectionIconURL from "./raspberryPiPico/raspberryPiPico-illustration.svg";
+import raspberryPiPicoConnectionSmallIconURL from "./raspberryPiPico/raspberryPiPico-small.svg";
 
 // import makeymakeyIconURL from "./makeymakey/makeymakey.png";
 // import makeymakeyConnectionIconURL from "./makeymakey/makeymakey-illustration.svg";
 // import makeymakeyConnectionSmallIconURL from "./makeymakey/makeymakey-small.svg";
 
-import nobotIconUrl from './nobot/nobot-new.png';
-import nobotSmallIconUrl from './nobot/nobot40.svg';
-import nobotConnectionSmallIconUrl from './nobot/nobot108-small.svg';
+import nobotIconUrl from "./nobot/nobot-new.png";
+import nobotSmallIconUrl from "./nobot/nobot40.svg";
+import nobotConnectionSmallIconUrl from "./nobot/nobot108-small.svg";
 
-import weeemakeELFUnoIconURL from './weeemakeELFUno/weeemakeELFUno.png';
-import weeemakeELFUnoSmallIconURL from './weeemakeELFUno/weeemakeELFUno.svg';
-import weeemakeELFUnoConnectionSmallIconUrl from './weeemakeELFUno/weeemakeELFUno-small.svg';
+import weeemakeELFUnoIconURL from "./weeemakeELFUno/weeemakeELFUno.png";
+import weeemakeELFUnoSmallIconURL from "./weeemakeELFUno/weeemakeELFUno.svg";
+import weeemakeELFUnoConnectionSmallIconUrl from "./weeemakeELFUno/weeemakeELFUno-small.svg";
 
-import nomobotStarterKitIconURL from './nomoBotStarterKit/nomobot-startkerkit.png';
-import nomobotStarterKitConnectionSmallIconUrl from './nomoBotStarterKit/nomobot-starterkit-small.png';
-import nomoBotStarterKitSmallIconUrl from './nomoBotStarterKit/nomobot-starterkit-illustration.png';
+import nomobotStarterKitIconURL from "./nomoBotStarterKit/nomobot-startkerkit.png";
+import nomobotStarterKitConnectionSmallIconUrl from "./nomoBotStarterKit/nomobot-starterkit-small.png";
+import nomoBotStarterKitSmallIconUrl from "./nomoBotStarterKit/nomobot-starterkit-illustration.png";
 
-import nomobotBasicKitIconURL from './esp32NomobotBasicKit/nomobot-basicKit.png';
-import nomoBotBasicKitSmallIconUrl from './esp32NomobotBasicKit/nomobot-basicKit-illustration.png';
-import nomobotBasicKitConnectionSmallIconUrl from './esp32NomobotBasicKit/nomobot-basicKit-small.png';
+import nomobotBasicKitIconURL from "./esp32NomobotBasicKit/nomobot-basicKit.png";
+import nomoBotBasicKitSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-illustration.png";
+import nomobotBasicKitConnectionSmallIconUrl from "./esp32NomobotBasicKit/nomobot-basicKit-small.png";
 
 const deviceData = [
     /**
@@ -101,7 +101,7 @@ const deviceData = [
                 id="gui.device.unselectDevice.name"
             />
         ),
-        deviceId: 'null',
+        deviceId: "null",
         iconURL: unselectDeviceIconURL,
         description: (
             <FormattedMessage
@@ -112,17 +112,17 @@ const deviceData = [
         ),
         featured: true,
         hide: false,
-        programMode: ['realtime'],
-        programLanguage: ['block'],
-        tags: ['realtime'],
+        programMode: ["realtime"],
+        programLanguage: ["block"],
+        tags: ["realtime"],
         freeDevice: true,
-        nomoproSubsItem: false
+        nomoproSubsItem: false,
     },
     {
-        name: 'Arduino Uno',
-        deviceId: 'arduinoUno',
-        manufactor: 'arduino.cc',
-        learnMore: 'https://store.arduino.cc/usa/arduino-uno-rev3',
+        name: "Arduino Uno",
+        deviceId: "arduinoUno",
+        manufactor: "arduino.cc",
+        learnMore: "https://store.arduino.cc/usa/arduino-uno-rev3",
         type: DeviceType.arduino,
         iconURL: arduinoUnoIconURL,
         description: (
@@ -136,7 +136,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '9600',
+        defaultBaudRate: "9600",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -150,18 +150,18 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ['realtime', 'upload'],
-        programLanguage: ['block', 'c', 'cpp', 'python'],
-        tags: ['arduino'],
-        helpLink: 'https://store.arduino.cc/usa/arduino-uno-rev3',
+        programMode: ["realtime", "upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino", "microPython"],
+        helpLink: "https://store.arduino.cc/usa/arduino-uno-rev3",
         freeDevice: true,
-        nomoproSubsItem: false
+        nomoproSubsItem: false,
     },
     {
-        name: 'Arduino Uno R4 Wifi',
-        deviceId: 'arduinoUnoR4Wifi',
-        manufactor: 'arduino.cc',
-        learnMore: 'https://store.arduino.cc/products/uno-r4-wifi',
+        name: "Arduino Uno R4 Wifi",
+        deviceId: "arduinoUnoR4Wifi",
+        manufactor: "arduino.cc",
+        learnMore: "https://store.arduino.cc/products/uno-r4-wifi",
         type: DeviceType.arduino,
         iconURL: arduinoUnoR4WifiIconURL,
         description: (
@@ -175,7 +175,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '115200',
+        defaultBaudRate: "115200",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -189,18 +189,18 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ['upload'],
-        programLanguage: ['block', 'c', 'cpp'],
-        tags: ['arduino'],
-        helpLink: 'https://store.arduino.cc/products/uno-r4-wifi',
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
+        helpLink: "https://store.arduino.cc/products/uno-r4-wifi",
         freeDevice: true,
-        nomoproSubsItem: false
+        nomoproSubsItem: false,
     },
     {
-        name: 'Arduino Nano',
-        deviceId: 'arduinoNano',
-        manufactor: 'arduino.cc',
-        learnMore: 'https://store.arduino.cc/usa/arduino-nano',
+        name: "Arduino Nano",
+        deviceId: "arduinoNano",
+        manufactor: "arduino.cc",
+        learnMore: "https://store.arduino.cc/usa/arduino-nano",
         type: DeviceType.arduino,
         iconURL: arduinoNanoIconURL,
         description: (
@@ -214,7 +214,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '9600',
+        defaultBaudRate: "9600",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -228,18 +228,18 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ['realtime', 'upload'],
-        programLanguage: ['block', 'c', 'cpp', 'python'],
-        tags: ['arduino'],
-        helpLink: 'https://store.arduino.cc/usa/arduino-nano',
+        programMode: ["realtime", "upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino", "microPython"],
+        helpLink: "https://store.arduino.cc/usa/arduino-nano",
         freeDevice: true,
-        nomoproSubsItem: false
+        nomoproSubsItem: false,
     },
     {
-        name: 'Arduino Nano 2',
-        deviceId: 'arduinoNano2',
-        manufactor: 'arduino.cc',
-        learnMore: 'https://store.arduino.cc/usa/arduino-nano',
+        name: "Arduino Nano 2",
+        deviceId: "arduinoNano2",
+        manufactor: "arduino.cc",
+        learnMore: "https://store.arduino.cc/usa/arduino-nano",
         type: DeviceType.arduino,
         iconURL: arduinoNanoIconURL,
         description: (
@@ -253,7 +253,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '9600',
+        defaultBaudRate: "9600",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -267,18 +267,18 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ['realtime', 'upload'],
-        programLanguage: ['block', 'c', 'cpp', 'python'],
-        tags: ['arduino'],
-        helpLink: 'https://store.arduino.cc/usa/arduino-nano',
+        programMode: ["realtime", "upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino", "microPython"],
+        helpLink: "https://store.arduino.cc/usa/arduino-nano",
         freeDevice: true,
-        nomoproSubsItem: false
+        nomoproSubsItem: false,
     },
     {
-        name: 'G-Bot Nomo',
-        deviceId: 'arduinoELFUno',
-        manufactor: 'arduino.cc',
-        learnMore: 'https://www.nomo-kit.com/',
+        name: "G-Bot Nomo",
+        deviceId: "arduinoELFUno",
+        manufactor: "arduino.cc",
+        learnMore: "https://www.nomo-kit.com/",
         type: DeviceType.arduino,
         iconURL: weeemakeELFUnoIconURL,
         description: (
@@ -292,7 +292,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '9600',
+        defaultBaudRate: "9600",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -306,19 +306,19 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ['realtime', 'upload'],
-        programLanguage: ['block', 'c', 'cpp'],
-        tags: ['kit', 'arduino'],
-        helpLink: 'https://www.weeemake.com/',
+        programMode: ["realtime", "upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["kit", "arduino"],
+        helpLink: "https://www.weeemake.com/",
         freeDevice: false,
-        buyNowUrl: 'https://instareducation.com/kit-robot/',
-        nomoproSubsItem: false
+        buyNowUrl: "https://instareducation.com/kit-robot/",
+        nomoproSubsItem: false,
     },
     {
-        name: 'ESP32',
-        deviceId: 'arduinoEsp32',
-        manufactor: 'espressif',
-        learnMore: 'https:www.espressif.com/',
+        name: "ESP32",
+        deviceId: "arduinoEsp32",
+        manufactor: "espressif",
+        learnMore: "https:www.espressif.com/",
         type: DeviceType.arduino,
         iconURL: esp32IconURL,
         description: (
@@ -332,7 +332,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '115200',
+        defaultBaudRate: "115200",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -346,20 +346,20 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ['upload', 'realtime'],
-        programLanguage: ['block', 'c', 'cpp', 'python'],
-        tags: ['arduino', 'microPython'],
+        programMode: ["upload", "realtime"],
+        programLanguage: ["block", "c", "cpp", "python"],
+        tags: ["arduino", "microPython"],
         supportsMicroPython: true,
         helpLink:
-            'https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html',
+            "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
         freeDevice: true,
-        nomoproSubsItem: false
+        nomoproSubsItem: false,
     },
     {
-        name: 'ESP32-CAM',
-        deviceId: 'arduinoEsp32Cam',
-        manufactor: 'espressif',
-        learnMore: 'https:www.espressif.com/',
+        name: "ESP32-CAM",
+        deviceId: "arduinoEsp32Cam",
+        manufactor: "espressif",
+        learnMore: "https:www.espressif.com/",
         type: DeviceType.arduino,
         iconURL: esp32CamIconURL,
         description: (
@@ -373,7 +373,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '115200',
+        defaultBaudRate: "115200",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -387,19 +387,19 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ['upload'],
-        programLanguage: ['block', 'c', 'cpp'],
-        tags: ['arduino'],
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
         helpLink:
-            'https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html',
+            "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
         freeDevice: true,
-        nomoproSubsItem: false
+        nomoproSubsItem: false,
     },
     {
-        name: 'Add-On ESP32-CAM',
-        deviceId: 'arduinoEsp32CamAddOn',
-        manufactor: 'espressif',
-        learnMore: 'https:www.espressif.com/',
+        name: "Add-On ESP32-CAM",
+        deviceId: "arduinoEsp32CamAddOn",
+        manufactor: "espressif",
+        learnMore: "https:www.espressif.com/",
         type: DeviceType.arduino,
         iconURL: esp32CamIconURL,
         description: (
@@ -413,7 +413,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '115200',
+        defaultBaudRate: "115200",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -427,21 +427,21 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ['upload'],
-        programLanguage: ['block', 'c', 'cpp'],
-        tags: ['arduino'],
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
         helpLink:
-            'https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html',
+            "https:docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
         freeDevice: false,
-        buyNowUrl: 'https://instareducation.com/kit-robot/',
-        nomoproSubsItem: false
+        buyNowUrl: "https://instareducation.com/kit-robot/",
+        nomoproSubsItem: false,
     },
     {
-        name: 'Arduino Nano 33 BLE Sense',
-        deviceId: 'arduinoNano33BleSense',
-        manufactor: 'arduino.cc',
+        name: "Arduino Nano 33 BLE Sense",
+        deviceId: "arduinoNano33BleSense",
+        manufactor: "arduino.cc",
         learnMore:
-            'https://store-usa.arduino.cc/products/nano-33-ble-sense-rev2',
+            "https://store-usa.arduino.cc/products/nano-33-ble-sense-rev2",
         type: DeviceType.arduino,
         iconURL: arduinoNano33IconURL,
         description: (
@@ -455,7 +455,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '115200',
+        defaultBaudRate: "115200",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -469,19 +469,19 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ['upload'],
-        programLanguage: ['block', 'c', 'cpp'],
-        tags: ['arduino'],
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino"],
         helpLink:
-            'https://store-usa.arduino.cc/products/nano-33-ble-sense-rev2',
+            "https://store-usa.arduino.cc/products/nano-33-ble-sense-rev2",
         freeDevice: true,
-        nomoproSubsItem: false
+        nomoproSubsItem: false,
     },
     {
-        name: 'NodeMCU',
-        deviceId: 'arduinoEsp8266NodeMCU',
-        manufactor: 'espressif',
-        learnMore: 'https:www.nodemcu.com',
+        name: "NodeMCU",
+        deviceId: "arduinoEsp8266NodeMCU",
+        manufactor: "espressif",
+        learnMore: "https:www.nodemcu.com",
         type: DeviceType.arduino,
         iconURL: esp8266NodeMCUIconURL,
         description: (
@@ -495,7 +495,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '76800',
+        defaultBaudRate: "76800",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -509,20 +509,20 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        deviceExtensionsCompatible: 'arduinoEsp8266',
-        programMode: ['upload', 'realtime'],
-        programLanguage: ['block', 'c', 'cpp', 'python'],
-        tags: ['arduino', 'microPython'],
+        deviceExtensionsCompatible: "arduinoEsp8266",
+        programMode: ["upload", "realtime"],
+        programLanguage: ["block", "c", "cpp", "python"],
+        tags: ["arduino", "microPython"],
         supportsMicroPython: true,
-        helpLink: 'https:arduino-esp8266.readthedocs.io/en/3.0.0/index.html',
+        helpLink: "https:arduino-esp8266.readthedocs.io/en/3.0.0/index.html",
         freeDevice: true,
-        nomoproSubsItem: false
+        nomoproSubsItem: false,
     },
     {
-        name: 'Nomo Bot Starter Kit',
-        deviceId: 'nomoBotStarterKit',
-        manufactor: 'IDN Boarding School & Instar Education',
-        learnMore: 'https:www.nodemcu.com',
+        name: "Nomo Bot Starter Kit",
+        deviceId: "nomoBotStarterKit",
+        manufactor: "IDN Boarding School & Instar Education",
+        learnMore: "https:www.nodemcu.com",
         type: DeviceType.arduino,
         iconURL: nomobotStarterKitIconURL,
         description: (
@@ -536,7 +536,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '76800',
+        defaultBaudRate: "76800",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -550,21 +550,21 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        deviceExtensionsCompatible: 'arduinoEsp8266',
-        programMode: ['upload'],
-        programLanguage: ['block', 'c', 'cpp'],
-        tags: ['arduino', 'kit'],
-        helpLink: 'https:nomo-kit.com',
+        deviceExtensionsCompatible: "arduinoEsp8266",
+        programMode: ["upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino", "kit"],
+        helpLink: "https:nomo-kit.com",
         freeDevice: false,
-        buyNowUrl: 'https://instareducation.com/kit-robot/',
+        buyNowUrl: "https://instareducation.com/kit-robot/",
         // active: false,
-        nomoproSubsItem: false
+        nomoproSubsItem: false,
     },
     {
-        name: 'NOMOBOT Basic Kit',
-        deviceId: 'arduinoEsp32Nomobot',
-        manufactor: 'Instar Education',
-        learnMore: 'https:www.esp32.com',
+        name: "NOMOBOT Basic Kit",
+        deviceId: "arduinoEsp32Nomobot",
+        manufactor: "Instar Education",
+        learnMore: "https:www.esp32.com",
         type: DeviceType.arduino,
         iconURL: nomobotBasicKitIconURL,
         description: (
@@ -578,7 +578,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '76800',
+        defaultBaudRate: "76800",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -592,18 +592,18 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ['realtime', 'upload'],
-        programLanguage: ['block', 'c', 'cpp'],
-        tags: ['arduino', 'kit'],
-        helpLink: 'https:nomo-kit.com',
-        buyNowUrl: 'https://instareducation.com/kit-robot/',
-        nomoproSubsItem: false
+        programMode: ["realtime", "upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["arduino", "kit"],
+        helpLink: "https:nomo-kit.com",
+        buyNowUrl: "https://instareducation.com/kit-robot/",
+        nomoproSubsItem: false,
     },
     {
-        name: 'Micro:bit V2',
-        deviceId: 'microbitV2',
-        manufactor: 'microbit.org',
-        learnMore: 'https://microbit.org/',
+        name: "Micro:bit V2",
+        deviceId: "microbitV2",
+        manufactor: "microbit.org",
+        learnMore: "https://microbit.org/",
         type: DeviceType.microbit,
         iconURL: microbitV2IconURL,
         description: (
@@ -617,7 +617,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '115200',
+        defaultBaudRate: "115200",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -631,18 +631,18 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: microbitBaseToolBox,
-        programMode: ['realtime', 'upload'],
-        programLanguage: ['block', 'microPython'],
-        tags: ['microPython'],
-        helpLink: 'https://microbit.org/get-started/first-steps/introduction/',
+        programMode: ["realtime", "upload"],
+        programLanguage: ["block", "microPython"],
+        tags: ["microPython"],
+        helpLink: "https://microbit.org/get-started/first-steps/introduction/",
         freeDevice: true,
-        nomoproSubsItem: false
+        nomoproSubsItem: false,
     },
     {
-        name: 'G-Bot Nomo ESP32',
-        deviceId: 'arduinoEsp32Gbot',
-        manufactor: 'arduino.cc',
-        learnMore: 'https://www.nomo-kit.com/',
+        name: "G-Bot Nomo ESP32",
+        deviceId: "arduinoEsp32Gbot",
+        manufactor: "arduino.cc",
+        learnMore: "https://www.nomo-kit.com/",
         type: DeviceType.arduino,
         iconURL: weeemakeELFUnoIconURL,
         description: (
@@ -656,7 +656,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '9600',
+        defaultBaudRate: "9600",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -670,13 +670,13 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: arduinoBaseToolBox,
-        programMode: ['realtime', 'upload'],
-        programLanguage: ['block', 'c', 'cpp'],
-        tags: ['kit', 'arduino'],
-        helpLink: 'https://www.weeemake.com/',
+        programMode: ["realtime", "upload"],
+        programLanguage: ["block", "c", "cpp"],
+        tags: ["kit", "arduino"],
+        helpLink: "https://www.weeemake.com/",
         freeDevice: false,
-        buyNowUrl: 'https://instareducation.com/kit-robot/',
-        nomoproSubsItem: false
+        buyNowUrl: "https://instareducation.com/kit-robot/",
+        nomoproSubsItem: false,
     },
     // {
     //     name: 'Makey Makey',
@@ -864,10 +864,10 @@ const deviceData = [
     //     helpLink: 'https://wiki.sipeed.com/soft/maixpy/en/develop_kit_board/maix_duino.html'
     // },
     {
-        name: 'Raspberry Pi Pico',
-        deviceId: 'arduinoRaspberryPiPico',
-        manufactor: 'Raspberry Pi Foundation',
-        learnMore: 'https://www.raspberrypi.com/',
+        name: "Raspberry Pi Pico",
+        deviceId: "arduinoRaspberryPiPico",
+        manufactor: "Raspberry Pi Foundation",
+        learnMore: "https://www.raspberrypi.com/",
         type: DeviceType.arduino,
         iconURL: raspberryPiPicoIconURL,
         description: (
@@ -881,7 +881,7 @@ const deviceData = [
         disabled: false,
         bluetoothRequired: false,
         serialportRequired: true,
-        defaultBaudRate: '115200',
+        defaultBaudRate: "115200",
         internetConnectionRequired: false,
         launchPeripheralConnectionFlow: true,
         useAutoScan: false,
@@ -895,14 +895,14 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: null,
-        programMode: ['upload'],
-        programLanguage: ['python'],
-        tags: ['microPython'],
+        programMode: ["upload"],
+        programLanguage: ["python"],
+        tags: ["microPython"],
         supportsMicroPython: true,
         helpLink:
-            'https://www.raspberrypi.com/documentation/microcontrollers/micropython.html',
+            "https://www.raspberrypi.com/documentation/microcontrollers/micropython.html",
         freeDevice: true,
-        nomoproSubsItem: false
+        nomoproSubsItem: false,
     },
     // {
     //     name: "Micro:bit",
@@ -945,29 +945,29 @@ const deviceData = [
      * For those parent devices that exist in VM but are not displayed in GUI
      */
     {
-        deviceId: 'arduinoUnoUltra',
+        deviceId: "arduinoUnoUltra",
         type: DeviceType.arduino,
         featured: true,
         disabled: false,
         hide: true,
-        baseToolBoxXml: arduinoBaseToolBox
+        baseToolBoxXml: arduinoBaseToolBox,
     },
     {
-        deviceId: 'arduinoSE',
+        deviceId: "arduinoSE",
         type: DeviceType.arduino,
         featured: true,
         disabled: false,
         hide: true,
-        baseToolBoxXml: arduinoBaseToolBox
+        baseToolBoxXml: arduinoBaseToolBox,
     },
     {
-        deviceId: 'arduinoEsp8266',
+        deviceId: "arduinoEsp8266",
         type: DeviceType.arduino,
         featured: true,
         disabled: false,
         hide: true,
-        baseToolBoxXml: arduinoBaseToolBox
-    }
+        baseToolBoxXml: arduinoBaseToolBox,
+    },
 ];
 
 /**
@@ -975,11 +975,11 @@ const deviceData = [
  * @param {string} deviceId - the id of the device.
  * @return {string} deviceId - the real device id.
  */
-const analysisRealDeviceId = deviceId => {
+const analysisRealDeviceId = (deviceId) => {
     if (deviceId) {
         // if the id contain '_' use the string afer the '_'.
-        if (deviceId.indexOf('_') !== -1) {
-            deviceId = deviceId.split('_')[1];
+        if (deviceId.indexOf("_") !== -1) {
+            deviceId = deviceId.split("_")[1];
         }
     }
     return deviceId;
@@ -996,20 +996,20 @@ const makeDeviceLibrary = (deviceList = null) => {
     let regeneratedDeviceData = [];
 
     if (deviceList) {
-        deviceList.forEach(dev => {
+        deviceList.forEach((dev) => {
             // Because the micropython framework is not included in the community version,
             // for a control board that supports multiple programming frameworks, if it
             // also supports arduino, then we only load the arduino version of the device.
             if (
-                typeof dev.typeList !== 'undefined' &&
-                dev.deviceId.indexOf('arduino') !== -1
+                typeof dev.typeList !== "undefined" &&
+                dev.deviceId.indexOf("arduino") !== -1
             ) {
                 dev.hide = false;
             }
 
             // Check if this is a build-in device.
             const matchedDevice = deviceData.find(
-                item => dev.deviceId === item.deviceId,
+                (item) => dev.deviceId === item.deviceId,
             );
             if (matchedDevice) {
                 return regeneratedDeviceData.push(matchedDevice);
@@ -1019,11 +1019,11 @@ const makeDeviceLibrary = (deviceList = null) => {
             const realDeviceId = analysisRealDeviceId(dev.deviceId);
             if (realDeviceId) {
                 const parentDevice = deviceData.find(
-                    item => realDeviceId === item.deviceId,
+                    (item) => realDeviceId === item.deviceId,
                 );
                 if (parentDevice) {
                     return regeneratedDeviceData.push(
-                        defaults({}, dev, {hide: false}, parentDevice),
+                        defaults({}, dev, { hide: false }, parentDevice),
                     );
                 }
             }
@@ -1042,4 +1042,4 @@ const makeDeviceLibrary = (deviceList = null) => {
     return regeneratedDeviceData;
 };
 
-export {deviceData as default, makeDeviceLibrary};
+export { deviceData as default, makeDeviceLibrary };

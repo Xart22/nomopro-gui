@@ -97,8 +97,11 @@ const PythonIde = (props) => {
     // Check if current device supports MicroPython
     const currentDevice = deviceData.find((d) => d.deviceId === deviceId);
     const supportsMicroPython = currentDevice
-        ? currentDevice.supportsMicroPython ||
-          currentDevice.tags?.includes("microPython")
+        ? (currentDevice.supportsMicroPython ||
+           currentDevice.tags?.includes("microPython")) &&
+          currentDevice.programLanguage?.some(
+              lang => lang === "python" || lang === "microPython"
+          )
         : false;
 
     const isMicroPythonDevice =

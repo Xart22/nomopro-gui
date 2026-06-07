@@ -1,48 +1,51 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import {compose} from 'redux';
-import {FormattedMessage} from 'react-intl';
+import React from "react";
+import ReactDOM from "react-dom";
+import { compose } from "redux";
+import { FormattedMessage } from "react-intl";
 
-import AppStateHOC from '../lib/app-state-hoc.jsx';
-import GUI from '../containers/gui.jsx';
-import HashParserHOC from '../lib/hash-parser-hoc.jsx';
-import log from '../lib/log.js';
-import MessageBoxType from '../lib/message-box.js';
+import AppStateHOC from "../lib/app-state-hoc.jsx";
+import GUI from "../containers/gui.jsx";
+import HashParserHOC from "../lib/hash-parser-hoc.jsx";
+import log from "../lib/log.js";
+import MessageBoxType from "../lib/message-box.js";
 
 const onClickLogo = () => {
-    window.location = 'https://nomo-kit.com/home';
+    //check if electron API is available, if so, open the Scratch website
+    if (!window.electronAPI && !window.electronAPI.openExternal) {
+        window.location = "https://nomo-kit.com";
+    }
 };
 
 const onClickCheckUpdate = () => {
-    log('User click check update');
+    log("User click check update");
 };
 
 const onClickUpdate = () => {
-    log('User click update');
+    log("User click update");
 };
 
 const onAbortUpdate = () => {
-    log('User click abort update');
+    log("User click abort update");
 };
 
 const onClickClearCache = () => {
-    log('User click clear cahce');
+    log("User click clear cahce");
 };
 
 const onClickInstallDriver = () => {
-    log('User click install driver');
+    log("User click install driver");
 };
 
 const handleTelemetryModalCancel = () => {
-    log('User canceled telemetry modal');
+    log("User canceled telemetry modal");
 };
 
 const handleTelemetryModalOptIn = () => {
-    log('User opted into telemetry');
+    log("User opted into telemetry");
 };
 
 const handleTelemetryModalOptOut = () => {
-    log('User opted out of telemetry');
+    log("User opted out of telemetry");
 };
 
 const onClickAbout = [
@@ -54,7 +57,7 @@ const onClickAbout = [
                 id="gui.desktopMenuBar.about"
             />
         ),
-        onClick: () => log('About')
+        onClick: () => log("About"),
     },
     {
         title: (
@@ -64,7 +67,7 @@ const onClickAbout = [
                 id="gui.desktopMenuBar.license"
             />
         ),
-        onClick: () => log('License')
+        onClick: () => log("License"),
     },
     {
         title: (
@@ -74,7 +77,7 @@ const onClickAbout = [
                 id="gui.menuBar.privacyPolicy"
             />
         ),
-        onClick: () => log('Privacy Policy')
+        onClick: () => log("Privacy Policy"),
     },
     {
         title: (
@@ -84,8 +87,8 @@ const onClickAbout = [
                 id="gui.menuBar.dataSettings"
             />
         ),
-        onClick: () => log('Data Settings')
-    }
+        onClick: () => log("Data Settings"),
+    },
 ];
 
 const handleShowMessageBox = (type, message) => {
@@ -101,7 +104,7 @@ const handleShowMessageBox = (type, message) => {
  * that instantiates the VM causes unsupported browsers to crash
  * {object} appTarget - the DOM element to render to
  */
-export default appTarget => {
+export default (appTarget) => {
     GUI.setAppElement(appTarget);
 
     // note that redux's 'compose' function is just being used as a general utility to make
@@ -111,12 +114,12 @@ export default appTarget => {
 
     // TODO a hack for testing the backpack, allow backpack host to be set by url param
     const backpackHostMatches = window.location.href.match(
-        /[?&]backpack_host=([^&]*)&?/
+        /[?&]backpack_host=([^&]*)&?/,
     );
     const backpackHost = backpackHostMatches ? backpackHostMatches[1] : null;
 
     const scratchDesktopMatches = window.location.href.match(
-        /[?&]isScratchDesktop=([^&]+)/
+        /[?&]isScratchDesktop=([^&]+)/,
     );
     let simulateScratchDesktop;
     if (scratchDesktopMatches) {
@@ -130,7 +133,7 @@ export default appTarget => {
         }
     }
 
-    if (process.env.NODE_ENV === 'production' && typeof window === 'object') {
+    if (process.env.NODE_ENV === "production" && typeof window === "object") {
         // Warn before navigating away
         window.onbeforeunload = () => true;
     }
@@ -165,6 +168,6 @@ export default appTarget => {
                 onShowMessageBox={handleShowMessageBox}
             />
         ),
-        appTarget
+        appTarget,
     );
 };

@@ -1053,9 +1053,7 @@ class MenuBar extends React.Component {
                             disabled={
                                 this.props.isToolboxUpdating ||
                                 !this.props.isSupportSwitchMode ||
-                                (isWeb &&
-                                    this.props.activeTabIndex ===
-                                        PYTHON_TAB_INDEX)
+                                this.props.activeTabIndex === PYTHON_TAB_INDEX
                             }
                             height={25}
                             width={90}
