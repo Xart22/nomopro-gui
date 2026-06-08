@@ -8,11 +8,16 @@ import GUI from "../containers/gui.jsx";
 import HashParserHOC from "../lib/hash-parser-hoc.jsx";
 import log from "../lib/log.js";
 import MessageBoxType from "../lib/message-box.js";
+const { electronAPI } = window;
 
+function isBrowser() {
+    return (
+        typeof window !== "undefined" && typeof window.document !== "undefined"
+    );
+}
 const onClickLogo = () => {
-    //check if electron API is available, if so, open the Scratch website
-    if (!window.electronAPI && !window.electronAPI.openExternal) {
-        window.location = "https://nomo-kit.com";
+    if (isBrowser()) {
+        window.open("https://nomo-kit.com");
     }
 };
 
