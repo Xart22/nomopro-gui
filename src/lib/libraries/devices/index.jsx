@@ -895,7 +895,7 @@ const deviceData = [
             />
         ),
         baseToolBoxXml: null,
-        programMode: ["upload"],
+        programMode: ["upload", "realtime"],
         programLanguage: ["python"],
         tags: ["microPython"],
         supportsMicroPython: true,
