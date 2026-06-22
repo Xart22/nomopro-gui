@@ -95,7 +95,8 @@ const normalizeCommand = rawCommand => {
             cmd: rawCommand.cmd,
             args: Array.isArray(rawCommand.args) ? rawCommand.args : [],
             targetId: rawCommand.targetId,
-            targetName: rawCommand.targetName
+            targetName: rawCommand.targetName,
+            _requestId: rawCommand._requestId
         };
     }
 
@@ -307,6 +308,7 @@ const playSoundByName = (target, soundName) => {
 const SOUND_STATE_KEY = 'Scratch.sound';
 
 const getSoundState = target => {
+    if (!target) return null;
     if (typeof target.getCustomState !== 'function') return null;
     let state = target.getCustomState(SOUND_STATE_KEY);
     if (!state) {
@@ -422,7 +424,29 @@ const executeExtensionOpcode = async (
         );
     }
 
-    let result = primitive(args, {target});
+    const safeTarget = target || runtime.getEditingTarget() || runtime.getTargetForStage() || null;
+    const stackFrame = {};
+    const primitiveUtil = {
+        target: safeTarget,
+        runtime: runtime,
+        stackFrame: stackFrame,
+        yield: () => {},
+        yieldTick: () => {},
+        ioQuery: (device, func, queryArgs) => {
+            if (
+                runtime.ioDevices &&
+                runtime.ioDevices[device] &&
+                typeof runtime.ioDevices[device][func] === 'function'
+            ) {
+                return runtime.ioDevices[device][func](...queryArgs);
+            }
+        },
+        startHats: () => [],
+        startBranch: () => {},
+        stopAll: () => runtime.stopAll()
+    };
+
+    let result = primitive(args, primitiveUtil);
     if (result && typeof result.then === 'function') {
         result = await result;
     }

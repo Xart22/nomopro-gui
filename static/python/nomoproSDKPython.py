@@ -476,7 +476,7 @@ class Sprite:
 
     # Object Detection
     def ob2Analyse(self):
-        self._emit("extOb2AnalyseImage")
+        return _extension_rpc("extOb2AnalyseImage")
 
     def ob2Video(self, state="on"):
         self._emit("extOb2VideoToggle", [str(state)])

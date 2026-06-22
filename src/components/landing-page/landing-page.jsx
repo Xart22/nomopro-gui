@@ -1,13 +1,13 @@
-import React from "react";
-import PropTypes from "prop-types";
-import styles from "./landing-page.css";
-import nomokitJrIcon from "./nomokit-jr.png";
-import nomoProIcon from "./nomo.png";
+import React from 'react';
+import PropTypes from 'prop-types';
+import styles from './landing-page.css';
+import nomokitJrIcon from './nomokit-jr.png';
+import nomoProIcon from './nomo.png';
 
 const LandingPage = ({
     onSelectJuniorCode,
     onSelectBlockCode,
-    onSelectPythonIDE,
+    onSelectPythonIDE
 }) => (
     <div className={styles.overlay}>
         <div className={styles.container}>
@@ -16,7 +16,10 @@ const LandingPage = ({
                 Pilih mode coding yang ingin digunakan
             </div>
             <div className={styles.cards}>
-                <div className={styles.card} onClick={onSelectJuniorCode}>
+                <div
+                    className={styles.card}
+                    onClick={onSelectJuniorCode}
+                >
                     <img
                         className={styles.cardIcon}
                         src={nomokitJrIcon}
@@ -27,7 +30,10 @@ const LandingPage = ({
                         Coding blocks untuk pemula dengan balok warna-warni
                     </p>
                 </div>
-                <div className={styles.card} onClick={onSelectBlockCode}>
+                <div
+                    className={styles.card}
+                    onClick={onSelectBlockCode}
+                >
                     <img
                         className={styles.cardIcon}
                         src={nomoProIcon}
@@ -38,7 +44,10 @@ const LandingPage = ({
                         Coding blocks yang interaktif
                     </p>
                 </div>
-                <div className={styles.card} onClick={onSelectPythonIDE}>
+                <div
+                    className={styles.card}
+                    onClick={onSelectPythonIDE}
+                >
                     <img
                         className={styles.cardIcon}
                         src={nomoProIcon}
@@ -57,7 +66,7 @@ const LandingPage = ({
 LandingPage.propTypes = {
     onSelectJuniorCode: PropTypes.func.isRequired,
     onSelectBlockCode: PropTypes.func.isRequired,
-    onSelectPythonIDE: PropTypes.func.isRequired,
+    onSelectPythonIDE: PropTypes.func.isRequired
 };
 
 export default LandingPage;

@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
+import React, {useEffect, useRef, useState} from 'react';
+import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
 
-import PythonIdeComponent from "../components/python-ide/python-ide.jsx";
+import PythonIdeComponent from '../components/python-ide/python-ide.jsx';
 import {
     initTargetFile,
     setActiveTarget,
@@ -15,24 +15,24 @@ import {
     deleteTreeItem,
     moveTreeItem,
     duplicateTreeItem,
-    setModuleLibraryItems,
-} from "../reducers/python-ide";
-import { openExtensionLibrary } from "../reducers/modals";
-import { setFirmwareMode } from "../reducers/device";
-import { createDesktopPythonRunner } from "../lib/desktop-python-runner";
-import getCostumeUrl from "../lib/get-costume-url";
-import { createPyodideRunner } from "../lib/pyodide-runner";
-import MicropythonRunner from "../lib/micropython-runner";
-import deviceData from "../lib/libraries/devices/index.jsx";
-import { executeBridgeCommand, drainPendingDeviceResults } from "../lib/bridge";
-import { parseNdjsonCommandLine } from "../lib/ndjson-command-parser";
-import { backend as pythonBackend } from "../shared/env";
+    setModuleLibraryItems
+} from '../reducers/python-ide';
+import {openExtensionLibrary} from '../reducers/modals';
+import {setFirmwareMode} from '../reducers/device';
+import {createDesktopPythonRunner} from '../lib/desktop-python-runner';
+import getCostumeUrl from '../lib/get-costume-url';
+import {createPyodideRunner} from '../lib/pyodide-runner';
+import MicropythonRunner from '../lib/micropython-runner';
+import deviceData from '../lib/libraries/devices/index.jsx';
+import {executeBridgeCommand, drainPendingDeviceResults} from '../lib/bridge';
+import {parseNdjsonCommandLine} from '../lib/ndjson-command-parser';
+import {backend as pythonBackend} from '../shared/env';
 
 const resolveFileNameByTarget = (targetId, stage, sprites) => {
-    if (!targetId) return "";
-    if (stage && stage.id === targetId) return "Stage.py";
+    if (!targetId) return '';
+    if (stage && stage.id === targetId) return 'Stage.py';
     const sprite = sprites && sprites[targetId];
-    const spriteName = sprite && sprite.name ? sprite.name : "Sprite";
+    const spriteName = sprite && sprite.name ? sprite.name : 'Sprite';
     return `${spriteName}.py`;
 };
 
@@ -43,24 +43,24 @@ const buildFileList = (stage, sprites) => {
     if (stage && stage.id) {
         fileList.push({
             targetId: stage.id,
-            fileName: "Stage.py",
+            fileName: 'Stage.py'
         });
     }
 
     // Add all sprite files, sorted by name
     if (sprites) {
         const spriteIds = Object.keys(sprites).sort((a, b) => {
-            const nameA = (sprites[a].name || "Sprite").toLowerCase();
-            const nameB = (sprites[b].name || "Sprite").toLowerCase();
+            const nameA = (sprites[a].name || 'Sprite').toLowerCase();
+            const nameB = (sprites[b].name || 'Sprite').toLowerCase();
             return nameA.localeCompare(nameB);
         });
 
-        spriteIds.forEach((spriteId) => {
+        spriteIds.forEach(spriteId => {
             const sprite = sprites[spriteId];
-            const fileName = `${sprite.name || "Sprite"}.py`;
+            const fileName = `${sprite.name || 'Sprite'}.py`;
             fileList.push({
                 targetId: spriteId,
-                fileName,
+                fileName
             });
         });
     }
@@ -68,16 +68,16 @@ const buildFileList = (stage, sprites) => {
     return fileList;
 };
 
-const createStandalonePythonCode = (fileName = "script.py") => {
-    const baseName = String(fileName || "script.py").replace(/\.py$/i, "");
-    return [`# ${fileName}`, "", `print(\"Hello from ${baseName}\")`].join(
-        "\n",
+const createStandalonePythonCode = (fileName = 'script.py') => {
+    const baseName = String(fileName || 'script.py').replace(/\.py$/i, '');
+    return [`# ${fileName}`, '', `print(\"Hello from ${baseName}\")`].join(
+        '\n',
     );
 };
 
-const normalizeRunnerCode = (value) => String(value || "");
+const normalizeRunnerCode = value => String(value || '');
 
-const PythonIde = (props) => {
+const PythonIde = props => {
     const {
         editingTarget,
         stage,
@@ -88,50 +88,50 @@ const PythonIde = (props) => {
         activeTargetId,
         onSetActiveTarget,
         onInitTargetFile,
-        onCodeChange,
+        onCodeChange
     } = props;
 
     const deviceId = props.deviceId;
     const peripheralName = props.peripheralName;
     const isDeviceConnected = Boolean(peripheralName);
     // Check if current device supports MicroPython
-    const currentDevice = deviceData.find((d) => d.deviceId === deviceId);
-    const supportsMicroPython = currentDevice
-        ? (currentDevice.supportsMicroPython ||
-           currentDevice.tags?.includes("microPython")) &&
+    const currentDevice = deviceData.find(d => d.deviceId === deviceId);
+    const supportsMicroPython = currentDevice ?
+        (currentDevice.supportsMicroPython ||
+           currentDevice.tags?.includes('microPython')) &&
           currentDevice.programLanguage?.some(
-              lang => lang === "python" || lang === "microPython"
-          )
-        : false;
+              lang => lang === 'python' || lang === 'microPython'
+          ) :
+        false;
 
     const isMicroPythonDevice =
         supportsMicroPython &&
-        (props.firmwareMode === "microPython" ||
-            deviceId === "microbitV2" ||
-            deviceId === "microbit");
+        (props.firmwareMode === 'microPython' ||
+            deviceId === 'microbitV2' ||
+            deviceId === 'microbit');
 
     // MicroPython upload mode state
-    const [runtimeTarget, setRuntimeTarget] = useState("vm");
+    const [runtimeTarget, setRuntimeTarget] = useState('vm');
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState({
-        stage: "",
-        percent: 0,
+        stage: '',
+        percent: 0
     });
-    const [firmwareStatus, setFirmwareStatus] = useState("unknown");
+    const [firmwareStatus, setFirmwareStatus] = useState('unknown');
     const [uploadLog, setUploadLog] = useState([]);
 
     // Sync firmwareStatus with Redux firmwareMode (set after flash in connection modal)
     useEffect(() => {
         setFirmwareStatus(
-            props.firmwareMode === "microPython" ? "micropython" : "unknown",
+            props.firmwareMode === 'microPython' ? 'micropython' : 'unknown',
         );
     }, [props.firmwareMode]);
 
     // Wire VM serial data events to the serial terminal component
     useEffect(() => {
-        if (!vm || typeof vm.addListener !== "function") return;
+        if (!vm || typeof vm.addListener !== 'function') return;
 
-        const handleSerialData = (data) => {
+        const handleSerialData = data => {
             // Ensure data is a proper Uint8Array.
             // VM emits Buffer (Node.js) in upload mode, which extends Uint8Array.
             let uint8;
@@ -152,7 +152,7 @@ const PythonIde = (props) => {
                 );
             } else if (data instanceof ArrayBuffer) {
                 uint8 = new Uint8Array(data);
-            } else if (typeof data === "string") {
+            } else if (typeof data === 'string') {
                 uint8 = new TextEncoder().encode(data);
             } else {
                 try {
@@ -187,80 +187,80 @@ const PythonIde = (props) => {
                 Array.isArray(window.__serialTerminalListeners) &&
                 window.__serialTerminalListeners.length > 0
             ) {
-                window.__serialTerminalListeners.forEach((fn) => fn(uint8));
+                window.__serialTerminalListeners.forEach(fn => fn(uint8));
             }
         };
 
-        vm.addListener("PERIPHERAL_RECIVE_DATA", handleSerialData);
+        vm.addListener('PERIPHERAL_RECIVE_DATA', handleSerialData);
 
         return () => {
-            if (vm && typeof vm.removeListener === "function") {
-                vm.removeListener("PERIPHERAL_RECIVE_DATA", handleSerialData);
+            if (vm && typeof vm.removeListener === 'function') {
+                vm.removeListener('PERIPHERAL_RECIVE_DATA', handleSerialData);
             }
         };
     }, [vm]);
 
     // Listen for MicroPython upload/flash progress events from Link server
     useEffect(() => {
-        if (!vm || typeof vm.addListener !== "function") return;
+        if (!vm || typeof vm.addListener !== 'function') return;
 
-        const handleStdout = (data) => {
-            const text = data?.message || data?.text || String(data || "");
+        const handleStdout = data => {
+            const text = data?.message || data?.text || String(data || '');
             if (text) {
                 const cleaned = text
-                    .replace(/\x1b\[[0-9;]*m/g, "")
-                    .replace(/\r\n?/g, "")
+                    .replace(/\x1b\[[0-9;]*m/g, '')
+                    .replace(/\r\n?/g, '')
                     .trim();
                 if (/^\.{1,}$/.test(cleaned)) return; // skip esptool connection dots
                 const pctMatch = text.match(/[[(](\d+)\s*%[\])]/);
-                const percent = pctMatch
-                    ? parseInt(pctMatch[1], 10)
-                    : undefined;
-                setUploadProgress((prev) => ({
+                const percent = pctMatch ?
+                    parseInt(pctMatch[1], 10) :
+                    undefined;
+                setUploadProgress(prev => ({
                     ...prev,
                     text: text,
-                    percent: percent !== undefined ? percent : prev.percent,
+                    percent: percent !== undefined ? percent : prev.percent
                 }));
-                setUploadLog((prev) => [...prev, text]);
+                setUploadLog(prev => [...prev, text]);
             }
         };
         const handleSuccess = () => {
             setIsUploading(false);
-            setUploadProgress({ stage: "", percent: 0, text: "" });
+            setUploadProgress({stage: '', percent: 0, text: ''});
             setUploadLog([]);
-            setFirmwareStatus("micropython");
-            props.onSetFirmwareMode("microPython");
+            setFirmwareStatus('micropython');
+            props.onSetFirmwareMode('microPython');
         };
-        const handleError = (data) => {
+        const handleError = data => {
             setIsUploading(false);
-            setUploadProgress({ stage: "", percent: 0, text: "" });
-            setFirmwareStatus("error");
+            setUploadProgress({stage: '', percent: 0, text: ''});
+            setFirmwareStatus('error');
             const msg =
-                data?.message || data?.params?.message || "Unknown error";
-            setUploadLog((prev) => [...prev, `Error: ${msg}`]);
-            setRunError((prev) => `${prev}Error: ${msg}\n`);
+                data?.message || data?.params?.message || 'Unknown error';
+            setUploadLog(prev => [...prev, `Error: ${msg}`]);
+            setRunError(prev => `${prev}Error: ${msg}\n`);
         };
 
-        vm.addListener("PERIPHERAL_UPLOAD_STDOUT", handleStdout);
-        vm.addListener("PERIPHERAL_UPLOAD_SUCCESS", handleSuccess);
-        vm.addListener("PERIPHERAL_UPLOAD_ERROR", handleError);
+        vm.addListener('PERIPHERAL_UPLOAD_STDOUT', handleStdout);
+        vm.addListener('PERIPHERAL_UPLOAD_SUCCESS', handleSuccess);
+        vm.addListener('PERIPHERAL_UPLOAD_ERROR', handleError);
 
         return () => {
-            vm.removeListener("PERIPHERAL_UPLOAD_STDOUT", handleStdout);
-            vm.removeListener("PERIPHERAL_UPLOAD_SUCCESS", handleSuccess);
-            vm.removeListener("PERIPHERAL_UPLOAD_ERROR", handleError);
+            vm.removeListener('PERIPHERAL_UPLOAD_STDOUT', handleStdout);
+            vm.removeListener('PERIPHERAL_UPLOAD_SUCCESS', handleSuccess);
+            vm.removeListener('PERIPHERAL_UPLOAD_ERROR', handleError);
         };
     }, [vm]);
 
     // Build sprite name list for the completion provider
-    const spriteNames = sprites
-        ? Object.values(sprites)
-              .map((s) => s.name)
-              .filter(Boolean)
-        : [];
+    const spriteNames = sprites ?
+        Object.values(sprites)
+            .map(s => s.name)
+            .filter(Boolean) :
+        [];
 
     const [runOutput, setRunOutput] = useState([]);
-    const [runError, setRunError] = useState("");
+    const [runError, setRunError] = useState('');
     const [isRunning, setIsRunning] = useState(false);
     const [realtimeMode, setRealtimeMode] = useState(false);
     const runnerRef = useRef(null);
@@ -270,85 +270,99 @@ const PythonIde = (props) => {
     const runIdRef = useRef(0);
     const commandCountRef = useRef(0);
 
-    const isBridgeCommandLine = (line) => {
+    const isBridgeCommandLine = line => {
         const parsed = parseNdjsonCommandLine(line);
         return Array.isArray(parsed) && parsed.length > 0;
     };
 
-    const appendOutputLine = (line) => {
+    const appendOutputLine = line => {
         if (isBridgeCommandLine(line)) {
-            console.log("[RAW_STDOUT_JSON]", line);
+            console.log('[RAW_STDOUT_JSON]', line);
             return;
         }
-        setRunOutput((prev) => {
-            const text = String(line || "");
+        setRunOutput(prev => {
+            const text = String(line || '');
             if (!text) return prev;
             const sprite = currentRunSpriteRef.current;
             if (sprite) {
                 return [
                     ...prev,
                     {
-                        type: "line",
+                        type: 'line',
                         spriteUrl: sprite.url,
                         spriteName: sprite.name,
-                        text,
-                    },
+                        text
+                    }
                 ];
             }
-            return [...prev, { type: "text", text }];
+            return [...prev, {type: 'text', text}];
         });
     };
 
-    const appendErrorLine = (line) => {
-        setRunError((prev) => {
-            const normalized = String(line || "");
+    const appendErrorLine = line => {
+        setRunError(prev => {
+            const normalized = String(line || '');
             return normalized ? `${prev}${normalized}\n` : prev;
         });
     };
 
     const fallbackTargetId =
         (stage && stage.id) ||
-        (sprites && Object.keys(sprites).length > 0
-            ? Object.keys(sprites)[0]
-            : null);
+        (sprites && Object.keys(sprites).length > 0 ?
+            Object.keys(sprites)[0] :
+            null);
     const resolvedTargetId = editingTarget || fallbackTargetId;
 
-    const resolveSpriteName = (targetId) => {
-        if (!targetId) return "Sprite";
-        if (stage && stage.id === targetId) return "Stage";
+    const resolveSpriteName = targetId => {
+        if (!targetId) return 'Sprite';
+        if (stage && stage.id === targetId) return 'Stage';
         return (
-            (sprites && sprites[targetId] && sprites[targetId].name) || "Sprite"
+            (sprites && sprites[targetId] && sprites[targetId].name) || 'Sprite'
         );
     };
 
-    const resolveTargetType = (targetId) =>
-        stage && stage.id === targetId ? "stage" : "sprite";
+    const resolveTargetType = targetId =>
+        (stage && stage.id === targetId ? 'stage' : 'sprite');
 
-    const resolveFileTreeItemByTargetId = (targetId) =>
-        Array.isArray(fileTree)
-            ? fileTree.find(
-                  (item) =>
-                      item &&
-                      item.type === "file" &&
+    const resolveFileTreeItemByTargetId = targetId =>
+        (Array.isArray(fileTree) ?
+            fileTree.find(
+                item =>
+                    item &&
+                      item.type === 'file' &&
                       item.targetId === targetId,
-              )
-            : null;
+            ) :
+            null);
 
     // If running in desktop/native backend, wire IPC stdout/stderr events from preload
     useEffect(() => {
         try {
-            if (pythonBackend === "native" && typeof window !== "undefined") {
+            if (pythonBackend === 'native' && typeof window !== 'undefined') {
                 const api = window.electronAPI;
-                if (api && typeof api.on === "function") {
-                    api.on("nomopro-python-stdout", (event, line) => {
+                if (api && typeof api.on === 'function') {
+                    api.on('nomopro-python-stdout', async (event, line) => {
                         const parsed = parseNdjsonCommandLine(line);
                         if (parsed.length) {
-                            parsed.forEach((cmd) => queueVmCommand(cmd));
+                            for (const cmd of parsed) {
+                                await queueVmCommand(cmd);
+                                const requestId = cmd._requestId;
+                                if (typeof requestId !== 'undefined') {
+                                    try {
+                                        const bridge = window.nomoproDesktopPython;
+                                        if (bridge && typeof bridge.writeStdin === 'function') {
+                                            const value = await deviceRpcResponse(requestId);
+                                            bridge.writeStdin(JSON.stringify({_requestId: requestId, value}));
+                                        }
+                                    } catch (e) {
+                                        appendErrorLine(`[RPC] ${e.message}\n`);
+                                    }
+                                }
+                            }
                         } else {
                             appendOutputLine(line);
                         }
                     });
-                    api.on("nomopro-python-stderr", (event, text) => {
+                    api.on('nomopro-python-stderr', (event, text) => {
                         appendErrorLine(text);
                     });
                 }
@@ -367,7 +381,7 @@ const PythonIde = (props) => {
         const fileName =
             fileNameOverride ||
             resolveFileNameByTarget(targetId, stage, sprites) ||
-            "script.py";
+            'script.py';
         const targetName = resolveSpriteName(targetId);
         const targetType = resolveTargetType(targetId);
         onInitTargetFile(
@@ -394,24 +408,24 @@ const PythonIde = (props) => {
     // created sprites/backdrops flow like Block mode (no manual refresh needed).
     useEffect(() => {
         const targets = buildFileList(stage, sprites);
-        targets.forEach((target) => ensureTargetFile(target.targetId));
+        targets.forEach(target => ensureTargetFile(target.targetId));
     }, [stage, sprites]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const selectedTargetId = activeTargetId || resolvedTargetId;
-    const activeFile = selectedTargetId
-        ? filesByTargetId[selectedTargetId]
-        : null;
+    const activeFile = selectedTargetId ?
+        filesByTargetId[selectedTargetId] :
+        null;
 
-    const code = activeFile ? activeFile.code : "";
-    const activeFileName = activeFile
-        ? activeFile.fileName
-        : resolveFileNameByTarget(selectedTargetId, stage, sprites);
+    const code = activeFile ? activeFile.code : '';
+    const activeFileName = activeFile ?
+        activeFile.fileName :
+        resolveFileNameByTarget(selectedTargetId, stage, sprites);
 
     const fileList = buildFileList(stage, sprites);
 
-    const handleCodeChange = (newCode) =>
+    const handleCodeChange = newCode =>
         onCodeChange(selectedTargetId, newCode);
-    const handleSelectFile = (targetId) => {
+    const handleSelectFile = targetId => {
         // Init file entry if not yet present (first time clicking this target)
         if (!filesByTargetId[targetId]) {
             const treeFile = resolveFileTreeItemByTargetId(targetId);
@@ -431,32 +445,32 @@ const PythonIde = (props) => {
         onSetActiveTarget(targetId);
     };
 
-    const queueVmCommand = (command) => {
+    const queueVmCommand = command => {
         const cmd = command && command.cmd;
         if (!cmd) return;
 
-        const devId = command && command.args && String(command.args[0] || "");
+        const devId = command && command.args && String(command.args[0] || '');
         if (devId && vm && vm.runtime) {
             const periph = vm.runtime.peripheralExtensions?.[devId];
             if (periph) {
                 const ready =
-                    typeof periph.isReady === "function"
-                        ? periph.isReady()
-                        : "?";
+                    typeof periph.isReady === 'function' ?
+                        periph.isReady() :
+                        '?';
                 const connected =
-                    typeof periph.isConnected === "function"
-                        ? periph.isConnected()
-                        : "?";
+                    typeof periph.isConnected === 'function' ?
+                        periph.isConnected() :
+                        '?';
                 console.log(
-                    "[QUEUE_CMD]",
+                    '[QUEUE_CMD]',
                     cmd,
-                    "isReady=",
+                    'isReady=',
                     ready,
-                    "isConnected=",
+                    'isConnected=',
                     connected,
                 );
             } else {
-                console.log("[QUEUE_CMD]", cmd, "peripheral NOT FOUND");
+                console.log('[QUEUE_CMD]', cmd, 'peripheral NOT FOUND');
             }
         }
 
@@ -464,10 +478,10 @@ const PythonIde = (props) => {
         // for REPORTER blocks, so the returned promise must resolve after bridge
         // execution to ensure _pendingDeviceResults are available.
         return executeBridgeCommand(vm, command, commandContextRef.current)
-            .then((result) => {
+            .then(result => {
                 if (result) commandContextRef.current = result;
             })
-            .catch((error) => {
+            .catch(error => {
                 const msg = (error && error.message) || String(error);
                 if (/soundEffects/i.test(msg)) return;
                 appendOutputLine(`[Bridge] ${msg}`);
@@ -475,12 +489,12 @@ const PythonIde = (props) => {
             });
     };
 
-    const deviceRpcResponse = async (requestId) => {
+    const deviceRpcResponse = async requestId => {
         for (let i = 0; i < 50; i++) {
             const results = drainPendingDeviceResults();
-            const match = results.find((r) => r.requestId === requestId);
+            const match = results.find(r => r.requestId === requestId);
             if (match) return match.value;
-            await new Promise((r) => setTimeout(r, 100));
+            await new Promise(r => setTimeout(r, 100));
         }
         throw new Error(`Device RPC timeout: requestId ${requestId}`);
     };
@@ -488,33 +502,33 @@ const PythonIde = (props) => {
     const createRunner = async () => {
         let candidates;
         if (
-            pythonBackend !== "pyodide" &&
-            typeof window !== "undefined" &&
+            pythonBackend !== 'pyodide' &&
+            typeof window !== 'undefined' &&
             window.electronAPI?.getPythonCandidates
         ) {
             try {
                 candidates = await window.electronAPI.getPythonCandidates();
             } catch (e) {
-                console.warn("[PythonIDE] Failed to get python candidates:", e);
+                console.warn('[PythonIDE] Failed to get python candidates:', e);
             }
         }
         return (
-            pythonBackend === "pyodide"
-                ? createPyodideRunner
-                : createDesktopPythonRunner
+            pythonBackend === 'pyodide' ?
+                createPyodideRunner :
+                createDesktopPythonRunner
         )({
             onStdoutLine: appendOutputLine,
-            onStderr: (text) => appendErrorLine(text),
+            onStderr: text => appendErrorLine(text),
             onCommand: queueVmCommand,
             onDeviceRpcResponse: deviceRpcResponse,
             executionTimeoutMs: realtimeMode ? 0 : undefined,
-            pythonCandidates: candidates,
+            pythonCandidates: candidates
         });
     };
 
-    const runTargetCode = async (targetId, scriptCode, label = "") => {
+    const runTargetCode = async (targetId, scriptCode, label = '') => {
         commandContextRef.current = {
-            selectedTargetId: targetId,
+            selectedTargetId: targetId
         };
         commandQueueRef.current = Promise.resolve();
         commandCountRef.current = 0;
@@ -523,25 +537,25 @@ const PythonIde = (props) => {
         const runner = await createRunner();
         if (!runner.isAvailable()) {
             throw new Error(
-                pythonBackend === "pyodide"
-                    ? "Pyodide runner is unavailable in this browser environment."
-                    : "Desktop Python runner is unavailable. Provide a preload bridge (window.nomoproDesktopPython.runPythonCode) or enable Node integration in Electron.",
+                pythonBackend === 'pyodide' ?
+                    'Pyodide runner is unavailable in this browser environment.' :
+                    'Desktop Python runner is unavailable. Provide a preload bridge (window.nomoproDesktopPython.runPythonCode) or enable Node integration in Electron.',
             );
         }
 
         const target =
             stage && stage.id === targetId ? stage : sprites?.[targetId];
-        const spriteUrl = target?.costume?.asset
-            ? getCostumeUrl(target.costume.asset)
-            : null;
-        currentRunSpriteRef.current = spriteUrl
-            ? { url: spriteUrl, name: label || target?.name || "script" }
-            : null;
+        const spriteUrl = target?.costume?.asset ?
+            getCostumeUrl(target.costume.asset) :
+            null;
+        currentRunSpriteRef.current = spriteUrl ?
+            {url: spriteUrl, name: label || target?.name || 'script'} :
+            null;
 
         runnerRef.current = runner;
 
         const codeToRun = normalizeRunnerCode(scriptCode);
-        const runLabel = label || "script";
+        const runLabel = label || 'script';
         appendOutputLine(runLabel);
         const result = await runner.run(codeToRun);
         await commandQueueRef.current;
@@ -556,13 +570,13 @@ const PythonIde = (props) => {
         if (isRunning) return;
 
         setRunOutput([]);
-        setRunError("");
+        setRunError('');
         setIsRunning(true);
         try {
             const result = await runTargetCode(
                 selectedTargetId,
                 code,
-                activeFileName || "script.py",
+                activeFileName || 'script.py',
             );
             if (result.exitCode !== 0) {
                 appendOutputLine(
@@ -586,29 +600,29 @@ const PythonIde = (props) => {
         if (isRunning) return;
 
         setRunOutput([]);
-        setRunError("");
+        setRunError('');
         setIsRunning(true);
 
         const targetsMap = new Map();
 
-        buildFileList(stage, sprites).forEach((target) => {
+        buildFileList(stage, sprites).forEach(target => {
             targetsMap.set(target.targetId, target);
         });
 
         if (Array.isArray(fileTree)) {
             fileTree
                 .filter(
-                    (item) =>
+                    item =>
                         item &&
-                        item.type === "file" &&
+                        item.type === 'file' &&
                         item.targetId &&
                         /\.py$/i.test(item.name),
                 )
-                .forEach((item) => {
+                .forEach(item => {
                     if (!targetsMap.has(item.targetId)) {
                         targetsMap.set(item.targetId, {
                             targetId: item.targetId,
-                            fileName: item.name,
+                            fileName: item.name
                         });
                     }
                 });
@@ -621,11 +635,11 @@ const PythonIde = (props) => {
                 const target = targets[index];
                 const targetId = target.targetId;
                 const targetFile = filesByTargetId[targetId];
-                const scriptCode = targetFile
-                    ? targetFile.code
-                    : /\.py$/i.test(target.fileName)
-                      ? createStandalonePythonCode(target.fileName)
-                      : createDefaultCode(
+                const scriptCode = targetFile ?
+                    targetFile.code :
+                    /\.py$/i.test(target.fileName) ?
+                        createStandalonePythonCode(target.fileName) :
+                        createDefaultCode(
                             resolveSpriteName(targetId),
                             resolveTargetType(targetId),
                         );
@@ -643,7 +657,7 @@ const PythonIde = (props) => {
                 }
             }
 
-            appendOutputLine("--- Run all finished ---");
+            appendOutputLine('--- Run all finished ---');
         } catch (error) {
             const msg = error.message || String(error);
             if (/^Pyodide execution (stopped|timed out)/i.test(msg)) {
@@ -660,25 +674,25 @@ const PythonIde = (props) => {
     const handleStop = () => {
         if (runnerRef.current) {
             runnerRef.current.stop();
-            appendOutputLine("Stop requested.");
+            appendOutputLine('Stop requested.');
         }
         setIsRunning(false);
     };
 
     const handleClear = () => {
         setRunOutput([]);
-        setRunError("");
+        setRunError('');
     };
 
     // Serial terminal handlers
-    const handleSerialSend = (data) => {
-        if (vm && deviceId && typeof vm.writeToPeripheral === "function") {
+    const handleSerialSend = data => {
+        if (vm && deviceId && typeof vm.writeToPeripheral === 'function') {
             vm.writeToPeripheral(deviceId, data);
         }
     };
 
-    const handleSerialBaudrate = (baudrate) => {
-        if (vm && deviceId && typeof vm.setPeripheralBaudrate === "function") {
+    const handleSerialBaudrate = baudrate => {
+        if (vm && deviceId && typeof vm.setPeripheralBaudrate === 'function') {
             vm.setPeripheralBaudrate(deviceId, baudrate);
         }
     };
@@ -692,84 +706,84 @@ const PythonIde = (props) => {
         micropythonRunnerRef.current = new MicropythonRunner();
     }
 
-    const isMicrobit = deviceId === "microbitV2" || deviceId === "microbit";
+    const isMicrobit = deviceId === 'microbitV2' || deviceId === 'microbit';
 
-    const handleUploadToDevice = async (code) => {
+    const handleUploadToDevice = async code => {
         if (!isDeviceConnected || !deviceId || !vm) {
-            throw new Error("Device not connected");
+            throw new Error('Device not connected');
         }
         if (isMicrobit) {
             // Micro:bit uses the same VM upload path as C++/Blocks mode
             // (WebSocket -> Link server -> microbit.js / uflash)
             setIsUploading(true);
             setUploadProgress({
-                stage: "upload",
+                stage: 'upload',
                 percent: 0,
-                text: "Uploading...",
+                text: 'Uploading...'
             });
             vm.uploadToPeripheral(deviceId, code);
             return;
         }
-        if (typeof vm.writeToPeripheral !== "function") {
-            throw new Error("Device not connected");
+        if (typeof vm.writeToPeripheral !== 'function') {
+            throw new Error('Device not connected');
         }
-        const onSend = (data) => vm.writeToPeripheral(deviceId, data);
+        const onSend = data => vm.writeToPeripheral(deviceId, data);
         micropythonRunnerRef.current.sendCode(code, onSend);
     };
 
-    const handleUploadAsMain = async (code) => {
+    const handleUploadAsMain = async code => {
         if (!isDeviceConnected || !deviceId || !vm) {
-            throw new Error("Device not connected");
+            throw new Error('Device not connected');
         }
         if (isMicrobit) {
             // Micro:bit does not have a separate "main.py" concept;
             // VM upload always writes to main.py via microfs.
             setIsUploading(true);
             setUploadProgress({
-                stage: "upload",
+                stage: 'upload',
                 percent: 0,
-                text: "Uploading...",
+                text: 'Uploading...'
             });
             vm.uploadToPeripheral(deviceId, code);
             return;
         }
-        if (typeof vm.writeToPeripheral !== "function") {
-            throw new Error("Device not connected");
+        if (typeof vm.writeToPeripheral !== 'function') {
+            throw new Error('Device not connected');
         }
-        const onSend = (data) => vm.writeToPeripheral(deviceId, data);
+        const onSend = data => vm.writeToPeripheral(deviceId, data);
         micropythonRunnerRef.current.uploadMain(code, onSend);
     };
 
     // MicroPython Upload Mode handlers (VM peripheral path)
     const getPeripheral = () =>
-        vm && vm.runtime && vm.runtime.peripheralExtensions
-            ? vm.runtime.peripheralExtensions[deviceId]
-            : null;
+        (vm && vm.runtime && vm.runtime.peripheralExtensions ?
+            vm.runtime.peripheralExtensions[deviceId] :
+            null);
 
     const handleDetectFirmware = () => {
         if (!peripheralName || !deviceId || !vm) return;
         setUploadLog([]);
-        setFirmwareStatus("checking");
+        setFirmwareStatus('checking');
 
         const peripheral = getPeripheral();
-        if (peripheral && typeof peripheral.micropythonUpload === "function") {
+        if (peripheral && typeof peripheral.micropythonUpload === 'function') {
             try {
-                peripheral.micropythonUpload("", {
+                peripheral.micropythonUpload('', {
                     detectOnly: true,
-                    board: deviceId,
+                    board: deviceId
                 });
             } catch (e) {
-                setFirmwareStatus("error");
+                setFirmwareStatus('error');
             }
             return;
         }
 
         // Fallback: VM path via _micropythonMode
         try {
-            vm.runtime._micropythonMode = "detect";
-            vm.uploadToPeripheral(deviceId, "");
+            vm.runtime._micropythonMode = 'detect';
+            vm.uploadToPeripheral(deviceId, '');
         } catch (e) {
-            setFirmwareStatus("error");
+            setFirmwareStatus('error');
         }
     };
 
@@ -778,50 +792,50 @@ const PythonIde = (props) => {
         setUploadLog([]);
         setIsUploading(true);
         setUploadProgress({
-            stage: "flash",
+            stage: 'flash',
             percent: 0,
-            text: "Starting flash...",
+            text: 'Starting flash...'
         });
 
         const BOARD_MAP = {
-            arduinoEsp32: "esp32",
-            arduinoEsp8266NodeMCU: "esp8266",
-            arduinoRaspberryPiPico: "rpi_pico",
-            microbitV2: "microbit",
+            arduinoEsp32: 'esp32',
+            arduinoEsp8266NodeMCU: 'esp8266',
+            arduinoRaspberryPiPico: 'rpi_pico',
+            microbitV2: 'microbit'
         };
-        const board = BOARD_MAP[deviceId] || deviceId || "esp32";
+        const board = BOARD_MAP[deviceId] || deviceId || 'esp32';
 
         const peripheral = getPeripheral();
-        if (peripheral && typeof peripheral.micropythonUpload === "function") {
+        if (peripheral && typeof peripheral.micropythonUpload === 'function') {
             try {
-                peripheral.micropythonUpload("", { flashOnly: true, board });
+                peripheral.micropythonUpload('', {flashOnly: true, board});
                 // Progress/completion handled by VM listeners (PERIPHERAL_UPLOAD_STDOUT/SUCCESS/ERROR)
                 return;
             } catch (e) {
                 setIsUploading(false);
-                setRunError((prev) => `${prev}Flash error: ${e.message}\n`);
+                setRunError(prev => `${prev}Flash error: ${e.message}\n`);
             }
             return;
         }
 
         // Fallback: VM path via _micropythonMode
         try {
-            vm.runtime._micropythonMode = "flash";
-            vm.uploadToPeripheral(deviceId, "");
+            vm.runtime._micropythonMode = 'flash';
+            vm.uploadToPeripheral(deviceId, '');
         } catch (e) {
             setIsUploading(false);
-            setRunError((prev) => `${prev}Flash error: ${e.message}\n`);
+            setRunError(prev => `${prev}Flash error: ${e.message}\n`);
         }
     };
 
     // Auto-detect firmware when switching to MicroPython upload mode
     useEffect(() => {
         if (
-            runtimeTarget === "micropython" &&
+            runtimeTarget === 'micropython' &&
             isDeviceConnected &&
             supportsMicroPython
         ) {
-            if (firmwareStatus === "unknown" || firmwareStatus === "error") {
+            if (firmwareStatus === 'unknown' || firmwareStatus === 'error') {
                 handleDetectFirmware();
             }
         }
@@ -832,46 +846,46 @@ const PythonIde = (props) => {
     const handleUploadRun = () => {
         if (!code || !isDeviceConnected || !deviceId || !vm) return;
         setUploadLog([]);
-        const onSend = (data) => vm.writeToPeripheral(deviceId, data);
+        const onSend = data => vm.writeToPeripheral(deviceId, data);
         micropythonRunnerRef.current.uploadMain(code, onSend, {
-            shouldReset: true,
+            shouldReset: true
         });
     };
 
     const handleUploadOnly = () => {
         if (!code || !isDeviceConnected || !deviceId || !vm) return;
         setUploadLog([]);
-        const onSend = (data) => vm.writeToPeripheral(deviceId, data);
+        const onSend = data => vm.writeToPeripheral(deviceId, data);
         micropythonRunnerRef.current.uploadMain(code, onSend, {
-            shouldReset: false,
+            shouldReset: false
         });
     };
 
     const handleStopBoard = () => {
-        if (vm && deviceId && typeof vm.writeToPeripheral === "function") {
-            vm.writeToPeripheral(deviceId, "\x04");
+        if (vm && deviceId && typeof vm.writeToPeripheral === 'function') {
+            vm.writeToPeripheral(deviceId, '\x04');
         }
     };
 
     // Auto-detect firmware when switching to MicroPython mode
 
     // Handler: Restore project from loaded JSON
-    const handleLoadProject = (data) => {
+    const handleLoadProject = data => {
         if (!data || !Array.isArray(data.fileList)) {
-            alert("Invalid project file: missing fileList");
+            alert('Invalid project file: missing fileList');
             return;
         }
         // Inisialisasi semua file
-        data.fileList.forEach((file) => {
+        data.fileList.forEach(file => {
             const code =
-                data.code && file.fileName === data.activeFile ? data.code : "";
+                data.code && file.fileName === data.activeFile ? data.code : '';
             // Fallback: jika data.code hanya untuk activeFile, file lain kosong
             props.onInitTargetFile(file.targetId, file.fileName, code);
         });
         // Set file aktif
         if (data.fileList.length > 0) {
             const active =
-                data.fileList.find((f) => f.fileName === data.activeFile) ||
+                data.fileList.find(f => f.fileName === data.activeFile) ||
                 data.fileList[0];
             props.onSetActiveTarget(active.targetId);
         }
@@ -957,8 +971,8 @@ PythonIde.propTypes = {
     stage: PropTypes.shape({}),
     vm: PropTypes.shape({
         runtime: PropTypes.shape({
-            getTargetById: PropTypes.func,
-        }),
+            getTargetById: PropTypes.func
+        })
     }).isRequired,
     deviceId: PropTypes.string,
     peripheralName: PropTypes.string,
@@ -966,10 +980,10 @@ PythonIde.propTypes = {
     firmwareMode: PropTypes.string,
     stageSizeMode: PropTypes.string,
     moduleLibraryItems: PropTypes.array,
-    onSetModuleLibraryItems: PropTypes.func,
+    onSetModuleLibraryItems: PropTypes.func
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
     activeTargetId: state.scratchGui.pythonIde.activeTargetId,
     filesByTargetId: state.scratchGui.pythonIde.filesByTargetId,
     fileTree: state.scratchGui.pythonIde.fileTree,
@@ -983,11 +997,11 @@ const mapStateToProps = (state) => ({
     firmwareMode: state.scratchGui.device.firmwareMode,
     stageSizeMode: state.scratchGui.stageSize.stageSize,
     peripheralName: state.scratchGui.connectionModal.peripheralName,
-    moduleLibraryItems: state.scratchGui.pythonIde.moduleLibraryItems,
+    moduleLibraryItems: state.scratchGui.pythonIde.moduleLibraryItems
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    onSetActiveTarget: (targetId) => dispatch(setActiveTarget(targetId)),
+const mapDispatchToProps = dispatch => ({
+    onSetActiveTarget: targetId => dispatch(setActiveTarget(targetId)),
     onInitTargetFile: (targetId, fileName, initialCode) =>
         dispatch(initTargetFile(targetId, fileName, initialCode)),
     onCodeChange: (targetId, code) =>
@@ -996,10 +1010,10 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(createFolder(folderName, parentId)),
     onCreateFile: (fileName, parentId, targetId, initialCode) =>
         dispatch(createFile(fileName, parentId, targetId, initialCode)),
-    onToggleFolderExpand: (folderId) => dispatch(toggleFolderExpand(folderId)),
+    onToggleFolderExpand: folderId => dispatch(toggleFolderExpand(folderId)),
     onRenameTreeItem: (itemId, newName) =>
         dispatch(renameTreeItem(itemId, newName)),
-    onDeleteTreeItem: (itemId) => dispatch(deleteTreeItem(itemId)),
+    onDeleteTreeItem: itemId => dispatch(deleteTreeItem(itemId)),
     onMoveTreeItem: (itemId, newParentId) =>
         dispatch(moveTreeItem(itemId, newParentId)),
     onDuplicateTreeItem: (itemId, newParentId) =>
@@ -1007,8 +1021,8 @@ const mapDispatchToProps = (dispatch) => ({
     onOpenExtensionLibrary: () => {
         dispatch(openExtensionLibrary());
     },
-    onSetModuleLibraryItems: (items) => dispatch(setModuleLibraryItems(items)),
-    onSetFirmwareMode: (mode) => dispatch(setFirmwareMode(mode)),
+    onSetModuleLibraryItems: items => dispatch(setModuleLibraryItems(items)),
+    onSetFirmwareMode: mode => dispatch(setFirmwareMode(mode))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PythonIde);

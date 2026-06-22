@@ -908,8 +908,12 @@ export const createBridgeCommandRegistry = ({
     extOb2AnalyseImage: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ob2scratch', 'analyseImageFrom');
+        execute: async ({vm, runtime, command}) => {
+            const result = await executeExtensionOpcode(vm, runtime, null, 'ob2scratch', 'analyseImageFrom');
+            if (command && typeof command._requestId !== 'undefined') {
+                return {_deviceResult: {requestId: command._requestId, value: result}};
+            }
+            return result;
         }
     },
     extOb2VideoToggle: {

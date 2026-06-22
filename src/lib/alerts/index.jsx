@@ -1,34 +1,34 @@
-import React from "react";
-import { FormattedMessage } from "react-intl";
-import keyMirror from "keymirror";
+import React from 'react';
+import {FormattedMessage} from 'react-intl';
+import keyMirror from 'keymirror';
 
-import successImage from "../assets/icon--success.svg";
+import successImage from '../assets/icon--success.svg';
 
 const AlertTypes = keyMirror({
     STANDARD: null,
     EXTENSION: null,
-    INLINE: null,
+    INLINE: null
 });
 
 const AlertLevels = {
-    SUCCESS: "success",
-    INFO: "info",
-    WARN: "warn",
+    SUCCESS: 'success',
+    INFO: 'info',
+    WARN: 'warn'
 };
 
 const alerts = [
     {
-        alertId: "createSuccess",
+        alertId: 'createSuccess',
         alertType: AlertTypes.STANDARD,
         clearList: [
-            "createSuccess",
-            "creating",
-            "createCopySuccess",
-            "creatingCopy",
-            "createRemixSuccess",
-            "creatingRemix",
-            "saveSuccess",
-            "saving",
+            'createSuccess',
+            'creating',
+            'createCopySuccess',
+            'creatingCopy',
+            'createRemixSuccess',
+            'creatingRemix',
+            'saveSuccess',
+            'saving'
         ],
         content: (
             <FormattedMessage
@@ -39,20 +39,20 @@ const alerts = [
         ),
         iconURL: successImage,
         level: AlertLevels.SUCCESS,
-        maxDisplaySecs: 5,
+        maxDisplaySecs: 5
     },
     {
-        alertId: "createCopySuccess",
+        alertId: 'createCopySuccess',
         alertType: AlertTypes.STANDARD,
         clearList: [
-            "createSuccess",
-            "creating",
-            "createCopySuccess",
-            "creatingCopy",
-            "createRemixSuccess",
-            "creatingRemix",
-            "saveSuccess",
-            "saving",
+            'createSuccess',
+            'creating',
+            'createCopySuccess',
+            'creatingCopy',
+            'createRemixSuccess',
+            'creatingRemix',
+            'saveSuccess',
+            'saving'
         ],
         content: (
             <FormattedMessage
@@ -63,20 +63,20 @@ const alerts = [
         ),
         iconURL: successImage,
         level: AlertLevels.SUCCESS,
-        maxDisplaySecs: 5,
+        maxDisplaySecs: 5
     },
     {
-        alertId: "createRemixSuccess",
+        alertId: 'createRemixSuccess',
         alertType: AlertTypes.STANDARD,
         clearList: [
-            "createSuccess",
-            "creating",
-            "createCopySuccess",
-            "creatingCopy",
-            "createRemixSuccess",
-            "creatingRemix",
-            "saveSuccess",
-            "saving",
+            'createSuccess',
+            'creating',
+            'createCopySuccess',
+            'creatingCopy',
+            'createRemixSuccess',
+            'creatingRemix',
+            'saveSuccess',
+            'saving'
         ],
         content: (
             <FormattedMessage
@@ -87,20 +87,20 @@ const alerts = [
         ),
         iconURL: successImage,
         level: AlertLevels.SUCCESS,
-        maxDisplaySecs: 5,
+        maxDisplaySecs: 5
     },
     {
-        alertId: "creating",
+        alertId: 'creating',
         alertType: AlertTypes.STANDARD,
         clearList: [
-            "createSuccess",
-            "creating",
-            "createCopySuccess",
-            "creatingCopy",
-            "createRemixSuccess",
-            "creatingRemix",
-            "saveSuccess",
-            "saving",
+            'createSuccess',
+            'creating',
+            'createCopySuccess',
+            'creatingCopy',
+            'createRemixSuccess',
+            'creatingRemix',
+            'saveSuccess',
+            'saving'
         ],
         content: (
             <FormattedMessage
@@ -110,20 +110,20 @@ const alerts = [
             />
         ),
         iconSpinner: true,
-        level: AlertLevels.SUCCESS,
+        level: AlertLevels.SUCCESS
     },
     {
-        alertId: "creatingCopy",
+        alertId: 'creatingCopy',
         alertType: AlertTypes.STANDARD,
         clearList: [
-            "createSuccess",
-            "creating",
-            "createCopySuccess",
-            "creatingCopy",
-            "createRemixSuccess",
-            "creatingRemix",
-            "saveSuccess",
-            "saving",
+            'createSuccess',
+            'creating',
+            'createCopySuccess',
+            'creatingCopy',
+            'createRemixSuccess',
+            'creatingRemix',
+            'saveSuccess',
+            'saving'
         ],
         content: (
             <FormattedMessage
@@ -133,20 +133,20 @@ const alerts = [
             />
         ),
         iconSpinner: true,
-        level: AlertLevels.SUCCESS,
+        level: AlertLevels.SUCCESS
     },
     {
-        alertId: "creatingRemix",
+        alertId: 'creatingRemix',
         alertType: AlertTypes.STANDARD,
         clearList: [
-            "createSuccess",
-            "creating",
-            "createCopySuccess",
-            "creatingCopy",
-            "createRemixSuccess",
-            "creatingRemix",
-            "saveSuccess",
-            "saving",
+            'createSuccess',
+            'creating',
+            'createCopySuccess',
+            'creatingCopy',
+            'createRemixSuccess',
+            'creatingRemix',
+            'saveSuccess',
+            'saving'
         ],
         content: (
             <FormattedMessage
@@ -156,19 +156,19 @@ const alerts = [
             />
         ),
         iconSpinner: true,
-        level: AlertLevels.SUCCESS,
+        level: AlertLevels.SUCCESS
     },
     {
-        alertId: "creatingError",
+        alertId: 'creatingError',
         clearList: [
-            "createSuccess",
-            "creating",
-            "createCopySuccess",
-            "creatingCopy",
-            "createRemixSuccess",
-            "creatingRemix",
-            "saveSuccess",
-            "saving",
+            'createSuccess',
+            'creating',
+            'createCopySuccess',
+            'creatingCopy',
+            'createRemixSuccess',
+            'creatingRemix',
+            'saveSuccess',
+            'saving'
         ],
         closeButton: true,
         content: (
@@ -178,19 +178,19 @@ const alerts = [
                 id="gui.alerts.creatingError"
             />
         ),
-        level: AlertLevels.WARN,
+        level: AlertLevels.WARN
     },
     {
-        alertId: "savingError",
+        alertId: 'savingError',
         clearList: [
-            "createSuccess",
-            "creating",
-            "createCopySuccess",
-            "creatingCopy",
-            "createRemixSuccess",
-            "creatingRemix",
-            "saveSuccess",
-            "saving",
+            'createSuccess',
+            'creating',
+            'createCopySuccess',
+            'creatingCopy',
+            'createRemixSuccess',
+            'creatingRemix',
+            'saveSuccess',
+            'saving'
         ],
         showDownload: true,
         showSaveNow: true,
@@ -202,12 +202,12 @@ const alerts = [
                 id="gui.alerts.savingError"
             />
         ),
-        level: AlertLevels.WARN,
+        level: AlertLevels.WARN
     },
     {
-        alertId: "saveSuccess",
+        alertId: 'saveSuccess',
         alertType: AlertTypes.INLINE,
-        clearList: ["saveSuccess", "saving", "savingError"],
+        clearList: ['saveSuccess', 'saving', 'savingError'],
         content: (
             <FormattedMessage
                 defaultMessage="Project saved."
@@ -217,12 +217,12 @@ const alerts = [
         ),
         iconURL: successImage,
         level: AlertLevels.SUCCESS,
-        maxDisplaySecs: 3,
+        maxDisplaySecs: 3
     },
     {
-        alertId: "saving",
+        alertId: 'saving',
         alertType: AlertTypes.INLINE,
-        clearList: ["saveSuccess", "saving", "savingError"],
+        clearList: ['saveSuccess', 'saving', 'savingError'],
         content: (
             <FormattedMessage
                 defaultMessage="Saving project…"
@@ -231,12 +231,12 @@ const alerts = [
             />
         ),
         iconSpinner: true,
-        level: AlertLevels.INFO,
+        level: AlertLevels.INFO
     },
     {
-        alertId: "cloudInfo",
+        alertId: 'cloudInfo',
         alertType: AlertTypes.STANDARD,
-        clearList: ["cloudInfo"],
+        clearList: ['cloudInfo'],
         content: (
             <FormattedMessage
                 defaultMessage="Please note, cloud variables only support numbers, not letters or symbols. {learnMoreLink}" // eslint-disable-line max-len
@@ -255,16 +255,16 @@ const alerts = [
                                 id="gui.alerts.cloudInfoLearnMore"
                             />
                         </a>
-                    ),
+                    )
                 }}
             />
         ),
         closeButton: true,
         level: AlertLevels.SUCCESS,
-        maxDisplaySecs: 15,
+        maxDisplaySecs: 15
     },
     {
-        alertId: "importingAsset",
+        alertId: 'importingAsset',
         alertType: AlertTypes.STANDARD,
         clearList: [],
         content: (
@@ -275,12 +275,12 @@ const alerts = [
             />
         ),
         iconSpinner: true,
-        level: AlertLevels.SUCCESS,
+        level: AlertLevels.SUCCESS
     },
     {
-        alertId: "workspaceIsEmpty",
+        alertId: 'workspaceIsEmpty',
         alertType: AlertTypes.STANDARD,
-        clearList: ["workspaceIsEmpty"],
+        clearList: ['workspaceIsEmpty'],
         closeButton: true,
         content: (
             <FormattedMessage
@@ -290,12 +290,12 @@ const alerts = [
             />
         ),
         level: AlertLevels.WARN,
-        maxDisplaySecs: 5,
+        maxDisplaySecs: 5
     },
     {
-        alertId: "workspaceIsNotEmpty",
+        alertId: 'workspaceIsNotEmpty',
         alertType: AlertTypes.STANDARD,
-        clearList: ["workspaceIsNotEmpty"],
+        clearList: ['workspaceIsNotEmpty'],
         closeButton: true,
         content: (
             <FormattedMessage
@@ -305,12 +305,12 @@ const alerts = [
             />
         ),
         level: AlertLevels.WARN,
-        maxDisplaySecs: 5,
+        maxDisplaySecs: 5
     },
     {
-        alertId: "uploadError",
+        alertId: 'uploadError',
         alertType: AlertTypes.STANDARD,
-        clearList: ["uploadError"],
+        clearList: ['uploadError'],
         closeButton: true,
         content: (
             <FormattedMessage
@@ -320,12 +320,12 @@ const alerts = [
             />
         ),
         level: AlertLevels.WARN,
-        maxDisplaySecs: 5,
+        maxDisplaySecs: 5
     },
     {
-        alertId: "uploadSuccess",
+        alertId: 'uploadSuccess',
         alertType: AlertTypes.STANDARD,
-        clearList: ["uploadSuccess", "uploadError"],
+        clearList: ['uploadSuccess', 'uploadError'],
         closeButton: true,
         content: (
             <FormattedMessage
@@ -335,12 +335,12 @@ const alerts = [
             />
         ),
         level: AlertLevels.SUCCESS,
-        maxDisplaySecs: 5,
+        maxDisplaySecs: 5
     },
     {
-        alertId: "selectADeviceFirst",
+        alertId: 'selectADeviceFirst',
         alertType: AlertTypes.STANDARD,
-        clearList: ["selectADeviceFirst"],
+        clearList: ['selectADeviceFirst'],
         closeButton: true,
         content: (
             <FormattedMessage
@@ -350,12 +350,12 @@ const alerts = [
             />
         ),
         level: AlertLevels.WARN,
-        maxDisplaySecs: 5,
+        maxDisplaySecs: 5
     },
     {
-        alertId: "connectAPeripheralFirst",
+        alertId: 'connectAPeripheralFirst',
         alertType: AlertTypes.STANDARD,
-        clearList: ["connectAPeripheralFirst"],
+        clearList: ['connectAPeripheralFirst'],
         closeButton: true,
         content: (
             <FormattedMessage
@@ -365,12 +365,12 @@ const alerts = [
             />
         ),
         level: AlertLevels.WARN,
-        maxDisplaySecs: 5,
+        maxDisplaySecs: 5
     },
     {
-        alertId: "pythonIdeWebDeviceConnectionDisabled",
+        alertId: 'pythonIdeWebDeviceConnectionDisabled',
         alertType: AlertTypes.STANDARD,
-        clearList: ["pythonIdeWebDeviceConnectionDisabled"],
+        clearList: ['pythonIdeWebDeviceConnectionDisabled'],
         closeButton: true,
         content: (
             <FormattedMessage
@@ -380,12 +380,12 @@ const alerts = [
             />
         ),
         level: AlertLevels.WARN,
-        maxDisplaySecs: 5,
+        maxDisplaySecs: 5
     },
     {
-        alertId: "codeEditorIsLocked",
+        alertId: 'codeEditorIsLocked',
         alertType: AlertTypes.STANDARD,
-        clearList: ["codeEditorIsLocked", "codeEditorIsUnlocked"],
+        clearList: ['codeEditorIsLocked', 'codeEditorIsUnlocked'],
         closeButton: true,
         content: (
             <FormattedMessage
@@ -395,12 +395,12 @@ const alerts = [
             />
         ),
         level: AlertLevels.WARN,
-        maxDisplaySecs: 5,
+        maxDisplaySecs: 5
     },
     {
-        alertId: "codeEditorIsUnlocked",
+        alertId: 'codeEditorIsUnlocked',
         alertType: AlertTypes.STANDARD,
-        clearList: ["codeEditorIsUnlocked", "codeEditorIslocked"],
+        clearList: ['codeEditorIsUnlocked', 'codeEditorIslocked'],
         closeButton: true,
         content: (
             <FormattedMessage
@@ -410,8 +410,8 @@ const alerts = [
             />
         ),
         level: AlertLevels.WARN,
-        maxDisplaySecs: 5,
-    },
+        maxDisplaySecs: 5
+    }
 ];
 
-export { alerts as default, AlertLevels, AlertTypes };
+export {alerts as default, AlertLevels, AlertTypes};

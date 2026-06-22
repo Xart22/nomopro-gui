@@ -1,60 +1,60 @@
-import PropTypes from "prop-types";
-import React from "react";
-import extensionLibraryContent from "../lib/libraries/extensions/index.jsx";
-import { compose } from "redux";
-import { connect } from "react-redux";
-import ReactModal from "react-modal";
-import VM from "openblock-vm";
-import { injectIntl, intlShape } from "react-intl";
+import PropTypes from 'prop-types';
+import React from 'react';
+import extensionLibraryContent from '../lib/libraries/extensions/index.jsx';
+import {compose} from 'redux';
+import {connect} from 'react-redux';
+import ReactModal from 'react-modal';
+import VM from 'openblock-vm';
+import {injectIntl, intlShape} from 'react-intl';
 
-import ErrorBoundaryHOC from "../lib/error-boundary-hoc.jsx";
-import { getIsError, getIsShowingProject } from "../reducers/project-state";
+import ErrorBoundaryHOC from '../lib/error-boundary-hoc.jsx';
+import {getIsError, getIsShowingProject} from '../reducers/project-state';
 import {
     activateTab,
     BLOCKS_TAB_INDEX,
     COSTUMES_TAB_INDEX,
     SOUNDS_TAB_INDEX,
-    PYTHON_TAB_INDEX,
-} from "../reducers/editor-tab";
-import { setBlockMode, setPythonMode } from "../reducers/input-mode";
+    PYTHON_TAB_INDEX
+} from '../reducers/editor-tab';
+import {setBlockMode, setPythonMode} from '../reducers/input-mode';
 import {
     MODE_BLOCK,
     MODE_PYTHON,
     hasBlockModeContent,
     hasPythonModeContent,
-    modeFromTab,
-} from "../lib/modeState";
-import { createDefaultCode } from "../reducers/python-ide";
-import { resetPythonIdeState } from "../reducers/python-ide";
-import { isWeb } from "../shared/env";
-import { clearDeviceId, clearDeviceName } from "../reducers/device";
+    modeFromTab
+} from '../lib/modeState';
+import {createDefaultCode} from '../reducers/python-ide';
+import {resetPythonIdeState} from '../reducers/python-ide';
+import {isWeb} from '../shared/env';
+import {clearDeviceId, clearDeviceName} from '../reducers/device';
 import {
     clearConnectionModalPeripheralId,
     clearConnectionModalPeripheralName,
-    setRealtimeConnection,
-} from "../reducers/connection-modal";
+    setRealtimeConnection
+} from '../reducers/connection-modal';
 
 import {
     closeCostumeLibrary,
     closeBackdropLibrary,
     closeTelemetryModal,
-    openExtensionLibrary,
-} from "../reducers/modals";
+    openExtensionLibrary
+} from '../reducers/modals';
 
-import FontLoaderHOC from "../lib/font-loader-hoc.jsx";
-import LocalizationHOC from "../lib/localization-hoc.jsx";
-import SBFileUploaderHOC from "../lib/sb-file-uploader-hoc.jsx";
-import ProjectFetcherHOC from "../lib/project-fetcher-hoc.jsx";
-import TitledHOC from "../lib/titled-hoc.jsx";
-import ProjectSaverHOC from "../lib/project-saver-hoc.jsx";
-import QueryParserHOC from "../lib/query-parser-hoc.jsx";
-import storage from "../lib/storage";
-import vmListenerHOC from "../lib/vm-listener-hoc.jsx";
-import vmManagerHOC from "../lib/vm-manager-hoc.jsx";
-import cloudManagerHOC from "../lib/cloud-manager-hoc.jsx";
+import FontLoaderHOC from '../lib/font-loader-hoc.jsx';
+import LocalizationHOC from '../lib/localization-hoc.jsx';
+import SBFileUploaderHOC from '../lib/sb-file-uploader-hoc.jsx';
+import ProjectFetcherHOC from '../lib/project-fetcher-hoc.jsx';
+import TitledHOC from '../lib/titled-hoc.jsx';
+import ProjectSaverHOC from '../lib/project-saver-hoc.jsx';
+import QueryParserHOC from '../lib/query-parser-hoc.jsx';
+import storage from '../lib/storage';
+import vmListenerHOC from '../lib/vm-listener-hoc.jsx';
+import vmManagerHOC from '../lib/vm-manager-hoc.jsx';
+import cloudManagerHOC from '../lib/cloud-manager-hoc.jsx';
 
-import GUIComponent from "../components/gui/gui.jsx";
-import { setIsScratchDesktop } from "../lib/isScratchDesktop.js";
+import GUIComponent from '../components/gui/gui.jsx';
+import {setIsScratchDesktop} from '../lib/isScratchDesktop.js';
 
 class GUI extends React.Component {
     state = {
@@ -63,10 +63,10 @@ class GUI extends React.Component {
         switchFromMode: MODE_BLOCK,
         switchToMode: MODE_BLOCK,
         showLandingPage: true,
-        showJuniorContent: false,
+        showJuniorContent: false
     };
 
-    isNeutralEditorTab = (tabIndex) =>
+    isNeutralEditorTab = tabIndex =>
         tabIndex === COSTUMES_TAB_INDEX || tabIndex === SOUNDS_TAB_INDEX;
 
     clearAllExtensions = () => {
@@ -76,7 +76,7 @@ class GUI extends React.Component {
         // Collect loaded extension IDs from internal state
         let loadedIds = [];
         try {
-            if (typeof manager.getExtensionURLs === "function") {
+            if (typeof manager.getExtensionURLs === 'function') {
                 const urls = manager.getExtensionURLs();
                 if (Array.isArray(urls)) loadedIds = urls;
             }
@@ -88,12 +88,12 @@ class GUI extends React.Component {
             try {
                 if (
                     manager._loadedExtensions &&
-                    typeof manager._loadedExtensions.keys === "function"
+                    typeof manager._loadedExtensions.keys === 'function'
                 ) {
                     loadedIds = Array.from(manager._loadedExtensions.keys());
                 } else if (
                     manager._loadedExtensions &&
-                    typeof manager._loadedExtensions === "object"
+                    typeof manager._loadedExtensions === 'object'
                 ) {
                     loadedIds = Object.keys(manager._loadedExtensions);
                 }
@@ -105,25 +105,25 @@ class GUI extends React.Component {
         if (loadedIds.length === 0) return;
 
         // Filter out core extensions that should always remain
-        const coreExtensions = ["pen"];
-        const toUnload = loadedIds.filter((id) => !coreExtensions.includes(id));
+        const coreExtensions = ['pen'];
+        const toUnload = loadedIds.filter(id => !coreExtensions.includes(id));
 
-        toUnload.forEach((id) => {
+        toUnload.forEach(id => {
             try {
-                if (typeof manager.unloadExtension === "function") {
+                if (typeof manager.unloadExtension === 'function') {
                     manager.unloadExtension(id);
                 }
             } catch (e) {
-                console.warn("Failed to unload extension:", id, e);
+                console.warn('Failed to unload extension:', id, e);
             }
         });
 
         // Force workspace/toolbox update after cleanup
         try {
-            if (typeof this.props.vm.emitWorkspaceUpdate === "function") {
+            if (typeof this.props.vm.emitWorkspaceUpdate === 'function') {
                 this.props.vm.emitWorkspaceUpdate();
             }
-            if (typeof this.props.vm.refreshWorkspace === "function") {
+            if (typeof this.props.vm.refreshWorkspace === 'function') {
                 this.props.vm.refreshWorkspace();
             }
         } catch (_) {
@@ -135,37 +135,37 @@ class GUI extends React.Component {
         const runtime = this.props.vm && this.props.vm.runtime;
         if (!runtime || !Array.isArray(runtime.targets)) return;
 
-        runtime.targets.forEach((target) => {
+        runtime.targets.forEach(target => {
             const blocks = target && target.blocks && target.blocks._blocks;
             if (!blocks) return;
 
             const blockIds = Object.keys(blocks);
             const topLevelIds = blockIds.filter(
-                (id) => blocks[id] && blocks[id].topLevel,
+                id => blocks[id] && blocks[id].topLevel,
             );
             const idsToDelete = topLevelIds.length > 0 ? topLevelIds : blockIds;
 
-            idsToDelete.forEach((id) => {
+            idsToDelete.forEach(id => {
                 if (
                     target.blocks &&
-                    typeof target.blocks.deleteBlock === "function"
+                    typeof target.blocks.deleteBlock === 'function'
                 ) {
                     target.blocks.deleteBlock(id);
                 }
             });
 
-            if (target.comments && typeof target.comments === "object") {
+            if (target.comments && typeof target.comments === 'object') {
                 target.comments = {};
             }
         });
 
-        if (typeof this.props.vm.emitWorkspaceUpdate === "function") {
+        if (typeof this.props.vm.emitWorkspaceUpdate === 'function') {
             this.props.vm.emitWorkspaceUpdate();
         }
-        if (typeof this.props.vm.emitTargetsUpdate === "function") {
+        if (typeof this.props.vm.emitTargetsUpdate === 'function') {
             this.props.vm.emitTargetsUpdate(false);
         }
-        if (typeof this.props.vm.refreshWorkspace === "function") {
+        if (typeof this.props.vm.refreshWorkspace === 'function') {
             this.props.vm.refreshWorkspace();
         }
     };
@@ -176,7 +176,7 @@ class GUI extends React.Component {
         this.setState(
             {
                 showSwitchModeDialog: false,
-                pendingTabIndex: null,
+                pendingTabIndex: null
             },
             () => {
                 if (currentMode === MODE_BLOCK) {
@@ -187,10 +187,10 @@ class GUI extends React.Component {
                     this.props.onResetPythonIdeState();
                 }
 
-                if (typeof nextTab === "number") {
-                    const nextMode = this.isNeutralEditorTab(nextTab)
-                        ? this.props.inputMode
-                        : modeFromTab(nextTab, PYTHON_TAB_INDEX);
+                if (typeof nextTab === 'number') {
+                    const nextMode = this.isNeutralEditorTab(nextTab) ?
+                        this.props.inputMode :
+                        modeFromTab(nextTab, PYTHON_TAB_INDEX);
                     if (nextMode !== this.props.inputMode) {
                         this.clearAllExtensions();
                     }
@@ -203,11 +203,11 @@ class GUI extends React.Component {
     handleCancelSwitchMode = () => {
         this.setState({
             showSwitchModeDialog: false,
-            pendingTabIndex: null,
+            pendingTabIndex: null
         });
     };
 
-    shouldConfirmModeSwitch = (nextMode) => {
+    shouldConfirmModeSwitch = nextMode => {
         if (nextMode === this.props.inputMode) {
             return false;
         }
@@ -222,10 +222,10 @@ class GUI extends React.Component {
         return nextMode === MODE_PYTHON && hasBlockModeContent(this.props.vm);
     };
 
-    handleActivateTab = (tab) => {
-        const nextMode = this.isNeutralEditorTab(tab)
-            ? this.props.inputMode
-            : modeFromTab(tab, PYTHON_TAB_INDEX);
+    handleActivateTab = tab => {
+        const nextMode = this.isNeutralEditorTab(tab) ?
+            this.props.inputMode :
+            modeFromTab(tab, PYTHON_TAB_INDEX);
         const isSwitchToPythonOnWeb =
             isWeb &&
             this.props.activeTabIndex !== PYTHON_TAB_INDEX &&
@@ -236,7 +236,7 @@ class GUI extends React.Component {
                 showSwitchModeDialog: true,
                 pendingTabIndex: tab,
                 switchFromMode: this.props.inputMode,
-                switchToMode: nextMode,
+                switchToMode: nextMode
             });
             return false;
         }
@@ -246,22 +246,22 @@ class GUI extends React.Component {
         }
 
         if (isSwitchToPythonOnWeb) {
-            const { vm, deviceId } = this.props;
+            const {vm, deviceId} = this.props;
             if (
                 vm &&
                 deviceId &&
-                typeof vm.disconnectPeripheral === "function"
+                typeof vm.disconnectPeripheral === 'function'
             ) {
                 try {
                     if (
-                        typeof vm.getPeripheralIsConnected !== "function" ||
+                        typeof vm.getPeripheralIsConnected !== 'function' ||
                         vm.getPeripheralIsConnected(deviceId)
                     ) {
                         vm.disconnectPeripheral(deviceId);
                     }
                 } catch (e) {
                     console.warn(
-                        "Failed to disconnect peripheral on Python tab switch:",
+                        'Failed to disconnect peripheral on Python tab switch:',
                         e,
                     );
                 }
@@ -274,28 +274,28 @@ class GUI extends React.Component {
         return true;
     };
 
-    handleMessage = (event) => {
-        if (event.data && event.data.type === "closeJuniorContent") {
+    handleMessage = event => {
+        if (event.data && event.data.type === 'closeJuniorContent') {
             this.handleCloseJuniorContent();
         }
     };
     handleSelectJuniorCode = () => {
-        this.setState({ showJuniorContent: true });
+        this.setState({showJuniorContent: true});
     };
     handleCloseJuniorContent = () => {
-        this.setState({ showJuniorContent: false });
+        this.setState({showJuniorContent: false});
     };
 
     handleShowLandingPage = () => {
-        this.setState({ showLandingPage: true });
+        this.setState({showLandingPage: true});
     };
 
     handleSelectBlockCode = () => {
-        this.setState({ showLandingPage: false });
+        this.setState({showLandingPage: false});
     };
 
     handleSelectPythonIDE = () => {
-        this.setState({ showLandingPage: false }, () => {
+        this.setState({showLandingPage: false}, () => {
             this.props.onActivateTab(PYTHON_TAB_INDEX);
         });
     };
@@ -305,17 +305,17 @@ class GUI extends React.Component {
 
     handleActivateSoundsTab = () => this.handleActivateTab(SOUNDS_TAB_INDEX);
 
-    componentDidMount() {
+    componentDidMount () {
         setIsScratchDesktop(this.props.isScratchDesktop);
         this.props.onStorageInit(storage);
         this.props.onVmInit(this.props.vm);
         // Listen for extension add/remove events from the Python IDE UI
-        this._onPythonIdeAdd = async (evt) => {
+        this._onPythonIdeAdd = async evt => {
             const name = evt && evt.detail && evt.detail.name;
             if (!name) return;
             // map name to extensionId by trying both id and localized defaultMessage
-            const match = (extensionLibraryContent || []).find((ext) => {
-                const extId = String(ext.extensionId || "");
+            const match = (extensionLibraryContent || []).find(ext => {
+                const extId = String(ext.extensionId || '');
                 const localized =
                     ext &&
                     ext.name &&
@@ -334,42 +334,42 @@ class GUI extends React.Component {
                 const manager = this.props.vm && this.props.vm.extensionManager;
                 if (!manager) return;
                 const isLoaded =
-                    typeof manager.isExtensionLoaded === "function"
-                        ? manager.isExtensionLoaded(extensionId)
-                        : false;
+                    typeof manager.isExtensionLoaded === 'function' ?
+                        manager.isExtensionLoaded(extensionId) :
+                        false;
                 if (isLoaded) {
                     // Extension already loaded (e.g. via ExtensionLibrary in Python tab)
-                    this.setState((prevState) => {
+                    this.setState(prevState => {
                         const items = prevState.moduleLibraryItems || [];
-                        if (items.some((m) => m.name === name)) {
-                            return { moduleLibraryItems: items };
+                        if (items.some(m => m.name === name)) {
+                            return {moduleLibraryItems: items};
                         }
                         return {
                             moduleLibraryItems: [
                                 ...items,
-                                { name, core: false },
-                            ],
+                                {name, core: false}
+                            ]
                         };
                     });
                     return;
                 }
-                if (typeof manager.loadExtensionIdSync === "function") {
+                if (typeof manager.loadExtensionIdSync === 'function') {
                     manager.loadExtensionIdSync(extensionId);
-                } else if (typeof manager.loadExtensionURL === "function") {
+                } else if (typeof manager.loadExtensionURL === 'function') {
                     await manager.loadExtensionURL(extensionId);
                 }
             } catch (e) {
                 // ignore load errors for now
-                console.warn("Failed to load extension", extensionId, e);
+                console.warn('Failed to load extension', extensionId, e);
             }
         };
 
-        this._onPythonIdeRemove = (evt) => {
+        this._onPythonIdeRemove = evt => {
             const name = evt && evt.detail && evt.detail.name;
             if (!name) return;
             // Unloading extensions is not universally supported; attempt if available
-            const match = (extensionLibraryContent || []).find((ext) => {
-                const extId = String(ext.extensionId || "");
+            const match = (extensionLibraryContent || []).find(ext => {
+                const extId = String(ext.extensionId || '');
                 const localized =
                     ext &&
                     ext.name &&
@@ -387,43 +387,43 @@ class GUI extends React.Component {
             try {
                 const manager = this.props.vm && this.props.vm.extensionManager;
                 if (!manager) return;
-                if (typeof manager.unloadExtension === "function") {
+                if (typeof manager.unloadExtension === 'function') {
                     manager.unloadExtension(extensionId);
                 } else {
                     // no-op; some runtimes don't support unloading
                     console.info(
-                        "Runtime does not support unloading extension:",
+                        'Runtime does not support unloading extension:',
                         extensionId,
                     );
                 }
             } catch (e) {
-                console.warn("Failed to unload extension", extensionId, e);
+                console.warn('Failed to unload extension', extensionId, e);
             }
         };
 
         window.addEventListener(
-            "python-ide-add-extension",
+            'python-ide-add-extension',
             this._onPythonIdeAdd,
         );
         window.addEventListener(
-            "python-ide-remove-extension",
+            'python-ide-remove-extension',
             this._onPythonIdeRemove,
         );
 
         // Preload Pyodide if user previously enabled it in Python IDE
         try {
-            const p = localStorage.getItem("python-ide-preload-pyodide");
-            if (p === "1") {
+            const p = localStorage.getItem('python-ide-preload-pyodide');
+            if (p === '1') {
                 // load pyodide script
-                const script = document.createElement("script");
+                const script = document.createElement('script');
                 script.src =
-                    "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js";
-                script.crossOrigin = "anonymous";
+                    'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js';
+                script.crossOrigin = 'anonymous';
                 script.onload = async () => {
                     try {
                         await loadPyodide({
                             indexURL:
-                                "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/",
+                                'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/'
                         });
                     } catch (e) {
                         // ignore
@@ -434,25 +434,25 @@ class GUI extends React.Component {
             }
         } catch (e) {}
 
-        window.addEventListener("message", this.handleMessage);
+        window.addEventListener('message', this.handleMessage);
     }
 
-    componentWillUnmount() {
-        window.removeEventListener("message", this.handleMessage);
+    componentWillUnmount () {
+        window.removeEventListener('message', this.handleMessage);
         if (this._onPythonIdeAdd) {
             window.removeEventListener(
-                "python-ide-add-extension",
+                'python-ide-add-extension',
                 this._onPythonIdeAdd,
             );
         }
         if (this._onPythonIdeRemove) {
             window.removeEventListener(
-                "python-ide-remove-extension",
+                'python-ide-remove-extension',
                 this._onPythonIdeRemove,
             );
         }
     }
-    componentDidUpdate(prevProps) {
+    componentDidUpdate (prevProps) {
         if (
             this.props.projectId !== prevProps.projectId &&
             this.props.projectId !== null
@@ -472,9 +472,9 @@ class GUI extends React.Component {
             this.props.onActivateBlocksTab();
         }
 
-        const expectedMode = this.isNeutralEditorTab(this.props.activeTabIndex)
-            ? this.props.inputMode
-            : modeFromTab(this.props.activeTabIndex, PYTHON_TAB_INDEX);
+        const expectedMode = this.isNeutralEditorTab(this.props.activeTabIndex) ?
+            this.props.inputMode :
+            modeFromTab(this.props.activeTabIndex, PYTHON_TAB_INDEX);
         if (
             this.props.inputMode === MODE_PYTHON &&
             expectedMode !== MODE_PYTHON
@@ -490,7 +490,7 @@ class GUI extends React.Component {
             this.props.onActivateBlocksTab();
         }
     }
-    render() {
+    render () {
         if (this.props.isError) {
             throw new Error(
                 `Error in Scratch GUI [location=${window.location}]: ${this.props.error}`,
@@ -577,22 +577,22 @@ GUI.propTypes = {
     vm: PropTypes.instanceOf(VM).isRequired,
     isRealtimeMode: PropTypes.bool,
     inputMode: PropTypes.string,
-    deviceId: PropTypes.string,
+    deviceId: PropTypes.string
 };
 
 GUI.defaultProps = {
     isScratchDesktop: false,
     onShowMessageBox: () => {},
-    onStorageInit: (storageInstance) =>
+    onStorageInit: storageInstance =>
         storageInstance.addOfficialScratchWebStores(),
     onProjectLoaded: () => {},
     onUpdateProjectId: () => {},
     onVmInit: (/* vm */) => {},
     onResetPythonIdeState: () => {},
-    juniorCodeUrl: "/junior-block-code/",
+    juniorCodeUrl: '/junior-block-code/'
 };
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
     const loadingState = state.scratchGui.projectState.loadingState;
     return {
         activeTabIndex: state.scratchGui.editorTab.activeTabIndex,
@@ -630,13 +630,13 @@ const mapStateToProps = (state) => {
         deviceId: state.scratchGui.device.deviceId,
         isRealtimeMode: state.scratchGui.programMode.isRealtimeMode,
         realtimeConnection: state.scratchGui.connectionModal.realtimeConnection,
-        inputMode: state.scratchGui.inputMode.mode,
+        inputMode: state.scratchGui.inputMode.mode
     };
 };
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
     onExtensionButtonClick: () => dispatch(openExtensionLibrary()),
-    onActivateTab: (tab) => {
+    onActivateTab: tab => {
         dispatch(activateTab(tab));
         if (modeFromTab(tab, PYTHON_TAB_INDEX) === MODE_PYTHON) {
             dispatch(setPythonMode());
@@ -660,7 +660,7 @@ const mapDispatchToProps = (dispatch) => ({
     onRequestCloseBackdropLibrary: () => dispatch(closeBackdropLibrary()),
     onRequestCloseCostumeLibrary: () => dispatch(closeCostumeLibrary()),
     onRequestCloseTelemetryModal: () => dispatch(closeTelemetryModal()),
-    onResetPythonIdeState: () => dispatch(resetPythonIdeState()),
+    onResetPythonIdeState: () => dispatch(resetPythonIdeState())
 });
 
 const ConnectedGUI = injectIntl(
@@ -672,7 +672,7 @@ const ConnectedGUI = injectIntl(
 // ability to compose reducers.
 const WrappedGui = compose(
     LocalizationHOC,
-    ErrorBoundaryHOC("Top Level App"),
+    ErrorBoundaryHOC('Top Level App'),
     FontLoaderHOC,
     QueryParserHOC,
     ProjectFetcherHOC,

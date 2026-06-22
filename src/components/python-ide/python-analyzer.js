@@ -32,7 +32,7 @@ try:
         'set_size', 'change_size',
         'play_sound', 'playSound', 'play_sound_until_done',
         'if_on_edge_bounce', 'bounce_on_edge',
-        'set_effect', 'change_effect',
+        'set_effect', 'change_effect', 'clear_effects',
         'pen_clear', 'pen_stamp', 'pen_down', 'pen_up',
         'set_pen_color', 'change_pen_color_param',
         'set_pen_color_param', 'change_pen_size', 'set_pen_size',
@@ -57,6 +57,67 @@ try:
         'trigger_sprite_clicked', 'trigger_stage_clicked',
         'trigger_backdrop_switch',
         'emit',
+        # ── Music ──
+        'play_drum', 'rest', 'play_note',
+        'set_instrument', 'set_tempo', 'change_tempo', 'get_tempo',
+        # ── Handpose ──
+        'handpose_video', 'handpose_set_transparency',
+        'handpose_set_ratio', 'handpose_get_x',
+        'handpose_get_y', 'handpose_get_z',
+        # ── Speech to Text ──
+        'listen', 'get_speech',
+        # ── Translate ──
+        'translate_text', 'get_viewer_language',
+        # ── OB2Scratch (Object Detection) ──
+        'ob2_analyse', 'ob2_video', 'ob2_show_bounding_boxes',
+        'ob2_set_threshold', 'ob2_get_counts', 'ob2_is_detected',
+        'ob2_get_count_of', 'ob2_get_objects',
+        # ── ML (Machine Learning) ──
+        'ml_add_example1', 'ml_add_example2', 'ml_add_example3',
+        'ml_add_example4', 'ml_add_example5', 'ml_train',
+        'ml_train_any', 'ml_get_label', 'ml_get_count',
+        'ml_reset', 'ml_reset_any', 'ml_download', 'ml_upload',
+        'ml_toggle', 'ml_set_interval', 'ml_video',
+        'ml_set_transparency', 'ml_set_input', 'ml_add_example',
+        'ml_classify', 'ml_set_confidence', 'ml_get_confidence', 'ml_clear',
+        # ── TM2Scratch (Teachable Machine) ──
+        'tm2_set_input', 'tm2_is_image_detected',
+        'tm2_image_confidence', 'tm2_set_image_model',
+        'tm2_classify_image', 'tm2_get_image_label',
+        'tm2_is_sound_detected', 'tm2_sound_confidence',
+        'tm2_set_sound_model', 'tm2_get_sound_label',
+        'tm2_toggle', 'tm2_set_interval', 'tm2_set_threshold',
+        'tm2_get_threshold', 'tm2_video', 'tm2_analyze_frame',
+        'tm2_get_image_width', 'tm2_get_image_height',
+        'tm2_set_label', 'tm2_load_model',
+        'tm2_get_label', 'tm2_get_confidence', 'tm2_get_class_n',
+        # ── TMPose2Scratch ──
+        'tmpose_is_detected', 'tmpose_confidence',
+        'tmpose_set_model', 'tmpose_classify', 'tmpose_get_label',
+        'tmpose_toggle', 'tmpose_set_interval', 'tmpose_set_threshold',
+        'tmpose_get_threshold', 'tmpose_video', 'tmpose_analyze_frame',
+        'tmpose_get_class_n',
+        # ── Device Control (Realtime Hardware) ──
+        'use', 'pinMode', 'digitalWrite', 'digitalRead',
+        'analogWrite', 'analogRead', 'servoWrite',
+        'serialPrint', 'serialPrintln', 'serialRead', 'serialAvailable',
+        'arduinoUno', 'arduinoNano', 'arduinoNano2',
+        'arduinoEsp32', 'arduinoEsp32Gbot', 'arduinoEsp32Nomobot',
+        'arduinoMega2560', 'arduinoELFUno',
+        'delay', 'millis', 'tone', 'noTone',
+        # ── Additional nomoproSDKPython helpers ──
+        'handpose_video_toggle', 'handpose_set_video_transparency',
+        'ob2_get_category', 'ob2_get_x', 'ob2_get_y',
+        'ob2_get_width', 'ob2_get_height',
+        'tm2_get_class_n', 'tm2_set_label', 'tm2_load_model',
+        'tm2_get_image_x', 'tm2_get_image_y',
+        'ml_when_example1_labeled', 'ml_when_example2_labeled',
+        'ml_when_example3_labeled', 'ml_when_example4_labeled',
+        'ml_when_example5_labeled', 'ml_when_classify_done',
+        'tm2_when_classify_done', 'tm2_when_image_loaded',
+        'tmpose_when_classify_done',
+        'trigger_key_pressed', 'trigger_stage_clicked',
+        'trigger_sprite_clicked', 'trigger_backdrop_switch',
     }
     all_builtins = builtins_names | nomopro_builtins
     
