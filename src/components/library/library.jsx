@@ -265,6 +265,7 @@ class LibraryComponent extends React.Component {
                                 programLanguage={dataItem.programLanguage}
                                 collaborator={dataItem.collaborator}
                                 description={dataItem.description}
+                                desktopOnly={dataItem.desktopOnly}
                                 disabled={dataItem.disabled}
                                 extensionId={dataItem.extensionId}
                                 deviceId={dataItem.deviceId}

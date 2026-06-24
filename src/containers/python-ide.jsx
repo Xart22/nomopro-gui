@@ -490,11 +490,11 @@ const PythonIde = props => {
     };
 
     const deviceRpcResponse = async requestId => {
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 75; i++) {
             const results = drainPendingDeviceResults();
             const match = results.find(r => r.requestId === requestId);
             if (match) return match.value;
-            await new Promise(r => setTimeout(r, 100));
+            await new Promise(r => setTimeout(r, 200));
         }
         throw new Error(`Device RPC timeout: requestId ${requestId}`);
     };

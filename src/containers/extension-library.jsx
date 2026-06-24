@@ -11,6 +11,8 @@ import {defineMessages, injectIntl, intlShape} from 'react-intl';
 
 import extensionLibraryContent from '../lib/libraries/extensions/index.jsx';
 
+import {isDesktop} from '../shared/env';
+
 import LibraryComponent from '../components/library/library.jsx';
 import extensionIcon from '../components/action-menu/icon--sprite.svg';
 
@@ -194,7 +196,8 @@ class ExtensionLibrary extends React.PureComponent {
             extensionLibraryThumbnailData = extensionLibraryContent.map(
                 extension => ({
                     rawURL: extension.iconURL || extensionIcon,
-                    ...extension
+                    ...extension,
+                    disabled: extension.desktopOnly && !isDesktop ? true : extension.disabled
                 })
             );
         } else {

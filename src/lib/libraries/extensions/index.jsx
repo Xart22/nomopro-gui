@@ -37,6 +37,9 @@ import handposeInsetIconURL from './handpose/handpose2scratch-small.png';
 import tmPoseIconUrl from './tmpose/tmpose2scratch.png';
 import tmPoseInsetIconURL from './tmpose/tmpose2scratch-small.png';
 
+import nlpIconUrl from './nlp/nlp.svg';
+import nlpInsetIconURL from './nlp/nlp-small.svg';
+
 // import ev3IconURL from './ev3/ev3.png';
 // import ev3InsetIconURL from './ev3/ev3-small.svg';
 // import ev3ConnectionIconURL from './ev3/ev3-hub-illustration.svg';
@@ -322,6 +325,30 @@ export default [
             />
         ),
         featured: true
+    },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="NLP"
+                description="Name for the NLP extension"
+                id="gui.extension.nlp.name"
+            />
+        ),
+        extensionId: 'nlp',
+        iconURL: nlpIconUrl,
+        insetIconURL: nlpInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Natural Language Processing blocks. Analyze text, train intents, classify, and more. Desktop only."
+                description="Description for the NLP extension"
+                id="gui.extension.nlp.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        internetConnectionRequired: false,
+        desktopOnly: true
     }
     // {
     //     name: 'LEGO MINDSTORMS EV3',

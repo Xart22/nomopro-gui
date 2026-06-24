@@ -55,7 +55,15 @@ class LibraryItemComponent extends React.PureComponent {
                 onClick={this.props.onClick}
             >
                 <div className={styles.featuredImageContainer}>
-                    {this.props.disabled ? (
+                    {this.props.disabled && this.props.desktopOnly ? (
+                        <div className={styles.desktopOnlyBadge}>
+                            <FormattedMessage
+                                defaultMessage="Available on nomokit-desktop"
+                                description="Label for extensions that require the desktop app"
+                                id="gui.extensionLibrary.desktopOnly"
+                            />
+                        </div>
+                    ) : this.props.disabled ? (
                         <div className={styles.comingSoonText}>
                             <FormattedMessage
                                 defaultMessage="Coming Soon"
@@ -513,6 +521,7 @@ LibraryItemComponent.propTypes = {
     bluetoothRequired: PropTypes.bool,
     collaborator: PropTypes.string,
     description: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    desktopOnly: PropTypes.bool,
     disabled: PropTypes.bool,
     extensionId: PropTypes.string,
     deviceId: PropTypes.string,

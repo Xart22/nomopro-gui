@@ -82,7 +82,9 @@ class LibraryItem extends React.PureComponent {
     handleKeyPress (e) {
         if (e.key === ' ' || e.key === 'Enter') {
             e.preventDefault();
-            this.props.onSelect(this.props.id);
+            if (!this.props.disabled) {
+                this.props.onSelect(this.props.id);
+            }
         }
     }
     handleMouseEnter () {
@@ -162,6 +164,7 @@ class LibraryItem extends React.PureComponent {
                 serialportRequired={this.props.serialportRequired}
                 collaborator={this.props.collaborator}
                 description={this.props.description}
+                desktopOnly={this.props.desktopOnly}
                 deviceId={this.props.deviceId}
                 disabled={this.props.disabled}
                 extensionId={this.props.extensionId}
@@ -212,6 +215,7 @@ LibraryItem.propTypes = {
     serialportRequired: PropTypes.bool,
     collaborator: PropTypes.string,
     description: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    desktopOnly: PropTypes.bool,
     deviceId: PropTypes.string,
     disabled: PropTypes.bool,
     extensionId: PropTypes.string,

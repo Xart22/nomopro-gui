@@ -1509,5 +1509,191 @@ export const createBridgeCommandRegistry = ({
                 VIDEO_STATE: String(args[0] || 'off')
             });
         }
+    },
+
+    // ─── NLP Extension ───────────────────────────────────────────────────────────
+
+    nlp_sentiment: {
+        resolveTarget: false,
+        emitTargetsUpdate: false,
+        execute: async ({command, args}) => {
+            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+            if (!api) return;
+            try {
+                const text = String(args[0] || '');
+                const value = await api.sentiment(text);
+                if (command && typeof command._requestId !== 'undefined') {
+                    return {_deviceResult: {requestId: command._requestId, value: value || 'neutral'}};
+                }
+            } catch (e) {}
+        }
+    },
+    nlp_classify: {
+        resolveTarget: false,
+        emitTargetsUpdate: false,
+        execute: async ({command, args}) => {
+            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+            if (!api) return;
+            try {
+                const text = String(args[0] || '');
+                const raw = api.classifySync ? api.classifySync(text) : await api.classify(text);
+                // classifySync now returns {label, confidence}; extract label
+                const value = (raw && raw.label) || raw || '';
+                if (command && typeof command._requestId !== 'undefined') {
+                    return {_deviceResult: {requestId: command._requestId, value: value || ''}};
+                }
+            } catch (e) {}
+        }
+    },
+    nlp_classifyResult: {
+        resolveTarget: false,
+        emitTargetsUpdate: false,
+        execute: async ({command, args}) => {
+            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+            if (!api) return;
+            try {
+                const text = String(args[0] || '');
+                const raw = await api.classifyResult(text);
+                const value = (raw && raw.label) || '';
+                if (command && typeof command._requestId !== 'undefined') {
+                    return {_deviceResult: {requestId: command._requestId, value: value || ''}};
+                }
+            } catch (e) {}
+        }
+    },
+    nlp_sentimentScore: {
+        resolveTarget: false,
+        emitTargetsUpdate: false,
+        execute: async ({command, args}) => {
+            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+            if (!api) return;
+            try {
+                const text = String(args[0] || '');
+                const value = await api.sentimentScore(text);
+                if (command && typeof command._requestId !== 'undefined') {
+                    return {_deviceResult: {requestId: command._requestId, value: typeof value === 'number' ? value : 0}};
+                }
+            } catch (e) {}
+        }
+    },
+    nlp_entities: {
+        resolveTarget: false,
+        emitTargetsUpdate: false,
+        execute: async ({command, args}) => {
+            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+            if (!api) return;
+            try {
+                const text = String(args[0] || '');
+                const value = await api.entities(text);
+                if (command && typeof command._requestId !== 'undefined') {
+                    return {_deviceResult: {requestId: command._requestId, value: value || ''}};
+                }
+            } catch (e) {}
+        }
+    },
+    nlp_train: {
+        resolveTarget: false,
+        emitTargetsUpdate: false,
+        execute: async ({command, args}) => {
+            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+            if (!api) return;
+            try {
+                const label = String(args[0] || '');
+                const examples = Array.isArray(args[1]) ? args[1] : [];
+                await api.train(label, examples);
+                if (command && typeof command._requestId !== 'undefined') {
+                    return {_deviceResult: {requestId: command._requestId, value: null}};
+                }
+            } catch (e) {}
+        }
+    },
+    nlp_similarity: {
+        resolveTarget: false,
+        emitTargetsUpdate: false,
+        execute: async ({command, args}) => {
+            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+            if (!api) return;
+            try {
+                const t1 = String(args[0] || '');
+                const t2 = String(args[1] || '');
+                const value = await api.similarity(t1, t2);
+                if (command && typeof command._requestId !== 'undefined') {
+                    return {_deviceResult: {requestId: command._requestId, value: typeof value === 'number' ? value : 0}};
+                }
+            } catch (e) {}
+        }
+    },
+    nlp_loadSampleIntents: {
+        resolveTarget: false,
+        emitTargetsUpdate: false,
+        execute: async ({command, args}) => {
+            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+            if (!api) return;
+            try {
+                await api.train('greeting', ['hi','hello','hey','good morning']);
+                await api.train('goodbye', ['bye','see you','farewell']);
+                await api.train('question', ['what','how','why','when','where']);
+                if (command && typeof command._requestId !== 'undefined') {
+                    return {_deviceResult: {requestId: command._requestId, value: null}};
+                }
+            } catch (e) {}
+        }
+    },
+    nlp_exportTraining: {
+        resolveTarget: false,
+        emitTargetsUpdate: false,
+        execute: async ({command}) => {
+            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+            if (!api) return;
+            try {
+                await api.exportTraining();
+                if (command && typeof command._requestId !== 'undefined') {
+                    return {_deviceResult: {requestId: command._requestId, value: null}};
+                }
+            } catch (e) {}
+        }
+    },
+    nlp_importTraining: {
+        resolveTarget: false,
+        emitTargetsUpdate: false,
+        execute: async ({command}) => {
+            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+            if (!api) return;
+            try {
+                await api.importTraining();
+                if (command && typeof command._requestId !== 'undefined') {
+                    return {_deviceResult: {requestId: command._requestId, value: null}};
+                }
+            } catch (e) {}
+        }
+    },
+    nlp_resetAll: {
+        resolveTarget: false,
+        emitTargetsUpdate: false,
+        execute: async ({command}) => {
+            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+            if (!api) return;
+            try {
+                await api.resetAll();
+                if (command && typeof command._requestId !== 'undefined') {
+                    return {_deviceResult: {requestId: command._requestId, value: null}};
+                }
+            } catch (e) {}
+        }
+    },
+    nlp_removeIntent: {
+        resolveTarget: false,
+        emitTargetsUpdate: false,
+        execute: async ({command, args}) => {
+            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+            if (!api) return;
+            try {
+                const label = String(args[0] || '');
+                await api.removeIntent(label);
+                if (command && typeof command._requestId !== 'undefined') {
+                    return {_deviceResult: {requestId: command._requestId, value: null}};
+                }
+            } catch (e) {}
+        }
     }
 });

@@ -342,6 +342,26 @@
     color: $ui-white;
 }
 
+.desktop-only-badge {
+    position: absolute;
+    background-color: $motion-primary;
+    border-radius: 1rem;
+    box-shadow: 0 0 0.5rem hsla(0, 0%, 0%, 0.25);
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: $ui-white;
+    white-space: nowrap;
+}
+
+[dir="ltr"] .desktop-only-badge {
+    transform: translate(calc(2 * $space), calc(2 * $space));
+}
+
+[dir="rtl"] .desktop-only-badge {
+    transform: translate(calc(-2 * $space), calc(2 * $space));
+}
+
 [dir="ltr"] .coming-soon-text {
     transform: translate(calc(2 * $space), calc(2 * $space));
 }
