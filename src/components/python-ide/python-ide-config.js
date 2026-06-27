@@ -39,7 +39,7 @@ export const UPLOAD_CONFIG = {
 };
 
 export const PYODIDE_CONFIG = {
-    VERSION: 'v0.23.4',
+    VERSION: 'v0.26.4',
     CDN: 'https://cdn.jsdelivr.net/pyodide'
 };
 

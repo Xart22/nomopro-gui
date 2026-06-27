@@ -1,7 +1,8 @@
 import {useState, useEffect} from 'react';
+import {PYODIDE_CONFIG} from './python-ide-config';
 
-const PYODIDE_URL = 'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js';
-const PYODIDE_INDEX_URL = 'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/';
+const PYODIDE_URL = `${PYODIDE_CONFIG.CDN}/${PYODIDE_CONFIG.VERSION}/full/pyodide.js`;
+const PYODIDE_INDEX_URL = `${PYODIDE_CONFIG.CDN}/${PYODIDE_CONFIG.VERSION}/full/`;
 
 const usePyodideLoader = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -14,7 +15,9 @@ const usePyodideLoader = () => {
                 return;
             }
             if (window.loadingPyodidePromise) {
+                setIsLoading(true);
                 await window.loadingPyodidePromise;
+                setIsLoading(false);
                 setIsReady(true);
                 return;
             }

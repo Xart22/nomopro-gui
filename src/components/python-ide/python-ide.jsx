@@ -125,8 +125,10 @@ const PythonIdeComponent = props => {
     const [isDesktopToolsOpen, setIsDesktopToolsOpen] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [syntaxStatus, setSyntaxStatus] = useState('');
-    const [, setPyodideLoading] = useState(false);
-    usePyodideLoader();
+    const [pyodideLoading, setPyodideLoading] = useState(false);
+    const {isLoading: pyodideIsLoading} = usePyodideLoader();
+    const [editorReady, setEditorReady] = useState(false);
+    const isPythonEnvironmentReady = editorReady && !pyodideIsLoading;
     const [cursorPos, setCursorPos] = useState({line: 1, column: 1});
     const [zoomLevel, setZoomLevel] = useState(100);
 
@@ -311,6 +313,7 @@ const PythonIdeComponent = props => {
     const handleEditorDidMount = (editor, monaco) => {
         editorRef.current = editor;
         monacoRef.current = monaco;
+        setEditorReady(true);
 
         const glyphClass = styles['error-glyph'] || 'error-glyph';
         const validator = createSyntaxValidator(
@@ -320,17 +323,20 @@ const PythonIdeComponent = props => {
             glyphClass,
         );
 
-        const runValidation = async () => {
-            let retries = 0;
-            while (!window.pyodide && retries < 20) {
-                await new Promise(r => setTimeout(r, 500));
-                retries++;
+        // Defer initial validation: wait for Pyodide + one frame so UI settles
+        const runInitialValidation = async () => {
+            if (!window.pyodide && window.loadingPyodidePromise) {
+                await window.loadingPyodidePromise;
             }
-            validator(editor.getValue(), setSyntaxStatus);
+            // Wait one frame so the UI can paint before WASM work
+            await new Promise(r => requestAnimationFrame(r));
+            try {
+                validator(editor.getValue(), setSyntaxStatus);
+            } catch (err) {
+                console.error('[PythonIDE] Initial validation error:', err);
+            }
         };
-        runValidation().catch(err => {
-            console.error('[PythonIDE] Initial validation error:', err);
-        });
+        runInitialValidation();
 
         editor.onDidChangeModelContent(() => {
             if (validateTimerRef.current) {
@@ -967,28 +973,40 @@ const PythonIdeComponent = props => {
                             )}
                         </Box>
                     ) : (
-                        <CodeEditor
-                            language="python"
-                            value={code}
-                            theme="vs"
-                            options={{
-                                readOnly: false,
-                                contextmenu: true,
-                                minimap: {enabled: false},
-                                lineNumbers: 'on',
-                                glyphMargin: true,
-                                suggestOnTriggerCharacters: true,
-                                quickSuggestions: true,
-                                wordBasedSuggestions: false
-                            }}
-                            onChange={onCodeChange}
-                            editorWillMount={handleEditorWillMount}
-                            editorDidMount={handleEditorDidMount}
-                        />
+                        <Box className={styles.editorWrapperWithLoading}>
+                            <CodeEditor
+                                language="python"
+                                value={code}
+                                theme="vs"
+                                options={{
+                                    readOnly: false,
+                                    contextmenu: true,
+                                    minimap: {enabled: false},
+                                    lineNumbers: 'on',
+                                    glyphMargin: true,
+                                    suggestOnTriggerCharacters: true,
+                                    quickSuggestions: true,
+                                    wordBasedSuggestions: false
+                                }}
+                                onChange={onCodeChange}
+                                editorWillMount={handleEditorWillMount}
+                                editorDidMount={handleEditorDidMount}
+                            />
+                            {!isPythonEnvironmentReady && (
+                                <Box className={styles.loadingOverlay}>
+                                    <Box className={styles.loadingSpinner} />
+                                    <Box className={styles.loadingText}>
+                                        Loading Python environment...
+                                    </Box>
+                                </Box>
+                            )}
+                        </Box>
                     )}
 
                     <Box className={styles.editorStatusBar}>
-                        {syntaxStatus || 'Syntax: unknown'} — Ln{' '}
+                        {pyodideIsLoading ?
+                            'Loading Python runtime...' :
+                            syntaxStatus || 'Syntax: unknown'} — Ln{' '}
                         {cursorPos.line}, Col {cursorPos.column}
                     </Box>
 

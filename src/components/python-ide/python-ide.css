@@ -398,6 +398,65 @@ e.g. STAGE_DIMENSION_DEFAULTS in lib/screen-utils.js */
     min-height: 0;
 }
 
+.editor-wrapper-with-loading {
+    -webkit-box-flex: 1;
+    -webkit-flex-grow: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-overlay {
+    position: absolute;
+    inset: 0;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.85);
+    z-index: 10;
+    gap: 16px;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e0e0e0;
+    border-top-color: #4C97FF;
+    border-radius: 50%;
+    -webkit-animation: spin 0.8s linear infinite;
+    animation: spin 0.8s linear infinite;
+}
+
+@-webkit-keyframes spin {
+    to { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+}
+
+@keyframes spin {
+    to { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 14px;
+    color: #575E75;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
 .image-preview-wrapper {
     display: -webkit-box;
     display: -webkit-flex;

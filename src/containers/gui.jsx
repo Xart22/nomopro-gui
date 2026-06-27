@@ -53,6 +53,7 @@ import vmListenerHOC from '../lib/vm-listener-hoc.jsx';
 import vmManagerHOC from '../lib/vm-manager-hoc.jsx';
 import cloudManagerHOC from '../lib/cloud-manager-hoc.jsx';
 
+import {PYODIDE_CONFIG} from '../components/python-ide/python-ide-config';
 import GUIComponent from '../components/gui/gui.jsx';
 import {setIsScratchDesktop} from '../lib/isScratchDesktop.js';
 
@@ -410,34 +411,42 @@ class GUI extends React.Component {
             this._onPythonIdeRemove,
         );
 
-        // Preload Pyodide if user previously enabled it in Python IDE
-        try {
-            const p = localStorage.getItem('python-ide-preload-pyodide');
-            if (p === '1') {
-                // load pyodide script
+        // Preload Pyodide early so it's ready (or already loading) by
+        // the time user opens Python IDE.  Delay 2s to let UI settle first.
+        this._preloadPyodideTimer = setTimeout(() => {
+            if (window.pyodide || window.loadingPyodidePromise) return;
+            const scriptUrl = `${PYODIDE_CONFIG.CDN}/${PYODIDE_CONFIG.VERSION}/full/pyodide.js`;
+            const indexUrl = `${PYODIDE_CONFIG.CDN}/${PYODIDE_CONFIG.VERSION}/full/`;
+            window.loadingPyodidePromise = new Promise((resolve, reject) => {
                 const script = document.createElement('script');
-                script.src =
-                    'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js';
+                script.src = scriptUrl;
                 script.crossOrigin = 'anonymous';
                 script.onload = async () => {
                     try {
-                        await loadPyodide({
-                            indexURL:
-                                'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/'
+                        const pyodide = await window.loadPyodide({
+                            indexURL: indexUrl
                         });
+                        window.pyodide = pyodide;
+                        resolve(pyodide);
                     } catch (e) {
-                        // ignore
+                        reject(e);
                     }
                 };
-                script.onerror = () => {};
+                script.onerror = () => {
+                    window.loadingPyodidePromise = null;
+                    reject(new Error('Failed to load Pyodide'));
+                };
                 document.head.appendChild(script);
-            }
-        } catch (e) {}
+            });
+        }, 2000);
 
         window.addEventListener('message', this.handleMessage);
     }
 
     componentWillUnmount () {
+        if (this._preloadPyodideTimer) {
+            clearTimeout(this._preloadPyodideTimer);
+        }
         window.removeEventListener('message', this.handleMessage);
         if (this._onPythonIdeAdd) {
             window.removeEventListener(

@@ -213,24 +213,28 @@ const createSyntaxValidator = (
         if (window.loadingPyodidePromise) return window.loadingPyodidePromise;
 
         setPyodideLoading(true);
+        const scriptUrl = `${PYODIDE_CONFIG.CDN}/${PYODIDE_CONFIG.VERSION}/full/pyodide.js`;
+        const indexUrl = `${PYODIDE_CONFIG.CDN}/${PYODIDE_CONFIG.VERSION}/full/`;
         window.loadingPyodidePromise = new Promise((resolve, reject) => {
             const script = document.createElement('script');
-            script.src = `${PYODIDE_CONFIG.CDN}/${PYODIDE_CONFIG.VERSION}/full/pyodide.js`;
+            script.src = scriptUrl;
             script.crossOrigin = 'anonymous';
             script.onload = async () => {
                 try {
                     const pyodide = await loadPyodide({
-                        indexURL: `${PYODIDE_CONFIG.CDN}/${PYODIDE_CONFIG.VERSION}/full/`
+                        indexURL: indexUrl
                     });
                     window.pyodide = pyodide;
                     setPyodideLoading(false);
                     resolve(pyodide);
                 } catch (err) {
+                    setPyodideLoading(false);
                     reject(err);
                 }
             };
             script.onerror = err => {
                 setPyodideLoading(false);
+                window.loadingPyodidePromise = null;
                 reject(err || new Error('Failed to load pyodide script'));
             };
             document.head.appendChild(script);
