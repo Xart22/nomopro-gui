@@ -332,7 +332,7 @@ class GUI extends React.Component {
         this.props.onVmInit(this.props.vm);
         // Relay the nested nomokit-ml iframe's postMessage protocol to the desktop Python IPC.
         // No-op in web mode (window.nomoproDesktopPython is undefined there).
-        startNomokitMlRelay();
+        this._stopNomokitMlRelay = startNomokitMlRelay();
         // Listen for extension add/remove events from the Python IDE UI
         this._onPythonIdeAdd = async evt => {
             const name = evt && evt.detail && evt.detail.name;
@@ -469,6 +469,9 @@ class GUI extends React.Component {
     componentWillUnmount () {
         if (this._preloadPyodideTimer) {
             clearTimeout(this._preloadPyodideTimer);
+        }
+        if (this._stopNomokitMlRelay) {
+            this._stopNomokitMlRelay();
         }
         window.removeEventListener('message', this.handleMessage);
         if (this._onPythonIdeAdd) {
