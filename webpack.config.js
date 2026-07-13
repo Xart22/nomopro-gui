@@ -29,7 +29,8 @@ const base = {
     devServer: {
         contentBase: [
             path.resolve(__dirname, 'build'),
-            path.resolve(__dirname, 'nomokitjr')
+            path.resolve(__dirname, 'nomokitjr'),
+            path.resolve(__dirname, 'nomokit-ml')
         ],
         host: '0.0.0.0',
         port: process.env.PORT || 8601
@@ -230,6 +231,12 @@ module.exports = [
                     from: 'nomokitjr',
                     to: 'nomokitjr'
                 }
+            ]),
+            new CopyWebpackPlugin([
+                {
+                    from: 'nomokit-ml',
+                    to: 'nomokit-ml'
+                }
             ])
         ])
     })
@@ -278,6 +285,12 @@ module.exports = [
                     {
                         from: 'nomokitjr',
                         to: 'nomokitjr'
+                    }
+                ]),
+                new CopyWebpackPlugin([
+                    {
+                        from: 'nomokit-ml',
+                        to: 'nomokit-ml'
                     }
                 ]),
                 // Include library JSON files for scratch-desktop to use for downloading
