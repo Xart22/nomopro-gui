@@ -67,23 +67,38 @@ const startNomokitMlRelay = () => {
                 const installed = new Set((listRes.packages || []).map(p => p.name));
                 const missing = (data.packages || []).filter(pkg => !installed.has(pkg));
                 for (const pkg of missing) {
+                    // classify() returns {success, classification: {level, reason}} -- see
+                    // nomopro-desktop's src/main/safe-install.js. `level` is one of
+                    // safe | risky | blocked | unknown. This step is best-effort: if classify
+                    // itself throws, log/ignore and proceed with the install -- a classify
+                    // outage must not block a legitimate install.
+                    let level = null;
+                    let reason = null;
                     if (api.safeInstall && typeof api.safeInstall.classify === 'function') {
                         try {
-                            const classification = await api.safeInstall.classify(pkg);
-                            if (classification && classification.risk && classification.risk !== 'safe') {
-                                reply({
-                                    type: `${NS}pip-progress`,
-                                    id: data.id,
-                                    package: pkg,
-                                    line: `Warning: ${pkg} is classified as ${classification.risk} risk.`
-                                });
+                            const classifyRes = await api.safeInstall.classify(pkg);
+                            if (classifyRes && classifyRes.classification) {
+                                level = classifyRes.classification.level;
+                                reason = classifyRes.classification.reason;
                             }
                         } catch (_) {
                             // classify is best-effort: a failure here must not block the install.
                         }
                     }
+                    if (level === 'blocked') {
+                        done(false, reason || `${pkg} is blocked and cannot be installed.`);
+                        return;
+                    }
+                    if (level === 'risky' || level === 'unknown') {
+                        reply({
+                            type: `${NS}pip-progress`,
+                            id: data.id,
+                            package: pkg,
+                            line: `Warning: ${pkg} is classified as ${level} risk.`
+                        });
+                    }
                     reply({type: `${NS}pip-progress`, id: data.id, package: pkg, line: `Installing ${pkg}...`});
-                    const res = await api.pip.install({packageName: pkg});
+                    const res = await api.pip.install(pkg);
                     if (!res || res.success === false) {
                         done(false, (res && res.error) || `Failed to install ${pkg}`);
                         return;

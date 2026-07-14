@@ -258,7 +258,12 @@ describe('nomokit-ml-relay', () => {
             const install = jest.fn(() => Promise.resolve({success: true}));
             window.electronAPI = {
                 pip: {list: () => Promise.resolve({packages: [{name: 'onnxruntime'}]}), install},
-                safeInstall: {classify: () => Promise.resolve({risk: 'safe'})}
+                safeInstall: {
+                    classify: () => Promise.resolve({
+                        success: true,
+                        classification: {level: 'safe', reason: 'Known pure-Python package'}
+                    })
+                }
             };
             stopRelay = startNomokitMlRelay();
             const iframeWindow = createFakeIframeWindow();
@@ -270,7 +275,10 @@ describe('nomokit-ml-relay', () => {
             await flushPromises();
 
             expect(install).toHaveBeenCalledTimes(1);
-            expect(install).toHaveBeenCalledWith(expect.objectContaining({packageName: 'ultralytics'}));
+            // The real preload's install(packageName, options) takes a bare STRING as its first
+            // argument (nomopro-desktop/preload.js:152) -- not an object. Asserting the object
+            // shape here would ratify the bug this test guards against.
+            expect(install).toHaveBeenCalledWith('ultralytics');
             expect(iframeWindow.postMessage).toHaveBeenCalledWith(
                 expect.objectContaining({type: 'nomokit-ml:pip-done', id: 'X', ok: true}),
                 '*'
@@ -320,9 +328,12 @@ describe('nomokit-ml-relay', () => {
             expect(progressCalls).toEqual(['onnxruntime', 'ultralytics']);
         });
 
-        test('surfaces the safeInstall risk classification as a pip-progress warning before installing', async () => {
+        test('surfaces a risky classification as a pip-progress warning and still installs', async () => {
             const install = jest.fn(() => Promise.resolve({success: true}));
-            const classify = jest.fn(() => Promise.resolve({risk: 'high'}));
+            const classify = jest.fn(() => Promise.resolve({
+                success: true,
+                classification: {level: 'risky', reason: 'Package requires native extension build (compiler/toolchain)'}
+            }));
             window.electronAPI = {
                 pip: {list: () => Promise.resolve({packages: []}), install},
                 safeInstall: {classify}
@@ -341,7 +352,74 @@ describe('nomokit-ml-relay', () => {
                 expect.objectContaining({
                     type: 'nomokit-ml:pip-progress',
                     package: 'ultralytics',
-                    line: expect.stringContaining('high')
+                    line: expect.stringContaining('risky')
+                }),
+                '*'
+            );
+            expect(install).toHaveBeenCalledWith('ultralytics');
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({type: 'nomokit-ml:pip-done', id: 'X', ok: true}),
+                '*'
+            );
+        });
+
+        test('surfaces an unknown classification as a pip-progress warning and still installs', async () => {
+            const install = jest.fn(() => Promise.resolve({success: true}));
+            const classify = jest.fn(() => Promise.resolve({
+                success: true,
+                classification: {level: 'unknown', reason: 'Unknown package type - could require native build tools'}
+            }));
+            window.electronAPI = {
+                pip: {list: () => Promise.resolve({packages: []}), install},
+                safeInstall: {classify}
+            };
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe(
+                {type: 'nomokit-ml:pip-ensure', id: 'X', packages: ['ultralytics']},
+                iframeWindow
+            );
+            await flushPromises();
+
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: 'nomokit-ml:pip-progress',
+                    package: 'ultralytics',
+                    line: expect.stringContaining('unknown')
+                }),
+                '*'
+            );
+            expect(install).toHaveBeenCalledWith('ultralytics');
+        });
+
+        test('a blocked classification is NOT installed; replies pip-done ok: false with the reason', async () => {
+            const install = jest.fn();
+            const blockedReason = "Package 'torch-nightly' is not compatible with embedded Python runtime";
+            const classify = jest.fn(() => Promise.resolve({
+                success: true,
+                classification: {level: 'blocked', reason: blockedReason}
+            }));
+            window.electronAPI = {
+                pip: {list: () => Promise.resolve({packages: []}), install},
+                safeInstall: {classify}
+            };
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe(
+                {type: 'nomokit-ml:pip-ensure', id: 'X', packages: ['torch-nightly']},
+                iframeWindow
+            );
+            await flushPromises();
+
+            expect(install).not.toHaveBeenCalled();
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: 'nomokit-ml:pip-done',
+                    id: 'X',
+                    ok: false,
+                    error: blockedReason
                 }),
                 '*'
             );
@@ -363,7 +441,7 @@ describe('nomokit-ml-relay', () => {
             );
             await flushPromises();
 
-            expect(install).toHaveBeenCalledWith(expect.objectContaining({packageName: 'ultralytics'}));
+            expect(install).toHaveBeenCalledWith('ultralytics');
             expect(iframeWindow.postMessage).toHaveBeenCalledWith(
                 expect.objectContaining({type: 'nomokit-ml:pip-done', id: 'X', ok: true}),
                 '*'
@@ -372,7 +450,7 @@ describe('nomokit-ml-relay', () => {
 
         test('replies pip-done ok: false with the install error and stops at the first failure', async () => {
             const install = jest.fn(pkg => {
-                if (pkg.packageName === 'onnxruntime') {
+                if (pkg === 'onnxruntime') {
                     return Promise.resolve({success: false, error: 'disk full'});
                 }
                 return Promise.resolve({success: true});
@@ -450,7 +528,7 @@ describe('nomokit-ml-relay', () => {
             );
             await flushPromises();
 
-            expect(install).toHaveBeenCalledWith(expect.objectContaining({packageName: 'onnxruntime'}));
+            expect(install).toHaveBeenCalledWith('onnxruntime');
             expect(iframeWindow.postMessage).toHaveBeenCalledWith(
                 expect.objectContaining({type: 'nomokit-ml:pip-done', id: 'X', ok: true}),
                 '*'
