@@ -1,19 +1,12 @@
 // Bridges the nested nomokit-ml iframe's postMessage protocol to the desktop
-// bundled-Python IPC (window.nomoproDesktopPython). No-op if not in desktop.
+// bundled-Python IPC (window.nomoproDesktopPython) and the desktop pip IPC
+// (window.electronAPI.pip). No-op if not in desktop.
 //
 // Message envelope contract (owned by nomokit-ml -- do not rename these):
-//   iframe -> parent: nomokit-ml:hello, nomokit-ml:py-start, nomokit-ml:py-send, nomokit-ml:py-stop
-//   parent -> iframe: nomokit-ml:desktop-ready, nomokit-ml:py-message, nomokit-ml:py-stderr, nomokit-ml:py-exit
-//
-// NOTE on the desktop API surface: `window.nomoproDesktopPython.startPersistent(source, handlers)`
-// (returning a run handle with `.writeStdin()`/`.stop()`) and `.getVersion()` are the *intended*
-// preload shape this relay targets. As of writing, the real `nomopro-desktop/preload.js` instead
-// exposes a single-process `runPythonCode`/`writeStdin`/`stopPythonCode` triple with no per-session
-// run handle, no run ids, and no `getVersion`. A separate task normalizes the preload to add a
-// `startPersistent`-style wrapper -- once that lands, re-check the method names below still match.
-// Until then this relay degrades gracefully (see the `startPersistent` guard in `py-start` below and
-// the `getVersion` guard in `resolvePythonVersion`) instead of throwing when running against today's
-// real preload.
+//   iframe -> parent: nomokit-ml:hello, nomokit-ml:py-start, nomokit-ml:py-send, nomokit-ml:py-stop,
+//                      nomokit-ml:pip-ensure
+//   parent -> iframe: nomokit-ml:desktop-ready, nomokit-ml:py-message, nomokit-ml:py-stderr,
+//                      nomokit-ml:py-exit, nomokit-ml:pip-progress, nomokit-ml:pip-done
 const NS = 'nomokit-ml:';
 
 const resolvePythonVersion = async py => {
@@ -22,6 +15,20 @@ const resolvePythonVersion = async py => {
         return await py.getVersion();
     } catch (_) {
         return null;
+    }
+};
+
+// True iff `ultralytics` (the YOLO training package, which drags in a large torch
+// download) is already installed. Informational only -- it tells the UI an install
+// step will be needed before training; it must never block training from starting.
+const isYoloInstalled = async () => {
+    const api = window.electronAPI;
+    if (!api || !api.pip || typeof api.pip.list !== 'function') return false;
+    try {
+        const res = await api.pip.list();
+        return (res.packages || []).some(p => p.name === 'ultralytics');
+    } catch (_) {
+        return false;
     }
 };
 
@@ -42,9 +49,50 @@ const startNomokitMlRelay = () => {
                     available: Boolean(py),
                     pythonVersion: await resolvePythonVersion(py),
                     engines: py ? ['browser', 'python'] : ['browser'],
-                    canTrainYolo: false // Phase 2
+                    canTrainYolo: await isYoloInstalled()
                 }
             });
+            return;
+        }
+
+        if (data.type === `${NS}pip-ensure`) {
+            const api = window.electronAPI;
+            const done = (ok, error) => reply({type: `${NS}pip-done`, id: data.id, ok, error});
+            if (!api || !api.pip || typeof api.pip.list !== 'function' || typeof api.pip.install !== 'function') {
+                done(false, 'Desktop pip bridge unavailable.');
+                return;
+            }
+            try {
+                const listRes = await api.pip.list();
+                const installed = new Set((listRes.packages || []).map(p => p.name));
+                const missing = (data.packages || []).filter(pkg => !installed.has(pkg));
+                for (const pkg of missing) {
+                    if (api.safeInstall && typeof api.safeInstall.classify === 'function') {
+                        try {
+                            const classification = await api.safeInstall.classify(pkg);
+                            if (classification && classification.risk && classification.risk !== 'safe') {
+                                reply({
+                                    type: `${NS}pip-progress`,
+                                    id: data.id,
+                                    package: pkg,
+                                    line: `Warning: ${pkg} is classified as ${classification.risk} risk.`
+                                });
+                            }
+                        } catch (_) {
+                            // classify is best-effort: a failure here must not block the install.
+                        }
+                    }
+                    reply({type: `${NS}pip-progress`, id: data.id, package: pkg, line: `Installing ${pkg}...`});
+                    const res = await api.pip.install({packageName: pkg});
+                    if (!res || res.success === false) {
+                        done(false, (res && res.error) || `Failed to install ${pkg}`);
+                        return;
+                    }
+                }
+                done(true);
+            } catch (err) {
+                done(false, err && err.message ? err.message : String(err));
+            }
             return;
         }
 

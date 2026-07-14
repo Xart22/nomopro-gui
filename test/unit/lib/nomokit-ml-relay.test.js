@@ -9,6 +9,16 @@ const dispatchFromIframe = (data, source) => {
     window.dispatchEvent(new MessageEvent('message', {data, source}));
 };
 
+// The listener is async and may await several microtasks in a row (pip.list(), then
+// safeInstall.classify()/pip.install() per missing package). Flush a generous number of
+// microtask turns rather than guessing the exact count, mirroring how the hello tests
+// above flush past `resolvePythonVersion`'s single await.
+const flushPromises = async (turns = 10) => {
+    for (let i = 0; i < turns; i++) {
+        await Promise.resolve();
+    }
+};
+
 describe('nomokit-ml-relay', () => {
     let stopRelay;
 
@@ -16,6 +26,7 @@ describe('nomokit-ml-relay', () => {
         if (stopRelay) stopRelay();
         stopRelay = null;
         delete window.nomoproDesktopPython;
+        delete window.electronAPI;
         jest.clearAllMocks();
     });
 
@@ -203,5 +214,247 @@ describe('nomokit-ml-relay', () => {
 
         dispatchFromIframe({type: 'nomokit-ml:py-send', id: 's1', msg: {cmd: 'predict'}}, iframeWindow);
         expect(writeStdin).not.toHaveBeenCalled();
+    });
+
+    test('hello reports canTrainYolo true when ultralytics is already installed', async () => {
+        window.electronAPI = {
+            pip: {list: () => Promise.resolve({packages: [{name: 'ultralytics'}]})}
+        };
+        stopRelay = startNomokitMlRelay();
+        const iframeWindow = createFakeIframeWindow();
+
+        dispatchFromIframe({type: 'nomokit-ml:hello'}, iframeWindow);
+        await flushPromises();
+
+        expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'nomokit-ml:desktop-ready',
+                capabilities: expect.objectContaining({canTrainYolo: true})
+            }),
+            '*'
+        );
+    });
+
+    test('hello reports canTrainYolo false when the pip bridge lookup fails', async () => {
+        window.electronAPI = {
+            pip: {list: () => Promise.reject(new Error('boom'))}
+        };
+        stopRelay = startNomokitMlRelay();
+        const iframeWindow = createFakeIframeWindow();
+
+        dispatchFromIframe({type: 'nomokit-ml:hello'}, iframeWindow);
+        await flushPromises();
+
+        expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                capabilities: expect.objectContaining({canTrainYolo: false})
+            }),
+            '*'
+        );
+    });
+
+    describe('pip-ensure', () => {
+        test('installs only the missing packages and replies pip-done with ok: true', async () => {
+            const install = jest.fn(() => Promise.resolve({success: true}));
+            window.electronAPI = {
+                pip: {list: () => Promise.resolve({packages: [{name: 'onnxruntime'}]}), install},
+                safeInstall: {classify: () => Promise.resolve({risk: 'safe'})}
+            };
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe(
+                {type: 'nomokit-ml:pip-ensure', id: 'X', packages: ['onnxruntime', 'ultralytics']},
+                iframeWindow
+            );
+            await flushPromises();
+
+            expect(install).toHaveBeenCalledTimes(1);
+            expect(install).toHaveBeenCalledWith(expect.objectContaining({packageName: 'ultralytics'}));
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({type: 'nomokit-ml:pip-done', id: 'X', ok: true}),
+                '*'
+            );
+        });
+
+        test('replies pip-done ok: true with no installs when all packages are already present', async () => {
+            const install = jest.fn();
+            window.electronAPI = {
+                pip: {list: () => Promise.resolve({packages: [{name: 'onnxruntime'}, {name: 'ultralytics'}]}), install}
+            };
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe(
+                {type: 'nomokit-ml:pip-ensure', id: 'X', packages: ['onnxruntime', 'ultralytics']},
+                iframeWindow
+            );
+            await flushPromises();
+
+            expect(install).not.toHaveBeenCalled();
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({type: 'nomokit-ml:pip-done', id: 'X', ok: true}),
+                '*'
+            );
+        });
+
+        test('emits a pip-progress line per package being installed, in order', async () => {
+            const install = jest.fn(() => Promise.resolve({success: true}));
+            window.electronAPI = {
+                pip: {list: () => Promise.resolve({packages: []}), install}
+            };
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe(
+                {type: 'nomokit-ml:pip-ensure', id: 'X', packages: ['onnxruntime', 'ultralytics']},
+                iframeWindow
+            );
+            await flushPromises();
+
+            const progressCalls = iframeWindow.postMessage.mock.calls
+                .map(call => call[0])
+                .filter(msg => msg.type === 'nomokit-ml:pip-progress')
+                .map(msg => msg.package);
+
+            expect(progressCalls).toEqual(['onnxruntime', 'ultralytics']);
+        });
+
+        test('surfaces the safeInstall risk classification as a pip-progress warning before installing', async () => {
+            const install = jest.fn(() => Promise.resolve({success: true}));
+            const classify = jest.fn(() => Promise.resolve({risk: 'high'}));
+            window.electronAPI = {
+                pip: {list: () => Promise.resolve({packages: []}), install},
+                safeInstall: {classify}
+            };
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe(
+                {type: 'nomokit-ml:pip-ensure', id: 'X', packages: ['ultralytics']},
+                iframeWindow
+            );
+            await flushPromises();
+
+            expect(classify).toHaveBeenCalledWith('ultralytics');
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: 'nomokit-ml:pip-progress',
+                    package: 'ultralytics',
+                    line: expect.stringContaining('high')
+                }),
+                '*'
+            );
+        });
+
+        test('a failing classify call is best-effort and does not block the install', async () => {
+            const install = jest.fn(() => Promise.resolve({success: true}));
+            const classify = jest.fn(() => Promise.reject(new Error('classify unavailable')));
+            window.electronAPI = {
+                pip: {list: () => Promise.resolve({packages: []}), install},
+                safeInstall: {classify}
+            };
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe(
+                {type: 'nomokit-ml:pip-ensure', id: 'X', packages: ['ultralytics']},
+                iframeWindow
+            );
+            await flushPromises();
+
+            expect(install).toHaveBeenCalledWith(expect.objectContaining({packageName: 'ultralytics'}));
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({type: 'nomokit-ml:pip-done', id: 'X', ok: true}),
+                '*'
+            );
+        });
+
+        test('replies pip-done ok: false with the install error and stops at the first failure', async () => {
+            const install = jest.fn(pkg => {
+                if (pkg.packageName === 'onnxruntime') {
+                    return Promise.resolve({success: false, error: 'disk full'});
+                }
+                return Promise.resolve({success: true});
+            });
+            window.electronAPI = {
+                pip: {list: () => Promise.resolve({packages: []}), install}
+            };
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe(
+                {type: 'nomokit-ml:pip-ensure', id: 'X', packages: ['onnxruntime', 'ultralytics']},
+                iframeWindow
+            );
+            await flushPromises();
+
+            expect(install).toHaveBeenCalledTimes(1);
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                {type: 'nomokit-ml:pip-done', id: 'X', ok: false, error: 'disk full'},
+                '*'
+            );
+        });
+
+        test('replies pip-done ok: false without throwing when electronAPI is unavailable (web mode)', async () => {
+            delete window.electronAPI;
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe(
+                {type: 'nomokit-ml:pip-ensure', id: 'X', packages: ['onnxruntime']},
+                iframeWindow
+            );
+            await flushPromises();
+
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({type: 'nomokit-ml:pip-done', id: 'X', ok: false}),
+                '*'
+            );
+        });
+
+        test('replies pip-done ok: false when pip.list rejects', async () => {
+            window.electronAPI = {
+                pip: {
+                    list: () => Promise.reject(new Error('ipc down')),
+                    install: jest.fn()
+                }
+            };
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe(
+                {type: 'nomokit-ml:pip-ensure', id: 'X', packages: ['onnxruntime']},
+                iframeWindow
+            );
+            await flushPromises();
+
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                {type: 'nomokit-ml:pip-done', id: 'X', ok: false, error: 'ipc down'},
+                '*'
+            );
+        });
+
+        test('pip-ensure works without the Python session bridge (nomoproDesktopPython absent)', async () => {
+            delete window.nomoproDesktopPython;
+            const install = jest.fn(() => Promise.resolve({success: true}));
+            window.electronAPI = {
+                pip: {list: () => Promise.resolve({packages: []}), install}
+            };
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe(
+                {type: 'nomokit-ml:pip-ensure', id: 'X', packages: ['onnxruntime']},
+                iframeWindow
+            );
+            await flushPromises();
+
+            expect(install).toHaveBeenCalledWith(expect.objectContaining({packageName: 'onnxruntime'}));
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({type: 'nomokit-ml:pip-done', id: 'X', ok: true}),
+                '*'
+            );
+        });
     });
 });
