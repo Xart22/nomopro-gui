@@ -535,4 +535,59 @@ describe('nomokit-ml-relay', () => {
             );
         });
     });
+
+    describe('pip-check', () => {
+        test('replies with per-package installed status from pip.list', async () => {
+            const list = jest.fn().mockImplementation(() => Promise.resolve({ packages: [{ name: 'scikit-learn' }, { name: 'numpy' }] }));
+            window.electronAPI = {
+                pip: { list }
+            };
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe({ type: 'nomokit-ml:pip-check', id: 'C1', packages: ['scikit-learn', 'ultralytics'] }, iframeWindow);
+            await flushPromises();
+
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                {
+                    type: 'nomokit-ml:pip-check-result',
+                    id: 'C1',
+                    packages: [
+                        { name: 'scikit-learn', installed: true },
+                        { name: 'ultralytics', installed: false }
+                    ]
+                },
+                '*'
+            );
+        });
+
+        test('replies all-false when the pip bridge is unavailable', async () => {
+            delete window.electronAPI;
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe({ type: 'nomokit-ml:pip-check', id: 'C2', packages: ['scikit-learn'] }, iframeWindow);
+            await flushPromises();
+
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                { type: 'nomokit-ml:pip-check-result', id: 'C2', packages: [{ name: 'scikit-learn', installed: false }] },
+                '*'
+            );
+        });
+
+        test('replies all-false when pip.list rejects', async () => {
+            const list = jest.fn().mockImplementation(() => Promise.reject(new Error('boom')));
+            window.electronAPI = { pip: { list } };
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe({ type: 'nomokit-ml:pip-check', id: 'C3', packages: ['onnxruntime'] }, iframeWindow);
+            await flushPromises();
+
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                { type: 'nomokit-ml:pip-check-result', id: 'C3', packages: [{ name: 'onnxruntime', installed: false }] },
+                '*'
+            );
+        });
+    });
 });

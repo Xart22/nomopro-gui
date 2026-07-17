@@ -4,9 +4,10 @@
 //
 // Message envelope contract (owned by nomokit-ml -- do not rename these):
 //   iframe -> parent: nomokit-ml:hello, nomokit-ml:py-start, nomokit-ml:py-send, nomokit-ml:py-stop,
-//                      nomokit-ml:pip-ensure
+//                      nomokit-ml:pip-ensure, nomokit-ml:pip-check
 //   parent -> iframe: nomokit-ml:desktop-ready, nomokit-ml:py-message, nomokit-ml:py-stderr,
-//                      nomokit-ml:py-exit, nomokit-ml:pip-progress, nomokit-ml:pip-done
+//                      nomokit-ml:py-exit, nomokit-ml:pip-progress, nomokit-ml:pip-done,
+//                      nomokit-ml:pip-check-result
 const NS = 'nomokit-ml:';
 
 const resolvePythonVersion = async py => {
@@ -52,6 +53,24 @@ const startNomokitMlRelay = () => {
                     canTrainYolo: await isYoloInstalled()
                 }
             });
+            return;
+        }
+
+        if (data.type === `${NS}pip-check`) {
+            const api = window.electronAPI;
+            const requested = data.packages || [];
+            const replyResult = (packages) => reply({type: `${NS}pip-check-result`, id: data.id, packages});
+            if (!api || !api.pip || typeof api.pip.list !== 'function') {
+                replyResult(requested.map(name => ({name, installed: false})));
+                return;
+            }
+            try {
+                const listRes = await api.pip.list();
+                const installed = new Set((listRes.packages || []).map(p => p.name));
+                replyResult(requested.map(name => ({name, installed: installed.has(name)})));
+            } catch (_) {
+                replyResult(requested.map(name => ({name, installed: false})));
+            }
             return;
         }
 
