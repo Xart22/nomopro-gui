@@ -534,6 +534,36 @@ describe('nomokit-ml-relay', () => {
                 '*'
             );
         });
+
+        test('forwards real pip.onProgress install-output lines as pip-progress', async () => {
+            const unsubscribe = jest.fn();
+            window.electronAPI = {
+                pip: {
+                    list: () => Promise.resolve({packages: []}),
+                    install: () => Promise.resolve({success: true}),
+                    // fire one output event synchronously on subscribe, like a live pip run
+                    onProgress: jest.fn(cb => {
+                        cb({type: 'install-output', data: 'Downloading torch (750 MB)\n'});
+                        return unsubscribe;
+                    })
+                }
+            };
+            stopRelay = startNomokitMlRelay();
+            const iframeWindow = createFakeIframeWindow();
+
+            dispatchFromIframe({type: 'nomokit-ml:pip-ensure', id: 'P1', packages: ['ultralytics']}, iframeWindow);
+            await flushPromises();
+
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                {type: 'nomokit-ml:pip-progress', id: 'P1', package: null, line: 'Downloading torch (750 MB)'},
+                '*'
+            );
+            expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+                {type: 'nomokit-ml:pip-done', id: 'P1', ok: true, error: undefined},
+                '*'
+            );
+            expect(unsubscribe).toHaveBeenCalled();
+        });
     });
 
     describe('pip-check', () => {

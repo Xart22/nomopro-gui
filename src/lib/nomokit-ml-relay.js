@@ -81,6 +81,14 @@ const startNomokitMlRelay = () => {
                 done(false, 'Desktop pip bridge unavailable.');
                 return;
             }
+            let unsubscribeProgress = null;
+            if (typeof api.pip.onProgress === 'function') {
+                unsubscribeProgress = api.pip.onProgress(evt => {
+                    if (evt && evt.type === 'install-output' && evt.data) {
+                        reply({type: `${NS}pip-progress`, id: data.id, package: null, line: String(evt.data).trim()});
+                    }
+                });
+            }
             try {
                 const listRes = await api.pip.list();
                 const installed = new Set((listRes.packages || []).map(p => p.name));
@@ -126,6 +134,8 @@ const startNomokitMlRelay = () => {
                 done(true);
             } catch (err) {
                 done(false, err && err.message ? err.message : String(err));
+            } finally {
+                if (unsubscribeProgress) unsubscribeProgress();
             }
             return;
         }
