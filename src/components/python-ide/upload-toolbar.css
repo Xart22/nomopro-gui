@@ -39,7 +39,7 @@
 
 .modeActive {
     font-weight: bold;
-    color: #4CAF50;
+    color: #4caf50;
     font-size: 12px;
 }
 
@@ -75,6 +75,8 @@
 .flashBtn,
 .uploadRunBtn,
 .uploadOnlyBtn,
+.runReplBtn,
+.uploadMainBtn,
 .stopBtn,
 .detectBtn {
     padding: 5px 12px;
@@ -86,39 +88,43 @@
 }
 
 .flashBtn {
-    background: #E65100;
+    background: #e65100;
     color: white;
 }
 
 .flashBtn:hover:not(:disabled) {
-    background: #FF6D00;
+    background: #ff6d00;
 }
 
-.uploadRunBtn {
-    background: #2E7D32;
+.uploadRunBtn,
+.runReplBtn {
+    background: #2e7d32;
     color: white;
 }
 
-.uploadRunBtn:hover:not(:disabled) {
-    background: #388E3C;
+.uploadRunBtn:hover:not(:disabled),
+.runReplBtn:hover:not(:disabled) {
+    background: #388e3c;
 }
 
-.uploadOnlyBtn {
-    background: #1565C0;
+.uploadOnlyBtn,
+.uploadMainBtn {
+    background: #1565c0;
     color: white;
 }
 
-.uploadOnlyBtn:hover:not(:disabled) {
-    background: #1976D2;
+.uploadOnlyBtn:hover:not(:disabled),
+.uploadMainBtn:hover:not(:disabled) {
+    background: #1976d2;
 }
 
 .stopBtn {
-    background: #C62828;
+    background: #c62828;
     color: white;
 }
 
 .stopBtn:hover:not(:disabled) {
-    background: #D32F2F;
+    background: #d32f2f;
 }
 
 .detectBtn {
@@ -135,6 +141,8 @@
 .flashBtn:disabled,
 .uploadRunBtn:disabled,
 .uploadOnlyBtn:disabled,
+.runReplBtn:disabled,
+.uploadMainBtn:disabled,
 .stopBtn:disabled,
 .detectBtn:disabled {
     opacity: 0.5;
@@ -157,7 +165,7 @@
 
 .progressFill {
     height: 100%;
-    background: #4CAF50;
+    background: #4caf50;
     transition: width 0.3s ease;
 }
 
@@ -172,7 +180,7 @@
     min-height: 0;
     overflow-y: auto;
     font-size: 11px;
-    font-family: 'Consolas', 'Courier New', monospace;
+    font-family: "Consolas", "Courier New", monospace;
     background: #111;
     border: 1px solid #333;
     border-radius: 3px;
@@ -188,7 +196,7 @@
 }
 
 .logLine:last-child {
-    color: #4CAF50;
+    color: #4caf50;
 }
 
 .logLine:last-child:empty {
