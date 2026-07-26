@@ -670,7 +670,7 @@ const GUIComponent = (props) => {
                         className={styles.juniorIframe}
                         src={
                             window.electronAPI?.getAppPath ?
-                                `file:///${window.electronAPI.getAppPath().replace(/\\/g, '/')}/nomokit-ml/index.html` :
+                                `file:///${window.electronAPI.getAppPath().replace(/\\/g, '/')}/src/gui/nomokit-ml/index.html` :
                                 '/nomokit-ml/index.html'
                         }
                         title="NomoML"
