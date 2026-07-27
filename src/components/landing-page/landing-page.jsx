@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styles from './landing-page.css';
 import nomokitJrIcon from './nomokit-jr.png';
 import nomoProIcon from './nomo.png';
-import nomoMlIcon from './nomokit-ml.png';
 
 const LandingPage = ({
     onSelectJuniorCode,
@@ -66,7 +65,7 @@ const LandingPage = ({
                 >
                     <img
                         className={styles.cardIcon}
-                        src={nomoMlIcon}
+                        src={nomoProIcon}
                         alt="NomoML"
                     />
                     <div className={styles.cardLabel}>NomoML</div>
