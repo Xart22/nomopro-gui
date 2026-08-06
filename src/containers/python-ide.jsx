@@ -24,7 +24,11 @@ import getCostumeUrl from "../lib/get-costume-url";
 import { createPyodideRunner } from "../lib/pyodide-runner";
 import MicropythonRunner from "../lib/micropython-runner";
 import deviceData from "../lib/libraries/devices/index.jsx";
-import { executeBridgeCommand, drainPendingDeviceResults } from "../lib/bridge";
+import {
+    executeBridgeCommand,
+    drainPendingDeviceResults,
+    setPythonEventTarget,
+} from "../lib/bridge";
 import { parseNdjsonCommandLine } from "../lib/ndjson-command-parser";
 import { backend as pythonBackend } from "../shared/env";
 
@@ -556,6 +560,22 @@ const PythonIde = (props) => {
             );
         }
 
+        // Wire event forwarding for desktop native Python runner.
+        // Events (green_flag, key_pressed, etc.) are written as JSON to stdin,
+        // where the Python event loop thread picks them up.
+        if (
+            pythonBackend === "native" &&
+            typeof runner.writeStdin === "function"
+        ) {
+            setPythonEventTarget((event) => {
+                try {
+                    runner.writeStdin(JSON.stringify(event));
+                } catch (e) {
+                    // ignore write errors if process already exited
+                }
+            });
+        }
+
         const target =
             stage && stage.id === targetId ? stage : sprites?.[targetId];
         const spriteUrl = target?.costume?.asset
@@ -573,6 +593,7 @@ const PythonIde = (props) => {
         const result = await runner.run(codeToRun);
         await commandQueueRef.current;
         currentRunSpriteRef.current = null;
+        setPythonEventTarget(null);
         if (result.stderr) {
             appendErrorLine(result.stderr);
         }
@@ -881,8 +902,144 @@ const PythonIde = (props) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [runtimeTarget]);
 
-    // Hapus yang lama: handleUploadRun, handleUploadOnly, handleStopBoard
-    // Sekarang cuma ada handleRunRepl dan handleUploadMain (di atas)
+    // === Handler: Upload multi-file (Thonny-style, semua file dari Project Explorer) ===
+    const handleUploadMulti = () => {
+        return new Promise((resolve, reject) => {
+            if (!isDeviceConnected || !deviceId || !vm) {
+                reject(new Error("Device not connected"));
+                return;
+            }
+            if (typeof vm.writeToPeripheral !== "function") {
+                reject(new Error("writeToPeripheral unavailable"));
+                return;
+            }
+            if (!Array.isArray(fileTree) || fileTree.length === 0) {
+                const msg = "Project Explorer is empty. Add files first.";
+                setRunError(`${msg}\n`);
+                reject(new Error(msg));
+                return;
+            }
+
+            // Exclude sprite/stage auto-generated scripts (e.g. Sprite1.py, Stage.py)
+            const spriteFileNames = new Set(
+                buildFileList(stage, sprites).map((f) => f.fileName),
+            );
+
+            // Build parent lookup
+            const parentMap = {};
+            fileTree.forEach((item) => {
+                parentMap[item.id] = item.parentId || null;
+            });
+
+            // Resolve full path for a file item
+            const resolvePath = (item) => {
+                const parts = [item.name];
+                let pid = item.parentId;
+                while (pid) {
+                    const parent = fileTree.find((f) => f.id === pid);
+                    if (parent) {
+                        parts.unshift(parent.name);
+                        pid = parent.parentId;
+                    } else break;
+                }
+                return parts.join("/");
+            };
+
+            const filesToUpload = [];
+            const folderSet = new Set();
+
+            fileTree
+                .filter(
+                    (item) =>
+                        item.type === "file" &&
+                        item.targetId &&
+                        !spriteFileNames.has(item.name),
+                )
+                .forEach((item) => {
+                    const fileData = filesByTargetId[item.targetId];
+                    const content = fileData?.code || "";
+                    const path = resolvePath(item);
+                    filesToUpload.push({ path, name: item.name, content });
+
+                    // Collect all parent folders
+                    const dir = path.substring(0, path.lastIndexOf("/"));
+                    if (dir) {
+                        const parts = dir.split("/");
+                        for (let i = 1; i <= parts.length; i++) {
+                            folderSet.add(parts.slice(0, i).join("/"));
+                        }
+                    }
+                });
+
+            // Include active file only if custom file (not sprite/stage script)
+            const alreadyIncluded = filesToUpload.some(
+                (f) => f.name === activeFileName,
+            );
+            if (
+                !alreadyIncluded &&
+                code &&
+                code.trim() &&
+                activeFileName &&
+                !spriteFileNames.has(activeFileName)
+            ) {
+                filesToUpload.push({
+                    path: activeFileName,
+                    name: activeFileName,
+                    content: code,
+                });
+            }
+
+            if (filesToUpload.length === 0) {
+                const msg = "No files to upload.";
+                setRunError(`${msg}\n`);
+                reject(new Error(msg));
+                return;
+            }
+
+            const folders = [...folderSet].sort();
+
+            setIsUploading(true);
+            setUploadProgress({
+                stage: "upload",
+                percent: 0,
+                text: `Preparing ${filesToUpload.length} files, ${folders.length} folders...`,
+            });
+
+            const onSend = (data) => vm.writeToPeripheral(deviceId, data);
+            const onProgress = (current, total, label) => {
+                setUploadProgress({
+                    stage: "upload",
+                    percent: Math.round((current / total) * 100),
+                    text: `[${current + 1}/${total}] ${label}`,
+                });
+            };
+
+            micropythonRunnerRef.current.uploadFiles(
+                filesToUpload,
+                folders,
+                onSend,
+                onProgress,
+                (result) => {
+                    setIsUploading(false);
+                    if (result.success) {
+                        setUploadProgress({
+                            stage: "",
+                            percent: 100,
+                            text: `Done: ${filesToUpload.length} files, ${folders.length} folders.`,
+                        });
+                        resolve();
+                    } else {
+                        setUploadProgress({
+                            stage: "",
+                            percent: 0,
+                            text: "Upload cancelled.",
+                        });
+                        reject(new Error("Upload cancelled"));
+                    }
+                },
+            );
+        });
+    };
 
     // Auto-detect firmware when switching to MicroPython mode
 
@@ -929,6 +1086,7 @@ const PythonIde = (props) => {
             onReplSend={handleReplSend}
             onRunRepl={handleRunRepl}
             onUploadMain={handleUploadMain}
+            onUploadMulti={handleUploadMulti}
             onCodeChange={handleCodeChange}
             onRun={handleRun}
             onRunAll={handleRunAll}
@@ -962,11 +1120,15 @@ const PythonIde = (props) => {
             onUploadRun={handleUploadMain}
             onUploadOnly={handleUploadMain}
             onStopBoard={() => {
+                if (micropythonRunnerRef.current) {
+                    micropythonRunnerRef.current.cancelUpload();
+                }
                 if (
                     vm &&
                     deviceId &&
                     typeof vm.writeToPeripheral === "function"
                 ) {
+                    vm.writeToPeripheral(deviceId, "\x03");
                     vm.writeToPeripheral(deviceId, "\x04");
                 }
             }}

@@ -1,14 +1,14 @@
-import {PYODIDE_CONFIG} from './python-ide-config';
+import { PYODIDE_CONFIG } from "./python-ide-config";
 
 const createSemanticAnalyzer = async (pyodide, code) => {
     if (!pyodide) {
-        console.log('[Analyzer] Pyodide not available');
+        console.log("[Analyzer] Pyodide not available");
         return [];
     }
     try {
-        console.log('[Analyzer] Running semantic analysis on code:');
+        console.log("[Analyzer] Running semantic analysis on code:");
         console.log(code);
-        await pyodide.globals.set('SRC_CODE', code);
+        await pyodide.globals.set("SRC_CODE", code);
 
         const result = await pyodide.runPythonAsync(`
 import ast, json, builtins
@@ -52,6 +52,9 @@ try:
         'delete_all_of_list', 'insert_at_list',
         'replace_item_of_list', 'item_of_list',
         'length_of_list', 'list_contains_item',
+        'when_green_flag_clicked', 'when_key_pressed',
+        'when_this_sprite_clicked', 'when_stage_clicked',
+        'when_backdrop_switches_to',
         'when_i_receive', 'broadcast', 'broadcast_and_wait',
         'green_flag', 'trigger_key_pressed',
         'trigger_sprite_clicked', 'trigger_stage_clicked',
@@ -159,6 +162,28 @@ try:
             if isinstance(node.target, ast.Name):
                 self._add_name(node.target.id)
             self.generic_visit(node)
+        def _visit_comp(self, node):
+            """Handle list/dict/set comprehensions and generator expressions."""
+            self.scopes.append(set())
+            for generator in getattr(node, 'generators', []):
+                if isinstance(generator.target, ast.Name):
+                    self._add_name(generator.target.id)
+                for if_clause in getattr(generator, 'ifs', []):
+                    self.generic_visit(if_clause)
+            if hasattr(node, 'elt'):
+                self.generic_visit(node.elt)
+            if hasattr(node, 'key'):
+                self.generic_visit(node.key)
+                self.generic_visit(node.value)
+            self.scopes.pop()
+        def visit_ListComp(self, node):
+            self._visit_comp(node)
+        def visit_SetComp(self, node):
+            self._visit_comp(node)
+        def visit_GeneratorExp(self, node):
+            self._visit_comp(node)
+        def visit_DictComp(self, node):
+            self._visit_comp(node)
         def visit_With(self, node):
             for item in getattr(node, 'items', []):
                 if hasattr(item, 'optional_vars') and isinstance(item.optional_vars, ast.Name):
@@ -190,12 +215,12 @@ except Exception as e:
     errors = [{'lineno': 1, 'col': 0, 'msg': f"Analysis error: {str(e)}"}]
 json.dumps(errors)
 `);
-        console.log('[Analyzer] Raw result from Pyodide:', result);
-        const parsed = JSON.parse(result || '[]');
-        console.log('[Analyzer] Parsed errors:', parsed);
+        console.log("[Analyzer] Raw result from Pyodide:", result);
+        const parsed = JSON.parse(result || "[]");
+        console.log("[Analyzer] Parsed errors:", parsed);
         return parsed;
     } catch (e) {
-        console.error('[Analyzer] Error during analysis:', e);
+        console.error("[Analyzer] Error during analysis:", e);
         return [];
     }
 };
@@ -216,13 +241,13 @@ const createSyntaxValidator = (
         const scriptUrl = `${PYODIDE_CONFIG.CDN}/${PYODIDE_CONFIG.VERSION}/full/pyodide.js`;
         const indexUrl = `${PYODIDE_CONFIG.CDN}/${PYODIDE_CONFIG.VERSION}/full/`;
         window.loadingPyodidePromise = new Promise((resolve, reject) => {
-            const script = document.createElement('script');
+            const script = document.createElement("script");
             script.src = scriptUrl;
-            script.crossOrigin = 'anonymous';
+            script.crossOrigin = "anonymous";
             script.onload = async () => {
                 try {
                     const pyodide = await loadPyodide({
-                        indexURL: indexUrl
+                        indexURL: indexUrl,
                     });
                     window.pyodide = pyodide;
                     setPyodideLoading(false);
@@ -232,49 +257,49 @@ const createSyntaxValidator = (
                     reject(err);
                 }
             };
-            script.onerror = err => {
+            script.onerror = (err) => {
                 setPyodideLoading(false);
                 window.loadingPyodidePromise = null;
-                reject(err || new Error('Failed to load pyodide script'));
+                reject(err || new Error("Failed to load pyodide script"));
             };
             document.head.appendChild(script);
         });
         return window.loadingPyodidePromise;
     };
 
-    const extractSyntaxError = raw => {
+    const extractSyntaxError = (raw) => {
         const fileLineMatch = raw.match(/File\s+".*?",\s*line\s*(\d+)/i);
         const lineMatch = raw.match(/line\s*(\d+)/i);
-        const lineno = fileLineMatch ?
-            parseInt(fileLineMatch[1], 10) :
-            lineMatch ?
-                parseInt(lineMatch[1], 10) :
-                null;
+        const lineno = fileLineMatch
+            ? parseInt(fileLineMatch[1], 10)
+            : lineMatch
+              ? parseInt(lineMatch[1], 10)
+              : null;
         const parts = raw
             .split(/\n/)
-            .map(s => s.trim())
+            .map((s) => s.trim())
             .filter(Boolean);
-        const message = parts.length ?
-            parts[parts.length - 1].replace(
-                /^Traceback.*:|^SyntaxError:\s*/i,
-                '',
-            ) :
-            raw;
-        return {lineno: lineno || 1, message: message || raw};
+        const message = parts.length
+            ? parts[parts.length - 1].replace(
+                  /^Traceback.*:|^SyntaxError:\s*/i,
+                  "",
+              )
+            : raw;
+        return { lineno: lineno || 1, message: message || raw };
     };
 
-    const validateBrackets = code => {
+    const validateBrackets = (code) => {
         const markers = [];
         const stack = [];
-        const openFor = {'(': ')', '[': ']', '{': '}'};
-        const closeFor = {')': '(', ']': '[', '}': '{'};
-        const lines = String(code || '').split(/\r?\n/);
+        const openFor = { "(": ")", "[": "]", "{": "}" };
+        const closeFor = { ")": "(", "]": "[", "}": "{" };
+        const lines = String(code || "").split(/\r?\n/);
 
         for (let i = 0; i < lines.length; i += 1) {
             const line = lines[i];
             for (let j = 0; j < line.length; j += 1) {
                 const ch = line[j];
-                if (openFor[ch]) stack.push({ch, line: i + 1});
+                if (openFor[ch]) stack.push({ ch, line: i + 1 });
                 if (closeFor[ch]) {
                     if (
                         stack.length === 0 ||
@@ -286,7 +311,7 @@ const createSyntaxValidator = (
                             startColumn: j + 1,
                             endLineNumber: i + 1,
                             endColumn: j + 2,
-                            message: `Unmatched '${ch}'`
+                            message: `Unmatched '${ch}'`,
                         });
                         return markers;
                     }
@@ -304,7 +329,7 @@ const createSyntaxValidator = (
                 startColumn: 1,
                 endLineNumber: last.line,
                 endColumn: 1,
-                message: `Unclosed '${last.ch}'`
+                message: `Unclosed '${last.ch}'`,
             });
         }
         return markers;
@@ -318,27 +343,27 @@ const createSyntaxValidator = (
 
         try {
             if (!window.pyodide) {
-                console.log('[PythonIDE] Waiting for Pyodide to load...');
+                console.log("[PythonIDE] Waiting for Pyodide to load...");
                 await ensurePyodideLoaded();
             }
 
             if (window.pyodide?.runPythonAsync) {
                 try {
-                    console.log('[PythonIDE] Running compile check...');
+                    console.log("[PythonIDE] Running compile check...");
                     await window.pyodide.runPythonAsync(
                         `compile(${JSON.stringify(code)}, '<input>', 'exec')`,
                     );
 
-                    console.log('[PythonIDE] Running semantic analysis...');
+                    console.log("[PythonIDE] Running semantic analysis...");
                     const semErrors = await createSemanticAnalyzer(
                         window.pyodide,
                         code,
                     );
                     console.log(
-                        '[PythonIDE] Semantic errors found:',
+                        "[PythonIDE] Semantic errors found:",
                         semErrors,
                     );
-                    semErrors.forEach(se => {
+                    semErrors.forEach((se) => {
                         if (se?.lineno) {
                             markers.push({
                                 severity: 8,
@@ -349,12 +374,12 @@ const createSyntaxValidator = (
                                     (se.col || 1) + 2,
                                     (se.col || 1) + 20,
                                 ),
-                                message: se.msg || 'Possible issue'
+                                message: se.msg || "Possible issue",
                             });
                         }
                     });
                 } catch (pyErr) {
-                    const {lineno, message} = extractSyntaxError(
+                    const { lineno, message } = extractSyntaxError(
                         String(pyErr?.message || pyErr),
                     );
                     markers.push({
@@ -363,14 +388,14 @@ const createSyntaxValidator = (
                         startColumn: 1,
                         endLineNumber: lineno,
                         endColumn: 1,
-                        message
+                        message,
                     });
                 }
             } else {
                 markers.push(...validateBrackets(code));
             }
         } catch (e) {
-            setSyntaxStatus('Validator error');
+            setSyntaxStatus("Validator error");
             return;
         }
 
@@ -378,18 +403,18 @@ const createSyntaxValidator = (
             `[PythonIDE] Validation complete: ${markers.length} error(s)`,
             markers,
         );
-        monaco.editor.setModelMarkers(model, 'python-syntax', markers);
+        monaco.editor.setModelMarkers(model, "python-syntax", markers);
 
         const uniqueErrorLines = [
-            ...new Set(markers.map(m => m.startLineNumber))
+            ...new Set(markers.map((m) => m.startLineNumber)),
         ];
-        const glyphDecorations = uniqueErrorLines.map(line => ({
+        const glyphDecorations = uniqueErrorLines.map((line) => ({
             range: new monaco.Range(line, 1, line, 1),
             options: {
                 isWholeLine: true,
                 glyphMarginClassName: glyphClass,
-                glyphMarginHoverMessage: {value: 'Error on this line'}
-            }
+                glyphMarginHoverMessage: { value: "Error on this line" },
+            },
         }));
         errorGlyphDecorations = editor.deltaDecorations(
             errorGlyphDecorations,
@@ -397,8 +422,8 @@ const createSyntaxValidator = (
         );
 
         if (markers.length) setSyntaxStatus(`${markers.length} error(s)`);
-        else setSyntaxStatus('Syntax OK');
+        else setSyntaxStatus("Syntax OK");
     };
 };
 
-export {createSemanticAnalyzer, createSyntaxValidator};
+export { createSemanticAnalyzer, createSyntaxValidator };

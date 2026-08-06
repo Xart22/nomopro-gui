@@ -1,21 +1,33 @@
-import bindAll from 'lodash.bindall';
-import PropTypes from 'prop-types';
-import React from 'react';
-import VM from 'openblock-vm';
+import bindAll from "lodash.bindall";
+import PropTypes from "prop-types";
+import React from "react";
+import VM from "openblock-vm";
 
-import {connect} from 'react-redux';
+import { connect } from "react-redux";
+import { forwardEventToPython } from "./bridge";
 
-import {updateTargets} from '../reducers/targets';
-import {updateBlockDrag} from '../reducers/block-drag';
-import {updateMonitors} from '../reducers/monitors';
-import {setProjectChanged, setProjectUnchanged} from '../reducers/project-changed';
-import {setRunningState, setTurboState, setStartedState} from '../reducers/vm-status';
-import {showDeviceAlert, showDeviceRealtimeAlert, clearDeviceRealtimeAlert} from '../reducers/alerts';
-import {setRealtimeConnection} from '../reducers/connection-modal';
-import {updateMicIndicator} from '../reducers/mic-indicator';
-import {setDeviceData} from '../reducers/device-data';
+import { updateTargets } from "../reducers/targets";
+import { updateBlockDrag } from "../reducers/block-drag";
+import { updateMonitors } from "../reducers/monitors";
+import {
+    setProjectChanged,
+    setProjectUnchanged,
+} from "../reducers/project-changed";
+import {
+    setRunningState,
+    setTurboState,
+    setStartedState,
+} from "../reducers/vm-status";
+import {
+    showDeviceAlert,
+    showDeviceRealtimeAlert,
+    clearDeviceRealtimeAlert,
+} from "../reducers/alerts";
+import { setRealtimeConnection } from "../reducers/connection-modal";
+import { updateMicIndicator } from "../reducers/mic-indicator";
+import { setDeviceData } from "../reducers/device-data";
 
-import {makeDeviceLibrary} from '../lib/libraries/devices/index.jsx';
+import { makeDeviceLibrary } from "../lib/libraries/devices/index.jsx";
 
 /*
  * Higher Order Component to manage events emitted by the VM
@@ -24,16 +36,16 @@ import {makeDeviceLibrary} from '../lib/libraries/devices/index.jsx';
  */
 const vmListenerHOC = function (WrappedComponent) {
     class VMListener extends React.Component {
-        constructor (props) {
+        constructor(props) {
             super(props);
             bindAll(this, [
-                'handleKeyDown',
-                'handleKeyUp',
-                'handleProjectChanged',
-                'handleTargetsUpdate',
-                'handleDeviceAlert',
-                'handleDeviceRealtimeAlert',
-                'handleDeviceRealtimeSuccess'
+                "handleKeyDown",
+                "handleKeyUp",
+                "handleProjectChanged",
+                "handleTargetsUpdate",
+                "handleDeviceAlert",
+                "handleDeviceRealtimeAlert",
+                "handleDeviceRealtimeSuccess",
             ]);
             // We have to start listening to the vm here rather than in
             // componentDidMount because the HOC mounts the wrapped component,
@@ -41,90 +53,133 @@ const vmListenerHOC = function (WrappedComponent) {
             // mounts.
             // If the wrapped component uses the vm in componentDidMount, then
             // we need to start listening before mounting the wrapped component.
-            this.props.vm.on('targetsUpdate', this.handleTargetsUpdate);
-            this.props.vm.on('MONITORS_UPDATE', this.props.onMonitorsUpdate);
-            this.props.vm.on('BLOCK_DRAG_UPDATE', this.props.onBlockDragUpdate);
-            this.props.vm.on('TURBO_MODE_ON', this.props.onTurboModeOn);
-            this.props.vm.on('TURBO_MODE_OFF', this.props.onTurboModeOff);
-            this.props.vm.on('PROJECT_RUN_START', this.props.onProjectRunStart);
-            this.props.vm.on('PROJECT_RUN_STOP', this.props.onProjectRunStop);
-            this.props.vm.on('PROJECT_CHANGED', this.handleProjectChanged);
-            this.props.vm.on('RUNTIME_STARTED', this.props.onRuntimeStarted);
-            this.props.vm.on('PROJECT_START', this.props.onGreenFlag);
-            this.props.vm.on('PERIPHERAL_CONNECTION_LOST_ERROR', this.handleDeviceAlert);
-            this.props.vm.on('PERIPHERAL_REALTIME_CONNECTION_LOST_ERROR', this.handleDeviceRealtimeAlert);
-            this.props.vm.on('PERIPHERAL_REALTIME_CONNECT_SUCCESS', this.handleDeviceRealtimeSuccess);
-            this.props.vm.on('MIC_LISTENING', this.props.onMicListeningUpdate);
-
+            this.props.vm.on("targetsUpdate", this.handleTargetsUpdate);
+            this.props.vm.on("MONITORS_UPDATE", this.props.onMonitorsUpdate);
+            this.props.vm.on("BLOCK_DRAG_UPDATE", this.props.onBlockDragUpdate);
+            this.props.vm.on("TURBO_MODE_ON", this.props.onTurboModeOn);
+            this.props.vm.on("TURBO_MODE_OFF", this.props.onTurboModeOff);
+            this.props.vm.on("PROJECT_RUN_START", this.props.onProjectRunStart);
+            this.props.vm.on("PROJECT_RUN_STOP", this.props.onProjectRunStop);
+            this.props.vm.on("PROJECT_CHANGED", this.handleProjectChanged);
+            this.props.vm.on("RUNTIME_STARTED", this.props.onRuntimeStarted);
+            this.props.vm.on("PROJECT_START", () => {
+                forwardEventToPython({ name: "green_flag" });
+                this.props.onGreenFlag();
+            });
+            this.props.vm.on(
+                "PERIPHERAL_CONNECTION_LOST_ERROR",
+                this.handleDeviceAlert,
+            );
+            this.props.vm.on(
+                "PERIPHERAL_REALTIME_CONNECTION_LOST_ERROR",
+                this.handleDeviceRealtimeAlert,
+            );
+            this.props.vm.on(
+                "PERIPHERAL_REALTIME_CONNECT_SUCCESS",
+                this.handleDeviceRealtimeSuccess,
+            );
+            this.props.vm.on("MIC_LISTENING", this.props.onMicListeningUpdate);
         }
-        componentDidMount () {
+        componentDidMount() {
             if (this.props.attachKeyboardEvents) {
-                document.addEventListener('keydown', this.handleKeyDown);
-                document.addEventListener('keyup', this.handleKeyUp);
+                document.addEventListener("keydown", this.handleKeyDown);
+                document.addEventListener("keyup", this.handleKeyUp);
             }
-            this.props.vm.postIOData('userData', {username: this.props.username});
+            this.props.vm.postIOData("userData", {
+                username: this.props.username,
+            });
             // Update device list
-            this.props.vm.extensionManager.getDeviceList().then(data => {
+            this.props.vm.extensionManager.getDeviceList().then((data) => {
                 if (data) {
                     this.props.onSetDeviceData(makeDeviceLibrary(data));
                 }
             });
         }
-        componentDidUpdate (prevProps) {
+        componentDidUpdate(prevProps) {
             if (prevProps.username !== this.props.username) {
-                this.props.vm.postIOData('userData', {username: this.props.username});
+                this.props.vm.postIOData("userData", {
+                    username: this.props.username,
+                });
             }
 
             // Re-request a targets update when the shouldUpdateTargets state changes to true
             // i.e. when the editor transitions out of fullscreen/player only modes
-            if (this.props.shouldUpdateTargets && !prevProps.shouldUpdateTargets) {
-                this.props.vm.emitTargetsUpdate(false /* Emit the event, but do not trigger project change */);
+            if (
+                this.props.shouldUpdateTargets &&
+                !prevProps.shouldUpdateTargets
+            ) {
+                this.props.vm.emitTargetsUpdate(
+                    false /* Emit the event, but do not trigger project change */,
+                );
             }
         }
-        componentWillUnmount () {
-            this.props.vm.removeListener('PERIPHERAL_CONNECTION_LOST_ERROR', this.handleDeviceAlert);
-            this.props.vm.removeListener('PERIPHERAL_REALTIME_CONNECTION_LOST_ERROR',
-                this.handleDeviceRealtimeAlert);
-            this.props.vm.removeListener('PERIPHERAL_REALTIME_CONNECT_SUCCESS',
-                this.handleDeviceRealtimeSuccess);
+        componentWillUnmount() {
+            this.props.vm.removeListener(
+                "PERIPHERAL_CONNECTION_LOST_ERROR",
+                this.handleDeviceAlert,
+            );
+            this.props.vm.removeListener(
+                "PERIPHERAL_REALTIME_CONNECTION_LOST_ERROR",
+                this.handleDeviceRealtimeAlert,
+            );
+            this.props.vm.removeListener(
+                "PERIPHERAL_REALTIME_CONNECT_SUCCESS",
+                this.handleDeviceRealtimeSuccess,
+            );
             if (this.props.attachKeyboardEvents) {
-                document.removeEventListener('keydown', this.handleKeyDown);
-                document.removeEventListener('keyup', this.handleKeyUp);
+                document.removeEventListener("keydown", this.handleKeyDown);
+                document.removeEventListener("keyup", this.handleKeyUp);
             }
         }
-        handleProjectChanged () {
-            if (this.props.shouldUpdateProjectChanged && !this.props.projectChanged) {
+        handleProjectChanged() {
+            if (
+                this.props.shouldUpdateProjectChanged &&
+                !this.props.projectChanged
+            ) {
                 this.props.onProjectChanged();
             }
         }
-        handleTargetsUpdate (data) {
+        handleTargetsUpdate(data) {
             if (this.props.shouldUpdateTargets) {
                 this.props.onTargetsUpdate(data);
             }
         }
-        handleKeyDown (e) {
+        handleKeyDown(e) {
             // Don't capture keys intended for Blockly inputs.
             if (e.target !== document && e.target !== document.body) return;
 
-            const key = (!e.key || e.key === 'Dead') ? e.keyCode : e.key;
-            this.props.vm.postIOData('keyboard', {
+            const key = !e.key || e.key === "Dead" ? e.keyCode : e.key;
+            this.props.vm.postIOData("keyboard", {
                 key: key,
-                isDown: true
+                isDown: true,
             });
 
+            // Forward to Python event-driven runtime
+            // Normalize browser key values to Scratch key names
+            let keyName = typeof e.key === "string" ? e.key : String(key);
+            if (keyName === " ") keyName = "space";
+            if (keyName === "ArrowUp") keyName = "up arrow";
+            if (keyName === "ArrowDown") keyName = "down arrow";
+            if (keyName === "ArrowLeft") keyName = "left arrow";
+            if (keyName === "ArrowRight") keyName = "right arrow";
+            forwardEventToPython({ name: "key_pressed", value: keyName });
+
             // Prevent space/arrow key from scrolling the page.
-            if (e.keyCode === 32 || // 32=space
-                (e.keyCode >= 37 && e.keyCode <= 40)) { // 37, 38, 39, 40 are arrows
+            if (
+                e.keyCode === 32 || // 32=space
+                (e.keyCode >= 37 && e.keyCode <= 40)
+            ) {
+                // 37, 38, 39, 40 are arrows
                 e.preventDefault();
             }
         }
-        handleKeyUp (e) {
+        handleKeyUp(e) {
             // Always capture up events,
             // even those that have switched to other targets.
-            const key = (!e.key || e.key === 'Dead') ? e.keyCode : e.key;
-            this.props.vm.postIOData('keyboard', {
+            const key = !e.key || e.key === "Dead" ? e.keyCode : e.key;
+            this.props.vm.postIOData("keyboard", {
                 key: key,
-                isDown: false
+                isDown: false,
             });
 
             // E.g., prevent scroll.
@@ -132,29 +187,35 @@ const vmListenerHOC = function (WrappedComponent) {
                 e.preventDefault();
             }
         }
-        handleDeviceAlert (data) {
-            const device = this.props.deviceData.find(dev => dev.deviceId === data.deviceId);
+        handleDeviceAlert(data) {
+            const device = this.props.deviceData.find(
+                (dev) => dev.deviceId === data.deviceId,
+            );
             if (device) {
                 this.props.onShowDeviceAlert(device);
             }
         }
-        handleDeviceRealtimeAlert (data) {
-            const device = this.props.deviceData.find(dev => dev.deviceId === data.deviceId);
+        handleDeviceRealtimeAlert(data) {
+            const device = this.props.deviceData.find(
+                (dev) => dev.deviceId === data.deviceId,
+            );
             device.message = data.message;
             if (device) {
                 this.props.onShowDeviceRealtimeAlert(device);
                 this.props.onSetRealtimeConnection(false);
             }
         }
-        handleDeviceRealtimeSuccess (data) {
-            const device = this.props.deviceData.find(dev => dev.deviceId === data.deviceId);
+        handleDeviceRealtimeSuccess(data) {
+            const device = this.props.deviceData.find(
+                (dev) => dev.deviceId === data.deviceId,
+            );
             device.message = data.message;
             if (device) {
                 this.props.onClearDeviceRealtimeAlert(device);
                 this.props.onSetRealtimeConnection(true);
             }
         }
-        render () {
+        render() {
             const {
                 /* eslint-disable no-unused-vars */
                 attachKeyboardEvents,
@@ -213,33 +274,39 @@ const vmListenerHOC = function (WrappedComponent) {
         shouldUpdateTargets: PropTypes.bool,
         shouldUpdateProjectChanged: PropTypes.bool,
         username: PropTypes.string,
-        vm: PropTypes.instanceOf(VM).isRequired
+        vm: PropTypes.instanceOf(VM).isRequired,
     };
     VMListener.defaultProps = {
         attachKeyboardEvents: true,
-        onGreenFlag: () => ({})
+        onGreenFlag: () => ({}),
     };
-    const mapStateToProps = state => ({
+    const mapStateToProps = (state) => ({
         deviceData: state.scratchGui.deviceData.deviceData,
         projectChanged: state.scratchGui.projectChanged,
         // Do not emit target or project updates in fullscreen or player only mode
         // or when recording sounds (it leads to garbled recordings on low-power machines)
-        shouldUpdateTargets: !state.scratchGui.mode.isFullScreen && !state.scratchGui.mode.isPlayerOnly &&
+        shouldUpdateTargets:
+            !state.scratchGui.mode.isFullScreen &&
+            !state.scratchGui.mode.isPlayerOnly &&
             !state.scratchGui.modals.soundRecorder,
         // Do not update the projectChanged state in fullscreen or player only mode
-        shouldUpdateProjectChanged: !state.scratchGui.mode.isFullScreen && !state.scratchGui.mode.isPlayerOnly,
+        shouldUpdateProjectChanged:
+            !state.scratchGui.mode.isFullScreen &&
+            !state.scratchGui.mode.isPlayerOnly,
         vm: state.scratchGui.vm,
-        username: state.session && state.session.session && state.session.session.user ?
-            state.session.session.user.username : ''
+        username:
+            state.session && state.session.session && state.session.session.user
+                ? state.session.session.user.username
+                : "",
     });
-    const mapDispatchToProps = dispatch => ({
-        onTargetsUpdate: data => {
+    const mapDispatchToProps = (dispatch) => ({
+        onTargetsUpdate: (data) => {
             dispatch(updateTargets(data.targetList, data.editingTarget));
         },
-        onMonitorsUpdate: monitorList => {
+        onMonitorsUpdate: (monitorList) => {
             dispatch(updateMonitors(monitorList));
         },
-        onBlockDragUpdate: areBlocksOverGui => {
+        onBlockDragUpdate: (areBlocksOverGui) => {
             dispatch(updateBlockDrag(areBlocksOverGui));
         },
         onProjectRunStart: () => dispatch(setRunningState(true)),
@@ -249,27 +316,24 @@ const vmListenerHOC = function (WrappedComponent) {
         onRuntimeStarted: () => dispatch(setStartedState(true)),
         onTurboModeOn: () => dispatch(setTurboState(true)),
         onTurboModeOff: () => dispatch(setTurboState(false)),
-        onShowDeviceAlert: device => {
+        onShowDeviceAlert: (device) => {
             dispatch(showDeviceAlert(device));
         },
-        onShowDeviceRealtimeAlert: device => {
+        onShowDeviceRealtimeAlert: (device) => {
             dispatch(showDeviceRealtimeAlert(device));
         },
-        onClearDeviceRealtimeAlert: device => {
+        onClearDeviceRealtimeAlert: (device) => {
             dispatch(clearDeviceRealtimeAlert(device));
         },
-        onSetDeviceData: data => dispatch(setDeviceData(data)),
-        onSetRealtimeConnection: state => {
+        onSetDeviceData: (data) => dispatch(setDeviceData(data)),
+        onSetRealtimeConnection: (state) => {
             dispatch(setRealtimeConnection(state));
         },
-        onMicListeningUpdate: listening => {
+        onMicListeningUpdate: (listening) => {
             dispatch(updateMicIndicator(listening));
-        }
+        },
     });
-    return connect(
-        mapStateToProps,
-        mapDispatchToProps
-    )(VMListener);
+    return connect(mapStateToProps, mapDispatchToProps)(VMListener);
 };
 
 export default vmListenerHOC;

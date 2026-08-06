@@ -58,6 +58,7 @@ const PythonIdeComponent = (props) => {
         onReplSend,
         onRunRepl,
         onUploadMain,
+        onUploadMulti,
         onCodeChange,
         onRun,
         onRunAll,
@@ -198,6 +199,18 @@ const PythonIdeComponent = (props) => {
             setIsUploading(false);
         }
     };
+    const handleUploadMulti = async () => {
+        if (isUploading || !onUploadMulti) return;
+        setIsUploading(true);
+        try {
+            await onUploadMulti();
+            setActiveBottomTab("repl");
+        } catch (e) {
+            console.error("Multi-file upload failed:", e);
+        } finally {
+            setIsUploading(false);
+        }
+    };
     const editorRef = useRef(null);
     const monacoRef = useRef(null);
     const validateTimerRef = useRef(null);
@@ -207,6 +220,8 @@ const PythonIdeComponent = (props) => {
     spriteNamesRef.current = spriteNames;
     const deviceIdRef = useRef(deviceId);
     deviceIdRef.current = deviceId;
+    const activeFileRef = useRef(activeFile);
+    activeFileRef.current = activeFile;
     useEffect(() => {
         // Stage size changes can resize the editor pane without a browser resize event.
         // Trigger both Monaco layout and a synthetic resize to refresh dependent widgets.
@@ -301,6 +316,7 @@ const PythonIdeComponent = (props) => {
         );
         // Defer initial validation: wait for Pyodide + one frame so UI settles
         const runInitialValidation = async () => {
+            if (!/\.py$/i.test(activeFileRef.current || "")) return; // skip non-.py
             if (!window.pyodide && window.loadingPyodidePromise) {
                 await window.loadingPyodidePromise;
             }
@@ -319,7 +335,17 @@ const PythonIdeComponent = (props) => {
             }
             validateTimerRef.current = setTimeout(() => {
                 try {
-                    validator(editor.getValue(), setSyntaxStatus);
+                    // Skip Python validation for non-.py files
+                    if (/\.py$/i.test(activeFileRef.current || "")) {
+                        validator(editor.getValue(), setSyntaxStatus);
+                    } else {
+                        monaco.editor.setModelMarkers(
+                            editor.getModel(),
+                            "python-syntax",
+                            [],
+                        );
+                        setSyntaxStatus("");
+                    }
                 } catch (err) {}
             }, 250);
         });
@@ -884,7 +910,15 @@ const PythonIdeComponent = (props) => {
                     ) : (
                         <Box className={styles.editorWrapperWithLoading}>
                             <CodeEditor
-                                language="python"
+                                language={
+                                    /\.(py|pyw)$/i.test(activeFile)
+                                        ? "python"
+                                        : /\.(txt|log|md|json|csv)$/i.test(
+                                                activeFile,
+                                            )
+                                          ? "plaintext"
+                                          : "python"
+                                }
                                 value={code}
                                 theme="vs"
                                 options={{
@@ -1196,9 +1230,9 @@ const PythonIdeComponent = (props) => {
                                                 isUploading ||
                                                 !isDeviceConnected
                                             }
-                                            onClick={handleUploadMain}
+                                            onClick={handleUploadMulti}
                                             type="button"
-                                            title="Upload main.py permanently and auto-run"
+                                            title="Upload all project files to board (preserves folder structure)"
                                         >
                                             <svg
                                                 width="16"
@@ -1208,25 +1242,17 @@ const PythonIdeComponent = (props) => {
                                                 stroke="currentColor"
                                                 strokeWidth="2"
                                             >
-                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                                <polyline points="14 2 14 8 20 8" />
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                                <polyline points="17 8 12 3 7 8" />
                                                 <line
-                                                    x1="16"
-                                                    y1="13"
-                                                    x2="8"
-                                                    y2="13"
-                                                />
-                                                <line
-                                                    x1="16"
-                                                    y1="17"
-                                                    x2="8"
-                                                    y2="17"
+                                                    x1="12"
+                                                    y1="3"
+                                                    x2="12"
+                                                    y2="15"
                                                 />
                                             </svg>
                                             <span className={styles.btnLabel}>
-                                                {isUploading
-                                                    ? "..."
-                                                    : "Upload main.py"}
+                                                {isUploading ? "..." : "Upload"}
                                             </span>
                                         </button>
                                     </>
@@ -1665,6 +1691,7 @@ PythonIdeComponent.propTypes = {
     onReplSend: PropTypes.func,
     onRunRepl: PropTypes.func,
     onUploadMain: PropTypes.func,
+    onUploadMulti: PropTypes.func,
     realtimeMode: PropTypes.bool,
     onRealtimeModeChange: PropTypes.func,
     onCodeChange: PropTypes.func,
@@ -1697,6 +1724,7 @@ PythonIdeComponent.propTypes = {
     onFlashFirmware: PropTypes.func,
     onDetectFirmware: PropTypes.func,
     onUploadMain: PropTypes.func,
+    onUploadMulti: PropTypes.func,
     onRunRepl: PropTypes.func,
     onStopBoard: PropTypes.func,
     stageSizeMode: PropTypes.string,
