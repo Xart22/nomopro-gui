@@ -1,19 +1,20 @@
-const OPEN_MODAL = 'scratch-gui/modals/OPEN_MODAL';
-const CLOSE_MODAL = 'scratch-gui/modals/CLOSE_MODAL';
+const OPEN_MODAL = "scratch-gui/modals/OPEN_MODAL";
+const CLOSE_MODAL = "scratch-gui/modals/CLOSE_MODAL";
 
-const MODAL_BACKDROP_LIBRARY = 'backdropLibrary';
-const MODAL_COSTUME_LIBRARY = 'costumeLibrary';
-const MODAL_EXTENSION_LIBRARY = 'extensionLibrary';
-const MODAL_LOADING_PROJECT = 'loadingProject';
-const MODAL_TELEMETRY = 'telemetryModal';
-const MODAL_SOUND_LIBRARY = 'soundLibrary';
-const MODAL_SPRITE_LIBRARY = 'spriteLibrary';
-const MODAL_SOUND_RECORDER = 'soundRecorder';
-const MODAL_CONNECTION = 'connectionModal';
-const MODAL_TIPS_LIBRARY = 'tipsLibrary';
-const MODAL_UPLOAD_PROGRESS = 'uploadProgress';
-const MODAL_DEVICE_LIBRARY = 'deviceLibrary';
-const MODAL_UPDATE = 'updateModal';
+const MODAL_BACKDROP_LIBRARY = "backdropLibrary";
+const MODAL_COSTUME_LIBRARY = "costumeLibrary";
+const MODAL_EXTENSION_LIBRARY = "extensionLibrary";
+const MODAL_LOADING_PROJECT = "loadingProject";
+const MODAL_TELEMETRY = "telemetryModal";
+const MODAL_SOUND_LIBRARY = "soundLibrary";
+const MODAL_SPRITE_LIBRARY = "spriteLibrary";
+const MODAL_SOUND_RECORDER = "soundRecorder";
+const MODAL_CONNECTION = "connectionModal";
+const MODAL_TIPS_LIBRARY = "tipsLibrary";
+const MODAL_UPLOAD_PROGRESS = "uploadProgress";
+const MODAL_ONBOARDING = "onboarding";
+const MODAL_DEVICE_LIBRARY = "deviceLibrary";
+const MODAL_UPDATE = "updateModal";
 
 const initialState = {
     [MODAL_BACKDROP_LIBRARY]: false,
@@ -28,34 +29,35 @@ const initialState = {
     [MODAL_UPLOAD_PROGRESS]: false,
     [MODAL_DEVICE_LIBRARY]: false,
     [MODAL_TIPS_LIBRARY]: false,
-    [MODAL_UPDATE]: false
+    [MODAL_ONBOARDING]: false,
+    [MODAL_UPDATE]: false,
 };
 
 const reducer = function (state, action) {
-    if (typeof state === 'undefined') state = initialState;
+    if (typeof state === "undefined") state = initialState;
     switch (action.type) {
-    case OPEN_MODAL:
-        return Object.assign({}, state, {
-            [action.modal]: true
-        });
-    case CLOSE_MODAL:
-        return Object.assign({}, state, {
-            [action.modal]: false
-        });
-    default:
-        return state;
+        case OPEN_MODAL:
+            return Object.assign({}, state, {
+                [action.modal]: true,
+            });
+        case CLOSE_MODAL:
+            return Object.assign({}, state, {
+                [action.modal]: false,
+            });
+        default:
+            return state;
     }
 };
 const openModal = function (modal) {
     return {
         type: OPEN_MODAL,
-        modal: modal
+        modal: modal,
     };
 };
 const closeModal = function (modal) {
     return {
         type: CLOSE_MODAL,
-        modal: modal
+        modal: modal,
     };
 };
 const openBackdropLibrary = function () {
@@ -93,6 +95,9 @@ const openDeviceLibrary = function () {
 };
 const openTipsLibrary = function () {
     return openModal(MODAL_TIPS_LIBRARY);
+};
+const openOnboarding = function () {
+    return openModal(MODAL_ONBOARDING);
 };
 const openUpdateModal = function () {
     return openModal(MODAL_UPDATE);
@@ -133,6 +138,9 @@ const closeUploadProgress = function () {
 const closeDeviceLibrary = function () {
     return closeModal(MODAL_DEVICE_LIBRARY);
 };
+const closeOnboarding = function () {
+    return closeModal(MODAL_ONBOARDING);
+};
 const closeUpdateModal = function () {
     return closeModal(MODAL_UPDATE);
 };
@@ -151,8 +159,10 @@ export {
     openTelemetryModal,
     openTipsLibrary,
     openUploadProgress,
+    openOnboarding,
     openUpdateModal,
     closeBackdropLibrary,
+    closeOnboarding,
     closeConnectionModal,
     closeCostumeLibrary,
     closeDeviceLibrary,
@@ -164,5 +174,5 @@ export {
     closeTelemetryModal,
     closeTipsLibrary,
     closeUploadProgress,
-    closeUpdateModal
+    closeUpdateModal,
 };

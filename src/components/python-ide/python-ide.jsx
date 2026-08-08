@@ -1,60 +1,50 @@
-import React, {useRef, useState, useEffect} from 'react';
-import PropTypes from 'prop-types';
-
-import Box from '../box/box.jsx';
-import CodeEditor from '../../containers/code-editor.jsx';
-import {registerPythonCompletionProvider} from '../../lib/python-completion-provider';
-import {STORAGE, UPLOAD_CONFIG} from './python-ide-config';
+import React, { useRef, useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import Box from "../box/box.jsx";
+import CodeEditor from "../../containers/code-editor.jsx";
+import { registerPythonCompletionProvider } from "../../lib/python-completion-provider";
+import { STORAGE, UPLOAD_CONFIG } from "./python-ide-config";
 import {
     isFileAllowedForUploadType,
     isImageFile,
     isTextReadableFile,
     isImageDataUrl,
-    generateUniqueId
-} from './python-ide-utils';
-import {createSyntaxValidator} from './python-analyzer';
-import ContextMenu from './python-ide-context-menu.jsx';
-import ModuleRow from './python-ide-module-row.jsx';
-import InputModal from './input-modal.jsx';
-import DesktopTools from './desktop-tools.jsx';
-import TutorialOverlay, {TUTORIAL_STEPS} from './tutorial-overlay.jsx';
-import SerialTerminal from './serial-terminal.jsx';
-import ReplTerminal from './repl-terminal.jsx';
-import FileTreeView from './file-tree-view.jsx';
-import FloatingToolbar from './floating-toolbar.jsx';
-import UploadToolbar from './upload-toolbar.jsx';
-
-import useTerminalAutoScroll from './use-terminal-auto-scroll';
-import usePyodideLoader from './use-pyodide-loader';
-import pythonIcon from './python-logo.svg';
-import {formatPythonError} from './python-error-formatter.js';
-
-import styles from './python-ide.css';
-
-const TUTORIAL_DISMISSED_KEY = 'python-ide-tutorial-dismissed';
-const TUTORIAL_SHOWN_KEY = 'python-ide-tutorial-shown';
-
+    generateUniqueId,
+} from "./python-ide-utils";
+import { createSyntaxValidator } from "./python-analyzer";
+import ContextMenu from "./python-ide-context-menu.jsx";
+import ModuleRow from "./python-ide-module-row.jsx";
+import InputModal from "./input-modal.jsx";
+import DesktopTools from "./desktop-tools.jsx";
+import TutorialOverlay, { TUTORIAL_STEPS } from "./tutorial-overlay.jsx";
+import SerialTerminal from "./serial-terminal.jsx";
+import ReplTerminal from "./repl-terminal.jsx";
+import FileTreeView from "./file-tree-view.jsx";
+import FloatingToolbar from "./floating-toolbar.jsx";
+import UploadToolbar from "./upload-toolbar.jsx";
+import useTerminalAutoScroll from "./use-terminal-auto-scroll";
+import usePyodideLoader from "./use-pyodide-loader";
+import pythonIcon from "./python-logo.svg";
+import { formatPythonError } from "./python-error-formatter.js";
+import styles from "./python-ide.css";
+const TUTORIAL_DISMISSED_KEY = "python-ide-tutorial-dismissed";
+const TUTORIAL_SHOWN_KEY = "python-ide-tutorial-shown";
 const UPLOAD_ICONS = {
-    video: '🎬',
-    image: '🖼',
-    csv: '📊',
-    text: '📄',
-    audio: '🎵',
-    python: <img
-        src={pythonIcon}
-        className={styles.pythonIcon}
-        alt=""
-    />
+    video: "🎬",
+    image: "🖼",
+    csv: "📊",
+    text: "📄",
+    audio: "🎵",
+    python: <img src={pythonIcon} className={styles.pythonIcon} alt="" />,
 };
-
-const PythonIdeComponent = props => {
+const PythonIdeComponent = (props) => {
     const {
         activeFile,
         activeTargetId,
         fileList = [],
         fileTree = [],
         expandedFolderIds = new Set(),
-        code = '',
+        code = "",
         isRunning = false,
         runOutput,
         runError,
@@ -66,8 +56,9 @@ const PythonIdeComponent = props => {
         onSerialSend,
         onSerialBaudrate,
         onReplSend,
-        onUploadToDevice,
-        onUploadAsMain,
+        onRunRepl,
+        onUploadMain,
+        onUploadMulti,
         onCodeChange,
         onRun,
         onRunAll,
@@ -88,26 +79,23 @@ const PythonIdeComponent = props => {
         onSetModuleLibraryItems,
         // MicroPython upload mode props
         supportsMicroPython = false,
-        runtimeTarget = 'vm',
+        runtimeTarget = "vm",
         onRuntimeTargetChange,
-        firmwareStatus = 'unknown',
+        firmwareStatus = "unknown",
         mpIsUploading = false,
-        mpUploadProgress = {stage: '', percent: 0},
+        mpUploadProgress = { stage: "", percent: 0 },
         mpUploadLog = [],
         onFlashFirmware,
         onDetectFirmware,
-        onUploadRun,
-        onUploadOnly,
         onStopBoard,
-        stageSizeMode
+        stageSizeMode,
     } = props;
-
     const [isTerminalExpanded, setIsTerminalExpanded] = useState(false);
-    const [activeBottomTab, setActiveBottomTab] = useState('output');
+    const [activeBottomTab, setActiveBottomTab] = useState("output");
     const [showSearch, setShowSearch] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState("");
     const terminalRef = useRef(null);
-    const {isAutoScroll, setIsAutoScroll} = useTerminalAutoScroll(
+    const { isAutoScroll, setIsAutoScroll } = useTerminalAutoScroll(
         terminalRef,
         activeBottomTab,
     );
@@ -115,112 +103,125 @@ const PythonIdeComponent = props => {
     const [contextTarget, setContextTarget] = useState(null);
     const [inputModal, setInputModal] = useState({
         isOpen: false,
-        title: '',
-        placeholder: '',
-        callback: null
+        title: "",
+        placeholder: "",
+        callback: null,
     });
     const [clipboardItem, setClipboardItem] = useState(null);
-    const [uploadConfig, setUploadConfig] = useState('any');
+    const [uploadConfig, setUploadConfig] = useState("any");
     const [selectedFolderId, setSelectedFolderId] = useState(null);
     const [isDesktopToolsOpen, setIsDesktopToolsOpen] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
-    const [syntaxStatus, setSyntaxStatus] = useState('');
+    const [syntaxStatus, setSyntaxStatus] = useState("");
     const [pyodideLoading, setPyodideLoading] = useState(false);
-    const {isLoading: pyodideIsLoading} = usePyodideLoader();
+    const { isLoading: pyodideIsLoading } = usePyodideLoader();
     const [editorReady, setEditorReady] = useState(false);
     const isPythonEnvironmentReady = editorReady && !pyodideIsLoading;
-    const [cursorPos, setCursorPos] = useState({line: 1, column: 1});
+    const [cursorPos, setCursorPos] = useState({ line: 1, column: 1 });
     const [zoomLevel, setZoomLevel] = useState(100);
-
     const [showTutorial, setShowTutorial] = useState(false);
     const [tutorialStep, setTutorialStep] = useState(0);
     const [tutorialDontShow, setTutorialDontShow] = useState(false);
     const tutorialSteps = TUTORIAL_STEPS.length;
-
+    // Tampilkan tutorial setiap kali halaman di-load (full reload),
+    // selama user belum centang "Don't show again"
     useEffect(() => {
         try {
             const dismissed = localStorage.getItem(TUTORIAL_DISMISSED_KEY);
-            const shown = localStorage.getItem(TUTORIAL_SHOWN_KEY);
-            if (!dismissed && !shown) {
-                localStorage.setItem(TUTORIAL_SHOWN_KEY, '1');
+            if (!dismissed) {
                 setShowTutorial(true);
             }
         } catch (e) {}
     }, []);
-
     const persistTutorialDismissed = () => {
         if (!tutorialDontShow) return;
         try {
-            localStorage.setItem(TUTORIAL_DISMISSED_KEY, '1');
+            localStorage.setItem(TUTORIAL_DISMISSED_KEY, "1");
         } catch (e) {}
     };
-
     const handleTutorialFinish = () => {
         persistTutorialDismissed();
         setShowTutorial(false);
         setTutorialStep(0);
+        // Hapus shown key agar tutorial muncul lagi saat reload
+        try {
+            sessionStorage.removeItem(TUTORIAL_SHOWN_KEY);
+        } catch (e) {}
     };
     const handleTutorialNext = () => {
         if (tutorialStep < tutorialSteps - 1) {
-            setTutorialStep(s => s + 1);
+            setTutorialStep((s) => s + 1);
         } else {
             handleTutorialFinish();
         }
     };
     const handleTutorialPrev = () => {
-        if (tutorialStep > 0) setTutorialStep(s => s - 1);
+        if (tutorialStep > 0) setTutorialStep((s) => s - 1);
     };
     const handleTutorialSkip = () => {
         persistTutorialDismissed();
         setShowTutorial(false);
         setTutorialStep(0);
+        // Hapus shown key agar tutorial muncul lagi saat reload
+        try {
+            sessionStorage.removeItem(TUTORIAL_SHOWN_KEY);
+        } catch (e) {}
     };
-
-    const handleTutorialDontShowChange = value => {
+    const handleTutorialDontShowChange = (value) => {
         setTutorialDontShow(value);
         if (value) {
             try {
-                localStorage.setItem(TUTORIAL_DISMISSED_KEY, '1');
+                localStorage.setItem(TUTORIAL_DISMISSED_KEY, "1");
             } catch (e) {}
         }
     };
-
-    const handleUploadToDevice = async () => {
-        if (isUploading || !onUploadToDevice) return;
+    const handleRunRepl = async () => {
+        if (isUploading || !onRunRepl) return;
         setIsUploading(true);
         try {
-            await onUploadToDevice(code);
-            setActiveBottomTab('repl');
+            await onRunRepl(code);
+            setActiveBottomTab("repl");
         } catch (e) {
-            console.error('Upload to device failed:', e);
+            console.error("Run REPL failed:", e);
         } finally {
             setIsUploading(false);
         }
     };
-
-    const handleUploadAsMain = async () => {
-        if (isUploading || !onUploadAsMain) return;
+    const handleUploadMain = async () => {
+        if (isUploading || !onUploadMain) return;
         setIsUploading(true);
         try {
-            await onUploadAsMain(code);
-            setActiveBottomTab('repl');
+            await onUploadMain(code);
+            setActiveBottomTab("repl");
         } catch (e) {
-            console.error('Upload as main.py failed:', e);
+            console.error("Upload main.py failed:", e);
         } finally {
             setIsUploading(false);
         }
     };
-
+    const handleUploadMulti = async () => {
+        if (isUploading || !onUploadMulti) return;
+        setIsUploading(true);
+        try {
+            await onUploadMulti();
+            setActiveBottomTab("repl");
+        } catch (e) {
+            console.error("Multi-file upload failed:", e);
+        } finally {
+            setIsUploading(false);
+        }
+    };
     const editorRef = useRef(null);
     const monacoRef = useRef(null);
     const validateTimerRef = useRef(null);
     const uploadInputRef = useRef();
-    const pendingUploadRef = useRef({type: 'any', parentId: null});
+    const pendingUploadRef = useRef({ type: "any", parentId: null });
     const spriteNamesRef = useRef(spriteNames);
     spriteNamesRef.current = spriteNames;
     const deviceIdRef = useRef(deviceId);
     deviceIdRef.current = deviceId;
-
+    const activeFileRef = useRef(activeFile);
+    activeFileRef.current = activeFile;
     useEffect(() => {
         // Stage size changes can resize the editor pane without a browser resize event.
         // Trigger both Monaco layout and a synthetic resize to refresh dependent widgets.
@@ -228,21 +229,18 @@ const PythonIdeComponent = props => {
             try {
                 editorRef.current?.layout?.();
             } catch (e) {}
-            if (typeof window !== 'undefined') {
-                window.dispatchEvent(new Event('resize'));
+            if (typeof window !== "undefined") {
+                window.dispatchEvent(new Event("resize"));
             }
         };
-
         relayout();
         const t1 = setTimeout(relayout, 0);
         const t2 = setTimeout(relayout, 120);
-
         return () => {
             clearTimeout(t1);
             clearTimeout(t2);
         };
     }, [stageSizeMode]);
-
     useEffect(() => {
         // On mount: if localStorage has module entries and Redux prop only
         // has the default core items, migrate from localStorage to Redux.
@@ -259,30 +257,28 @@ const PythonIdeComponent = props => {
             }
         } catch (e) {}
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
     useEffect(() => {
-        const handleAddExtension = e => {
+        const handleAddExtension = (e) => {
             const name = e && e.detail && e.detail.name;
             if (!name) return;
             if (
                 moduleLibraryItems.some(
-                    m => m.name.toLowerCase() === name.toLowerCase(),
+                    (m) => m.name.toLowerCase() === name.toLowerCase(),
                 )
             ) {
                 return;
             }
-            const next = [...moduleLibraryItems, {name, core: false}];
+            const next = [...moduleLibraryItems, { name, core: false }];
             onSetModuleLibraryItems?.(next);
         };
-        window.addEventListener('python-ide-add-extension', handleAddExtension);
+        window.addEventListener("python-ide-add-extension", handleAddExtension);
         return () => {
             window.removeEventListener(
-                'python-ide-add-extension',
+                "python-ide-add-extension",
                 handleAddExtension,
             );
         };
     }, [moduleLibraryItems, onSetModuleLibraryItems]);
-
     useEffect(() => {
         try {
             localStorage.setItem(
@@ -291,7 +287,6 @@ const PythonIdeComponent = props => {
             );
         } catch (e) {}
     }, [moduleLibraryItems]);
-
     useEffect(() => {
         if (monacoRef.current) {
             registerPythonCompletionProvider(
@@ -301,66 +296,70 @@ const PythonIdeComponent = props => {
             );
         }
     }, [deviceId]);
-
-    const handleEditorWillMount = monaco => {
+    const handleEditorWillMount = (monaco) => {
         registerPythonCompletionProvider(
             monaco,
             spriteNamesRef.current,
             deviceIdRef.current,
         );
     };
-
     const handleEditorDidMount = (editor, monaco) => {
         editorRef.current = editor;
         monacoRef.current = monaco;
         setEditorReady(true);
-
-        const glyphClass = styles['error-glyph'] || 'error-glyph';
+        const glyphClass = styles["error-glyph"] || "error-glyph";
         const validator = createSyntaxValidator(
             monaco,
             editor,
             setPyodideLoading,
             glyphClass,
         );
-
         // Defer initial validation: wait for Pyodide + one frame so UI settles
         const runInitialValidation = async () => {
+            if (!/\.py$/i.test(activeFileRef.current || "")) return; // skip non-.py
             if (!window.pyodide && window.loadingPyodidePromise) {
                 await window.loadingPyodidePromise;
             }
             // Wait one frame so the UI can paint before WASM work
-            await new Promise(r => requestAnimationFrame(r));
+            await new Promise((r) => requestAnimationFrame(r));
             try {
                 validator(editor.getValue(), setSyntaxStatus);
             } catch (err) {
-                console.error('[PythonIDE] Initial validation error:', err);
+                console.error("[PythonIDE] Initial validation error:", err);
             }
         };
         runInitialValidation();
-
         editor.onDidChangeModelContent(() => {
             if (validateTimerRef.current) {
                 clearTimeout(validateTimerRef.current);
             }
             validateTimerRef.current = setTimeout(() => {
                 try {
-                    validator(editor.getValue(), setSyntaxStatus);
+                    // Skip Python validation for non-.py files
+                    if (/\.py$/i.test(activeFileRef.current || "")) {
+                        validator(editor.getValue(), setSyntaxStatus);
+                    } else {
+                        monaco.editor.setModelMarkers(
+                            editor.getModel(),
+                            "python-syntax",
+                            [],
+                        );
+                        setSyntaxStatus("");
+                    }
                 } catch (err) {}
             }, 250);
         });
-
         try {
-            editor.onDidChangeCursorPosition(e => {
+            editor.onDidChangeCursorPosition((e) => {
                 const pos = e?.position || editor.getPosition();
                 if (pos) {
-                    setCursorPos({line: pos.lineNumber, column: pos.column});
+                    setCursorPos({ line: pos.lineNumber, column: pos.column });
                 }
             });
         } catch (err) {}
-
         try {
-            monaco.languages.registerHoverProvider('python', {
-                provideHover (model, position) {
+            monaco.languages.registerHoverProvider("python", {
+                provideHover(model, position) {
                     const word = model.getWordAtPosition(position);
                     if (!word) return null;
                     const line = model.getLineContent(position.lineNumber);
@@ -372,24 +371,22 @@ const PythonIdeComponent = props => {
                     if (!isDefined) return null;
                     return {
                         contents: [
-                            {language: 'python', value: word.word},
-                            'Variable, function, or class defined in scope'
-                        ]
+                            { language: "python", value: word.word },
+                            "Variable, function, or class defined in scope",
+                        ],
                     };
-                }
+                },
             });
         } catch (err) {}
     };
-
     const closeModal = () => {
         setInputModal({
             isOpen: false,
-            title: '',
-            placeholder: '',
-            callback: null
+            title: "",
+            placeholder: "",
+            callback: null,
         });
     };
-
     const createFileWithName = (
         title,
         placeholder,
@@ -400,64 +397,58 @@ const PythonIdeComponent = props => {
             isOpen: true,
             title,
             placeholder,
-            callback: input => {
+            callback: (input) => {
                 if (input?.trim() && onCreateFile) {
-                    const cleanName = fileName ?
-                        input
-                            .trim()
-                            .replace(new RegExp(`\\${fileName}$`, 'i'), '') +
-                          fileName :
-                        input.trim();
+                    const cleanName = fileName
+                        ? input
+                              .trim()
+                              .replace(new RegExp(`\\${fileName}$`, "i"), "") +
+                          fileName
+                        : input.trim();
                     onCreateFile(
                         cleanName,
                         parentId || selectedFolderId || null,
                         generateUniqueId(),
-                        '',
+                        "",
                     );
                 }
                 closeModal();
-            }
+            },
         });
     };
-
-    const startUpload = type => {
+    const startUpload = (type) => {
         const config = UPLOAD_CONFIG[type] || UPLOAD_CONFIG.any;
-        pendingUploadRef.current = {type, parentId: selectedFolderId};
+        pendingUploadRef.current = { type, parentId: selectedFolderId };
         setUploadConfig(config.accept);
         if (uploadInputRef.current) {
             uploadInputRef.current.accept = config.accept;
-            uploadInputRef.current.value = '';
+            uploadInputRef.current.value = "";
             uploadInputRef.current.click();
         }
     };
-
-    const handleUploadedFile = event => {
+    const handleUploadedFile = (event) => {
         const file = event.target.files?.[0];
         if (!file || !onCreateFile) return;
-
-        const {type, parentId} = pendingUploadRef.current;
+        const { type, parentId } = pendingUploadRef.current;
         if (!isFileAllowedForUploadType(file, type)) {
             alert(`File type not allowed for ${type} upload.`);
-            event.target.value = '';
+            event.target.value = "";
             return;
         }
-
         const targetId = generateUniqueId();
-
-        if (type === 'image') {
+        if (type === "image") {
             const reader = new FileReader();
-            reader.onload = e =>
+            reader.onload = (e) =>
                 onCreateFile(
                     file.name,
                     parentId,
                     targetId,
-                    String(e.target?.result || ''),
+                    String(e.target?.result || ""),
                 );
             reader.readAsDataURL(file);
-            event.target.value = '';
+            event.target.value = "";
             return;
         }
-
         if (!isTextReadableFile(file)) {
             onCreateFile(
                 file.name,
@@ -465,111 +456,107 @@ const PythonIdeComponent = props => {
                 targetId,
                 [
                     `# Uploaded: ${file.name}`,
-                    `# Type: ${file.type || 'unknown'}`,
+                    `# Type: ${file.type || "unknown"}`,
                     `# Size: ${file.size} bytes`,
-                    '',
-                    '# Binary asset reference.'
-                ].join('\n'),
+                    "",
+                    "# Binary asset reference.",
+                ].join("\n"),
             );
-            event.target.value = '';
+            event.target.value = "";
             return;
         }
-
         const reader = new FileReader();
-        reader.onload = e =>
+        reader.onload = (e) =>
             onCreateFile(
                 file.name,
                 parentId,
                 targetId,
-                String(e.target?.result || ''),
+                String(e.target?.result || ""),
             );
         reader.readAsText(file);
-        event.target.value = '';
+        event.target.value = "";
     };
-
     const openContextMenuAt = (event, target) => {
         event.preventDefault();
         event.stopPropagation();
-        setContextTarget(target || {scope: 'project'});
-        setContextMenu({x: event.clientX, y: event.clientY});
+        setContextTarget(target || { scope: "project" });
+        setContextMenu({ x: event.clientX, y: event.clientY });
     };
-
     const getContextMenuItems = () => {
-        const target = contextTarget || {scope: 'project'};
+        const target = contextTarget || { scope: "project" };
         const parentId =
-            target.scope === 'project' ?
-                null :
-                target.type === 'folder' ?
-                    target.id :
-                    target.parentId;
+            target.scope === "project"
+                ? null
+                : target.type === "folder"
+                  ? target.id
+                  : target.parentId;
         const item =
-            target.scope === 'project' ?
-                null :
-                fileTree?.find(i => i.id === target.id);
+            target.scope === "project"
+                ? null
+                : fileTree?.find((i) => i.id === target.id);
         const canPaste = Boolean(clipboardItem);
-
         return [
             {
-                label: 'New folder',
+                label: "New folder",
                 onClick: () =>
                     setInputModal({
                         isOpen: true,
-                        title: 'New Folder',
-                        placeholder: 'Folder name',
-                        callback: input => {
+                        title: "New Folder",
+                        placeholder: "Folder name",
+                        callback: (input) => {
                             if (input?.trim() && onCreateFolder) {
                                 onCreateFolder(input.trim(), parentId);
                             }
                             closeModal();
-                        }
-                    })
+                        },
+                    }),
             },
             {
-                label: 'Create Python file',
+                label: "Create Python file",
                 onClick: () =>
                     createFileWithName(
-                        'Create Python File',
-                        'Filename (without .py)',
-                        '.py',
+                        "Create Python File",
+                        "Filename (without .py)",
+                        ".py",
                         parentId,
-                    )
+                    ),
             },
             {
-                label: 'Create text file',
+                label: "Create text file",
                 onClick: () =>
                     createFileWithName(
-                        'Create Text File',
-                        'Filename (without .txt)',
-                        '.txt',
+                        "Create Text File",
+                        "Filename (without .txt)",
+                        ".txt",
                         parentId,
-                    )
+                    ),
             },
-            {label: 'Upload file', onClick: () => startUpload('any')},
-            {type: 'separator'},
+            { label: "Upload file", onClick: () => startUpload("any") },
+            { type: "separator" },
             {
-                label: 'Cut',
+                label: "Cut",
                 disabled: !item,
                 onClick: () =>
-                    item && setClipboardItem({mode: 'cut', itemId: item.id})
+                    item && setClipboardItem({ mode: "cut", itemId: item.id }),
             },
             {
-                label: 'Copy',
+                label: "Copy",
                 disabled: !item,
                 onClick: () =>
-                    item && setClipboardItem({mode: 'copy', itemId: item.id})
+                    item && setClipboardItem({ mode: "copy", itemId: item.id }),
             },
             {
-                label: 'Paste',
+                label: "Paste",
                 disabled: !canPaste || !onMoveTreeItem || !onDuplicateTreeItem,
                 onClick: () => {
                     if (!canPaste) return;
                     const destParentId =
-                        target.scope === 'project' ?
-                            null :
-                            target.type === 'folder' ?
-                                target.id :
-                                target.parentId;
-                    if (clipboardItem.mode === 'cut') {
+                        target.scope === "project"
+                            ? null
+                            : target.type === "folder"
+                              ? target.id
+                              : target.parentId;
+                    if (clipboardItem.mode === "cut") {
                         onMoveTreeItem?.(clipboardItem.itemId, destParentId);
                         setClipboardItem(null);
                     } else {
@@ -578,55 +565,48 @@ const PythonIdeComponent = props => {
                             destParentId,
                         );
                     }
-                }
+                },
             },
             {
-                label: 'Rename',
+                label: "Rename",
                 disabled: !item,
                 onClick: () =>
                     item &&
                     setInputModal({
                         isOpen: true,
-                        title: 'Rename',
-                        placeholder: 'New name',
-                        callback: newName => {
+                        title: "Rename",
+                        placeholder: "New name",
+                        callback: (newName) => {
                             if (newName?.trim()) {
                                 onRenameTreeItem?.(item.id, newName.trim());
                             }
                             closeModal();
-                        }
-                    })
+                        },
+                    }),
             },
-            {type: 'separator'},
+            { type: "separator" },
             {
-                label: 'Delete',
+                label: "Delete",
                 disabled: !item,
-                onClick: () => item && onDeleteTreeItem?.(item.id)
-            }
+                onClick: () => item && onDeleteTreeItem?.(item.id),
+            },
         ];
     };
-
     const handleFileContext = (e, item) => openContextMenuAt(e, item);
-
     const customFileTargetIds = new Set(
         (fileTree || [])
-            .filter(i => i.type === 'file' && i.targetId)
-            .map(i => i.targetId),
+            .filter((i) => i.type === "file" && i.targetId)
+            .map((i) => i.targetId),
     );
     const spriteScripts = (fileList || []).filter(
-        f => !customFileTargetIds.has(f.targetId),
+        (f) => !customFileTargetIds.has(f.targetId),
     );
-
     const isImagePreviewActive = isImageFile(activeFile);
     const imagePreviewSrc = isImageDataUrl(code) ? code : null;
-
     return (
         <Box className={styles.pythonIdeWrapper}>
             <Box className={styles.workspaceArea}>
-                <Box
-                    className={styles.sidebar}
-                    data-tutorial="sidebar"
-                >
+                <Box className={styles.sidebar} data-tutorial="sidebar">
                     <Box
                         className={`${styles.sidebarSection} ${styles.projectExplorerSection}`}
                     >
@@ -636,8 +616,8 @@ const PythonIdeComponent = props => {
                             </Box>
                             <button
                                 className={styles.sidebarMenuButton}
-                                onClick={e =>
-                                    openContextMenuAt(e, {scope: 'project'})
+                                onClick={(e) =>
+                                    openContextMenuAt(e, { scope: "project" })
                                 }
                                 type="button"
                                 title="Project menu"
@@ -647,8 +627,8 @@ const PythonIdeComponent = props => {
                         </Box>
                         <Box
                             className={styles.fileListContainer}
-                            onContextMenu={e =>
-                                openContextMenuAt(e, {scope: 'project'})
+                            onContextMenu={(e) =>
+                                openContextMenuAt(e, { scope: "project" })
                             }
                         >
                             <Box className={styles.fileGroup}>
@@ -684,14 +664,14 @@ const PythonIdeComponent = props => {
                                 </Box>
                                 <Box className={styles.fileGroupList}>
                                     {spriteScripts.length > 0 ? (
-                                        spriteScripts.map(file => (
+                                        spriteScripts.map((file) => (
                                             <button
                                                 key={file.targetId}
                                                 className={
                                                     activeTargetId ===
-                                                    file.targetId ?
-                                                        styles.fileItemActive :
-                                                        styles.fileItem
+                                                    file.targetId
+                                                        ? styles.fileItemActive
+                                                        : styles.fileItem
                                                 }
                                                 onClick={() =>
                                                     onSelectFile?.(
@@ -725,7 +705,6 @@ const PythonIdeComponent = props => {
                             </Box>
                         </Box>
                     </Box>
-
                     <Box className={styles.quickUploadFloatingZone}>
                         <button
                             className={styles.quickUploadFab}
@@ -736,13 +715,13 @@ const PythonIdeComponent = props => {
                         </button>
                         <Box className={styles.quickUploadFloatingMenu}>
                             {[
-                                'video',
-                                'image',
-                                'csv',
-                                'text',
-                                'audio',
-                                'python'
-                            ].map(type => (
+                                "video",
+                                "image",
+                                "csv",
+                                "text",
+                                "audio",
+                                "python",
+                            ].map((type) => (
                                 <button
                                     key={type}
                                     className={styles.quickUploadItem}
@@ -757,7 +736,6 @@ const PythonIdeComponent = props => {
                             ))}
                         </Box>
                     </Box>
-
                     <Box className={styles.modulesQuickMenuZone}>
                         <button
                             className={styles.quickUploadFab}
@@ -789,7 +767,6 @@ const PythonIdeComponent = props => {
                             </button>
                         </Box>
                     </Box>
-
                     <Box
                         className={`${styles.sidebarSection} ${styles.modulesSection}`}
                         data-tutorial="modules-section"
@@ -798,21 +775,21 @@ const PythonIdeComponent = props => {
                             Modules Libraries
                         </Box>
                         <Box className={styles.modulesList}>
-                            {moduleLibraryItems.map(module => (
+                            {moduleLibraryItems.map((module) => (
                                 <ModuleRow
                                     key={module.name}
                                     module={module}
-                                    onRemove={name => {
+                                    onRemove={(name) => {
                                         onSetModuleLibraryItems?.(
                                             moduleLibraryItems.filter(
-                                                m =>
+                                                (m) =>
                                                     m.core || m.name !== name,
                                             ),
                                         );
                                         window.dispatchEvent(
                                             new CustomEvent(
-                                                'python-ide-remove-extension',
-                                                {detail: {name}},
+                                                "python-ide-remove-extension",
+                                                { detail: { name } },
                                             ),
                                         );
                                     }}
@@ -821,22 +798,18 @@ const PythonIdeComponent = props => {
                         </Box>
                     </Box>
                 </Box>
-
-                <Box
-                    className={styles.editorArea}
-                    data-tutorial="editor-area"
-                >
+                <Box className={styles.editorArea} data-tutorial="editor-area">
                     <Box className={styles.pythonIdeToolbar}>
                         <span>{activeFile}</span>
-                        <span style={{flex: 1}} />
+                        <span style={{ flex: 1 }} />
                         <Box className={styles.zoomControls}>
                             <button
                                 className={styles.zoomBtn}
                                 onClick={() => {
                                     editorRef.current
-                                        ?.getAction('editor.action.fontZoomOut')
+                                        ?.getAction("editor.action.fontZoomOut")
                                         ?.run();
-                                    setZoomLevel(v => Math.max(v - 10, 50));
+                                    setZoomLevel((v) => Math.max(v - 10, 50));
                                 }}
                                 title="Zoom out"
                                 type="button"
@@ -849,23 +822,14 @@ const PythonIdeComponent = props => {
                                     stroke="currentColor"
                                     strokeWidth="2.5"
                                 >
-                                    <circle
-                                        cx="11"
-                                        cy="11"
-                                        r="8"
-                                    />
+                                    <circle cx="11" cy="11" r="8" />
                                     <line
                                         x1="21"
                                         y1="21"
                                         x2="16.65"
                                         y2="16.65"
                                     />
-                                    <line
-                                        x1="8"
-                                        y1="11"
-                                        x2="14"
-                                        y2="11"
-                                    />
+                                    <line x1="8" y1="11" x2="14" y2="11" />
                                 </svg>
                             </button>
                             <span className={styles.zoomLevel}>
@@ -875,9 +839,9 @@ const PythonIdeComponent = props => {
                                 className={styles.zoomBtn}
                                 onClick={() => {
                                     editorRef.current
-                                        ?.getAction('editor.action.fontZoomIn')
+                                        ?.getAction("editor.action.fontZoomIn")
                                         ?.run();
-                                    setZoomLevel(v => Math.min(v + 10, 200));
+                                    setZoomLevel((v) => Math.min(v + 10, 200));
                                 }}
                                 title="Zoom in"
                                 type="button"
@@ -890,29 +854,15 @@ const PythonIdeComponent = props => {
                                     stroke="currentColor"
                                     strokeWidth="2.5"
                                 >
-                                    <circle
-                                        cx="11"
-                                        cy="11"
-                                        r="8"
-                                    />
+                                    <circle cx="11" cy="11" r="8" />
                                     <line
                                         x1="21"
                                         y1="21"
                                         x2="16.65"
                                         y2="16.65"
                                     />
-                                    <line
-                                        x1="8"
-                                        y1="11"
-                                        x2="14"
-                                        y2="11"
-                                    />
-                                    <line
-                                        x1="11"
-                                        y1="8"
-                                        x2="11"
-                                        y2="14"
-                                    />
+                                    <line x1="8" y1="11" x2="14" y2="11" />
+                                    <line x1="11" y1="8" x2="11" y2="14" />
                                 </svg>
                             </button>
                             <button
@@ -920,7 +870,7 @@ const PythonIdeComponent = props => {
                                 onClick={() => {
                                     editorRef.current
                                         ?.getAction(
-                                            'editor.action.fontZoomReset',
+                                            "editor.action.fontZoomReset",
                                         )
                                         ?.run();
                                     setZoomLevel(100);
@@ -936,34 +886,19 @@ const PythonIdeComponent = props => {
                                     stroke="currentColor"
                                     strokeWidth="2"
                                 >
-                                    <circle
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                    />
-                                    <line
-                                        x1="12"
-                                        y1="8"
-                                        x2="12"
-                                        y2="16"
-                                    />
-                                    <line
-                                        x1="8"
-                                        y1="12"
-                                        x2="16"
-                                        y2="12"
-                                    />
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="16" />
+                                    <line x1="8" y1="12" x2="16" y2="12" />
                                 </svg>
                             </button>
                         </Box>
                     </Box>
-
                     {isImagePreviewActive ? (
                         <Box className={styles.pythonIdeEditorWrapper}>
                             {imagePreviewSrc ? (
                                 <img
                                     src={imagePreviewSrc}
-                                    alt={activeFile || 'uploaded image'}
+                                    alt={activeFile || "uploaded image"}
                                     className={styles.imagePreview}
                                 />
                             ) : (
@@ -975,18 +910,26 @@ const PythonIdeComponent = props => {
                     ) : (
                         <Box className={styles.editorWrapperWithLoading}>
                             <CodeEditor
-                                language="python"
+                                language={
+                                    /\.(py|pyw)$/i.test(activeFile)
+                                        ? "python"
+                                        : /\.(txt|log|md|json|csv)$/i.test(
+                                                activeFile,
+                                            )
+                                          ? "plaintext"
+                                          : "python"
+                                }
                                 value={code}
                                 theme="vs"
                                 options={{
                                     readOnly: false,
                                     contextmenu: true,
-                                    minimap: {enabled: false},
-                                    lineNumbers: 'on',
+                                    minimap: { enabled: false },
+                                    lineNumbers: "on",
                                     glyphMargin: true,
                                     suggestOnTriggerCharacters: true,
                                     quickSuggestions: true,
-                                    wordBasedSuggestions: false
+                                    wordBasedSuggestions: false,
                                 }}
                                 onChange={onCodeChange}
                                 editorWillMount={handleEditorWillMount}
@@ -1002,19 +945,17 @@ const PythonIdeComponent = props => {
                             )}
                         </Box>
                     )}
-
                     <Box className={styles.editorStatusBar}>
-                        {pyodideIsLoading ?
-                            'Loading Python runtime...' :
-                            syntaxStatus || 'Syntax: unknown'} — Ln{' '}
-                        {cursorPos.line}, Col {cursorPos.column}
+                        {pyodideIsLoading
+                            ? "Loading Python runtime..."
+                            : syntaxStatus || "Syntax: unknown"}{" "}
+                        — Ln {cursorPos.line}, Col {cursorPos.column}
                     </Box>
-
                     <Box
                         className={
-                            isTerminalExpanded ?
-                                styles.terminalAreaExpanded :
-                                styles.terminalArea
+                            isTerminalExpanded
+                                ? styles.terminalAreaExpanded
+                                : styles.terminalArea
                         }
                         data-tutorial="terminal-area"
                     >
@@ -1025,11 +966,11 @@ const PythonIdeComponent = props => {
                             <Box className={styles.tabList}>
                                 <button
                                     className={
-                                        activeBottomTab === 'output' ?
-                                            `${styles.tab} ${styles.tabSelected}` :
-                                            styles.tab
+                                        activeBottomTab === "output"
+                                            ? `${styles.tab} ${styles.tabSelected}`
+                                            : styles.tab
                                     }
-                                    onClick={() => setActiveBottomTab('output')}
+                                    onClick={() => setActiveBottomTab("output")}
                                     title="Output"
                                     type="button"
                                 >
@@ -1044,15 +985,17 @@ const PythonIdeComponent = props => {
                                         <polyline points="16 18 22 12 16 6" />
                                         <polyline points="8 6 2 12 8 18" />
                                     </svg>
-                                    <span className={styles.btnLabel}>Output</span>
+                                    <span className={styles.btnLabel}>
+                                        Output
+                                    </span>
                                 </button>
                                 <button
                                     className={
-                                        activeBottomTab === 'error' ?
-                                            `${styles.tab} ${styles.tabSelected}` :
-                                            styles.tab
+                                        activeBottomTab === "error"
+                                            ? `${styles.tab} ${styles.tabSelected}`
+                                            : styles.tab
                                     }
-                                    onClick={() => setActiveBottomTab('error')}
+                                    onClick={() => setActiveBottomTab("error")}
                                     title="Error"
                                     type="button"
                                 >
@@ -1064,17 +1007,8 @@ const PythonIdeComponent = props => {
                                         stroke="currentColor"
                                         strokeWidth="2"
                                     >
-                                        <circle
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                        />
-                                        <line
-                                            x1="12"
-                                            y1="8"
-                                            x2="12"
-                                            y2="12"
-                                        />
+                                        <circle cx="12" cy="12" r="10" />
+                                        <line x1="12" y1="8" x2="12" y2="12" />
                                         <line
                                             x1="12"
                                             y1="16"
@@ -1082,19 +1016,21 @@ const PythonIdeComponent = props => {
                                             y2="16"
                                         />
                                     </svg>
-                                    <span className={styles.btnLabel}>Error</span>
+                                    <span className={styles.btnLabel}>
+                                        Error
+                                    </span>
                                 </button>
                                 <button
                                     className={
-                                        activeBottomTab === 'serial' ?
-                                            `${styles.tab} ${styles.tabSelected}` :
-                                            styles.tab
+                                        activeBottomTab === "serial"
+                                            ? `${styles.tab} ${styles.tabSelected}`
+                                            : styles.tab
                                     }
-                                    onClick={() => setActiveBottomTab('serial')}
+                                    onClick={() => setActiveBottomTab("serial")}
                                     title={
-                                        isDeviceConnected ?
-                                            `Serial: ${peripheralName || deviceId || 'Connected'}` :
-                                            'Serial terminal'
+                                        isDeviceConnected
+                                            ? `Serial: ${peripheralName || deviceId || "Connected"}`
+                                            : "Serial terminal"
                                     }
                                     type="button"
                                 >
@@ -1122,12 +1058,7 @@ const PythonIdeComponent = props => {
                                             rx="2"
                                             ry="2"
                                         />
-                                        <line
-                                            x1="6"
-                                            y1="6"
-                                            x2="6.01"
-                                            y2="6"
-                                        />
+                                        <line x1="6" y1="6" x2="6.01" y2="6" />
                                         <line
                                             x1="6"
                                             y1="18"
@@ -1135,17 +1066,19 @@ const PythonIdeComponent = props => {
                                             y2="18"
                                         />
                                     </svg>
-                                    <span className={styles.btnLabel}>Serial{isDeviceConnected ? ' ●' : ''}</span>
+                                    <span className={styles.btnLabel}>
+                                        Serial{isDeviceConnected ? " ●" : ""}
+                                    </span>
                                 </button>
                                 {isMicroPythonDevice && (
                                     <button
                                         className={
-                                            activeBottomTab === 'repl' ?
-                                                `${styles.tab} ${styles.tabSelected}` :
-                                                styles.tab
+                                            activeBottomTab === "repl"
+                                                ? `${styles.tab} ${styles.tabSelected}`
+                                                : styles.tab
                                         }
                                         onClick={() =>
-                                            setActiveBottomTab('repl')
+                                            setActiveBottomTab("repl")
                                         }
                                         title="MicroPython REPL"
                                         type="button"
@@ -1161,42 +1094,46 @@ const PythonIdeComponent = props => {
                                             <polyline points="4 17 10 11 4 5" />
                                             <polyline points="12 19 20 19" />
                                         </svg>
-                                        <span className={styles.btnLabel}>REPL</span>
+                                        <span className={styles.btnLabel}>
+                                            REPL
+                                        </span>
                                     </button>
                                 )}
                                 {supportsMicroPython &&
-                                    runtimeTarget === 'micropython' && (
-                                    <button
-                                        className={
-                                            activeBottomTab === 'upload' ?
-                                                `${styles.tab} ${styles.tabSelected}` :
-                                                styles.tab
-                                        }
-                                        onClick={() =>
-                                            setActiveBottomTab('upload')
-                                        }
-                                        title="MicroPython Upload Controls"
-                                        type="button"
-                                    >
-                                        <svg
-                                            width="16"
-                                            height="16"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
+                                    runtimeTarget === "micropython" && (
+                                        <button
+                                            className={
+                                                activeBottomTab === "upload"
+                                                    ? `${styles.tab} ${styles.tabSelected}`
+                                                    : styles.tab
+                                            }
+                                            onClick={() =>
+                                                setActiveBottomTab("upload")
+                                            }
+                                            title="MicroPython Upload Controls"
+                                            type="button"
                                         >
-                                            <line
-                                                x1="12"
-                                                y1="2"
-                                                x2="12"
-                                                y2="13"
-                                            />
-                                            <polyline points="6 9 12 15 18 9" />
-                                        </svg>
-                                        <span className={styles.btnLabel}>Upload</span>
-                                    </button>
-                                )}
+                                            <svg
+                                                width="16"
+                                                height="16"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                            >
+                                                <line
+                                                    x1="12"
+                                                    y1="2"
+                                                    x2="12"
+                                                    y2="13"
+                                                />
+                                                <polyline points="6 9 12 15 18 9" />
+                                            </svg>
+                                            <span className={styles.btnLabel}>
+                                                Upload
+                                            </span>
+                                        </button>
+                                    )}
                             </Box>
                             <Box className={styles.terminalActions}>
                                 <button
@@ -1232,7 +1169,9 @@ const PythonIdeComponent = props => {
                                         <polygon points="3,3 15,12 3,21" />
                                         <polygon points="11,3 23,12 11,21" />
                                     </svg>
-                                    <span className={styles.btnLabel}>Run All</span>
+                                    <span className={styles.btnLabel}>
+                                        Run All
+                                    </span>
                                 </button>
                                 <button
                                     className={`${styles.actionButton} ${styles.stopButton}`}
@@ -1255,7 +1194,9 @@ const PythonIdeComponent = props => {
                                             rx="1"
                                         />
                                     </svg>
-                                    <span className={styles.btnLabel}>Stop</span>
+                                    <span className={styles.btnLabel}>
+                                        Stop
+                                    </span>
                                 </button>
                                 {isMicroPythonDevice && (
                                     <>
@@ -1265,9 +1206,9 @@ const PythonIdeComponent = props => {
                                                 isUploading ||
                                                 !isDeviceConnected
                                             }
-                                            onClick={handleUploadToDevice}
+                                            onClick={handleRunRepl}
                                             type="button"
-                                            title="Run code on device via REPL"
+                                            title="Run code on device via REPL (temporary)"
                                         >
                                             <svg
                                                 width="16"
@@ -1277,12 +1218,11 @@ const PythonIdeComponent = props => {
                                                 stroke="currentColor"
                                                 strokeWidth="2"
                                             >
-                                                <polyline points="4 17 10 11 4 5" />
-                                                <polyline points="12 19 20 19" />
+                                                <polygon points="5 3 19 12 5 21 5 3" />
                                             </svg>
-                                            <span className={styles.btnLabel}>{isUploading ?
-                                                '...' :
-                                                'µPython Run'}</span>
+                                            <span className={styles.btnLabel}>
+                                                {isUploading ? "..." : "Run"}
+                                            </span>
                                         </button>
                                         <button
                                             className={`${styles.actionButton} ${styles.runAllButton}`}
@@ -1290,9 +1230,9 @@ const PythonIdeComponent = props => {
                                                 isUploading ||
                                                 !isDeviceConnected
                                             }
-                                            onClick={handleUploadAsMain}
+                                            onClick={handleUploadMulti}
                                             type="button"
-                                            title="Upload as main.py and auto-run on boot"
+                                            title="Upload all project files to board (preserves folder structure)"
                                         >
                                             <svg
                                                 width="16"
@@ -1302,45 +1242,41 @@ const PythonIdeComponent = props => {
                                                 stroke="currentColor"
                                                 strokeWidth="2"
                                             >
-                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                                <polyline points="14 2 14 8 20 8" />
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                                <polyline points="17 8 12 3 7 8" />
                                                 <line
-                                                    x1="16"
-                                                    y1="13"
-                                                    x2="8"
-                                                    y2="13"
-                                                />
-                                                <line
-                                                    x1="16"
-                                                    y1="17"
-                                                    x2="8"
-                                                    y2="17"
+                                                    x1="12"
+                                                    y1="3"
+                                                    x2="12"
+                                                    y2="15"
                                                 />
                                             </svg>
-                                            <span className={styles.btnLabel}>{isUploading ?
-                                                '...' :
-                                                'Upload main.py'}</span>
+                                            <span className={styles.btnLabel}>
+                                                {isUploading ? "..." : "Upload"}
+                                            </span>
                                         </button>
                                     </>
                                 )}
                                 <label
                                     className={styles.realtimeToggle}
                                     title={
-                                        realtimeMode ?
-                                            'Realtime mode: no timeout' :
-                                            'Normal mode: 5s timeout'
+                                        realtimeMode
+                                            ? "Realtime mode: no timeout"
+                                            : "Normal mode: 5s timeout"
                                     }
                                 >
                                     <input
                                         type="checkbox"
                                         checked={realtimeMode}
-                                        onChange={e =>
+                                        onChange={(e) =>
                                             onRealtimeModeChange?.(
                                                 e.target.checked,
                                             )
                                         }
                                     />
-                                    <span className={styles.btnLabel}>Realtime</span>
+                                    <span className={styles.btnLabel}>
+                                        Realtime
+                                    </span>
                                 </label>
                                 <button
                                     className={`${styles.actionButton} ${styles.expandButton}`}
@@ -1350,9 +1286,9 @@ const PythonIdeComponent = props => {
                                         )
                                     }
                                     title={
-                                        isTerminalExpanded ?
-                                            'Collapse terminal' :
-                                            'Expand terminal'
+                                        isTerminalExpanded
+                                            ? "Collapse terminal"
+                                            : "Expand terminal"
                                     }
                                     type="button"
                                 >
@@ -1377,28 +1313,30 @@ const PythonIdeComponent = props => {
                                         )}
                                     </svg>
                                     <span className={styles.btnLabel}>
-                                        {isTerminalExpanded ?
-                                            'Collapse' :
-                                            'Expand'}
+                                        {isTerminalExpanded
+                                            ? "Collapse"
+                                            : "Expand"}
                                     </span>
                                 </button>
                                 {supportsMicroPython &&
-                                    runtimeTarget === 'vm' && (
-                                    <button
-                                        className={`${styles.actionButton} ${styles.uploadOnlyBtn}`}
-                                        onClick={() => {
+                                    runtimeTarget === "vm" && (
+                                        <button
+                                            className={`${styles.actionButton} ${styles.uploadOnlyBtn}`}
+                                            onClick={() => {
                                                 onRuntimeTargetChange?.(
-                                                    'micropython',
+                                                    "micropython",
                                                 );
-                                                setActiveBottomTab('upload');
-                                        }}
-                                        type="button"
-                                        title="Switch to MicroPython upload mode"
-                                        style={{marginLeft: '4px'}}
-                                    >
-                                        <span className={styles.btnLabel}>µPy Upload</span>
-                                    </button>
-                                )}
+                                                setActiveBottomTab("upload");
+                                            }}
+                                            type="button"
+                                            title="Switch to MicroPython upload mode"
+                                            style={{ marginLeft: "4px" }}
+                                        >
+                                            <span className={styles.btnLabel}>
+                                                µPy Upload
+                                            </span>
+                                        </button>
+                                    )}
                             </Box>
                         </Box>
                         <Box
@@ -1408,44 +1346,44 @@ const PythonIdeComponent = props => {
                             {showSearch && (
                                 <Box
                                     style={{
-                                        position: 'sticky',
+                                        position: "sticky",
                                         top: 0,
                                         zIndex: 20,
-                                        background: '#fff',
-                                        borderBottom: '1px solid #ddd',
-                                        padding: '4px 8px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 4
+                                        background: "#fff",
+                                        borderBottom: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 4,
                                     }}
                                 >
                                     <input
                                         type="text"
                                         placeholder="Search output..."
                                         value={searchQuery}
-                                        onChange={e =>
+                                        onChange={(e) =>
                                             setSearchQuery(e.target.value)
                                         }
-                                        onKeyDown={e => {
-                                            if (e.key === 'Escape') {
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Escape") {
                                                 setShowSearch(false);
-                                                setSearchQuery('');
+                                                setSearchQuery("");
                                             }
                                         }}
                                         style={{
                                             flex: 1,
-                                            border: '1px solid #ccc',
+                                            border: "1px solid #ccc",
                                             borderRadius: 3,
-                                            padding: '3px 6px',
-                                            fontSize: '0.82rem',
-                                            outline: 'none'
+                                            padding: "3px 6px",
+                                            fontSize: "0.82rem",
+                                            outline: "none",
                                         }}
                                         autoFocus
                                     />
                                     <button
                                         onClick={() => {
                                             setShowSearch(false);
-                                            setSearchQuery('');
+                                            setSearchQuery("");
                                         }}
                                         className={styles.terminalActionBtn}
                                         title="Close search"
@@ -1474,23 +1412,45 @@ const PythonIdeComponent = props => {
                                     </button>
                                 </Box>
                             )}
-                            {activeBottomTab === 'upload' ? (
+                            {/* SEMUA TAB DI-RENDER — display:none untuk tab non-aktif.
+                                Komponen tetap mount → state (log, history) gak hilang. */}
+                            <div
+                                style={{
+                                    display:
+                                        activeBottomTab === "upload"
+                                            ? "flex"
+                                            : "none",
+                                    flex: 1,
+                                    minHeight: 0,
+                                    minWidth: 0,
+                                    width: "100%",
+                                }}
+                            >
                                 <UploadToolbar
                                     firmwareStatus={firmwareStatus}
                                     isUploading={mpIsUploading}
                                     uploadProgress={mpUploadProgress}
                                     uploadLog={mpUploadLog}
                                     onSwitchToVM={() => {
-                                        onRuntimeTargetChange('vm');
-                                        setActiveBottomTab('output');
+                                        onRuntimeTargetChange("vm");
+                                        setActiveBottomTab("output");
                                     }}
                                     onFlashFirmware={onFlashFirmware}
                                     onDetectFirmware={onDetectFirmware}
-                                    onUploadRun={onUploadRun}
-                                    onUploadOnly={onUploadOnly}
-                                    onStopBoard={onStopBoard}
                                 />
-                            ) : activeBottomTab === 'serial' ? (
+                            </div>
+                            <div
+                                style={{
+                                    display:
+                                        activeBottomTab === "serial"
+                                            ? "flex"
+                                            : "none",
+                                    flex: 1,
+                                    minHeight: 0,
+                                    minWidth: 0,
+                                    width: "100%",
+                                }}
+                            >
                                 <SerialTerminal
                                     deviceId={deviceId}
                                     peripheralName={peripheralName}
@@ -1498,146 +1458,171 @@ const PythonIdeComponent = props => {
                                     onSend={onSerialSend}
                                     onChangeBaudrate={onSerialBaudrate}
                                 />
-                            ) : activeBottomTab === 'repl' &&
-                              isMicroPythonDevice ? (
-                                  <ReplTerminal
-                                        deviceId={deviceId}
-                                        peripheralName={peripheralName}
-                                        isConnected={isDeviceConnected}
-                                        onSend={onReplSend}
-                                    />
-                                ) : (
-                                    <pre
-                                        style={{
-                                            margin: 0,
-                                            whiteSpace: 'pre-wrap',
-                                            wordBreak: 'break-word',
-                                            flex: 1,
-                                            minHeight: 0
-                                        }}
-                                    >
-                                        {activeBottomTab === 'output' ? (
-                                            Array.isArray(runOutput) ? (
-                                                (() => {
-                                                    const items = searchQuery ?
-                                                        runOutput.filter(item =>
-                                                            (item.type === 'line' ?
-                                                                item.text :
-                                                                item.text
-                                                            )
-                                                                .toLowerCase()
-                                                                .includes(
-                                                                    searchQuery.toLowerCase(),
-                                                                ),
-                                                        ) :
-                                                        runOutput;
-                                                    return items.length === 0 ?
-                                                        searchQuery ?
-                                                            'No results found.' :
-                                                            'Output will appear here.' :
-                                                        items.map((item, i) =>
-                                                            (item.type ===
-                                                          'line' ? (
-                                                                    <span
+                            </div>
+                            <div
+                                style={{
+                                    display:
+                                        activeBottomTab === "repl" &&
+                                        isMicroPythonDevice
+                                            ? "flex"
+                                            : "none",
+                                    flex: 1,
+                                    minHeight: 0,
+                                    minWidth: 0,
+                                    width: "100%",
+                                }}
+                            >
+                                <ReplTerminal
+                                    deviceId={deviceId}
+                                    peripheralName={peripheralName}
+                                    isConnected={isDeviceConnected}
+                                    onSend={onReplSend}
+                                />
+                            </div>
+                            <div
+                                style={{
+                                    display:
+                                        activeBottomTab === "output" ||
+                                        (activeBottomTab === "repl" &&
+                                            !isMicroPythonDevice)
+                                            ? "flex"
+                                            : "none",
+                                    flex: 1,
+                                    minHeight: 0,
+                                    minWidth: 0,
+                                    width: "100%",
+                                }}
+                            >
+                                <pre
+                                    style={{
+                                        margin: 0,
+                                        whiteSpace: "pre-wrap",
+                                        wordBreak: "break-word",
+                                        flex: 1,
+                                        minHeight: 0,
+                                    }}
+                                >
+                                    {activeBottomTab === "output" ? (
+                                        Array.isArray(runOutput) ? (
+                                            (() => {
+                                                const items = searchQuery
+                                                    ? runOutput.filter((item) =>
+                                                          (item.type === "line"
+                                                              ? item.text
+                                                              : item.text
+                                                          )
+                                                              .toLowerCase()
+                                                              .includes(
+                                                                  searchQuery.toLowerCase(),
+                                                              ),
+                                                      )
+                                                    : runOutput;
+                                                return items.length === 0
+                                                    ? searchQuery
+                                                        ? "No results found."
+                                                        : "Output will appear here."
+                                                    : items.map((item, i) =>
+                                                          item.type ===
+                                                          "line" ? (
+                                                              <span
                                                                   key={i}
                                                                   style={{
-                                                                            display:
-                                                                          'block',
-                                                                            lineHeight:
-                                                                          '22px'
-                                                                        }}
+                                                                      display:
+                                                                          "block",
+                                                                      lineHeight:
+                                                                          "22px",
+                                                                  }}
                                                               >
                                                                   {item.spriteUrl ? (
-                                                                            <img
+                                                                      <img
                                                                           src={
-                                                                                    item.spriteUrl
-                                                                                }
+                                                                              item.spriteUrl
+                                                                          }
                                                                           style={{
-                                                                                    width: 18,
-                                                                                    height: 18,
-                                                                                    objectFit:
-                                                                                  'contain',
-                                                                                    verticalAlign:
-                                                                                  'middle',
-                                                                                    marginRight: 4
-                                                                                }}
+                                                                              width: 18,
+                                                                              height: 18,
+                                                                              objectFit:
+                                                                                  "contain",
+                                                                              verticalAlign:
+                                                                                  "middle",
+                                                                              marginRight: 4,
+                                                                          }}
                                                                       />
-                                                                        ) : null}
+                                                                  ) : null}
                                                                   <span>{`> ${item.text}`}</span>
                                                               </span>
-                                                                ) : (
-                                                                    <span
-                                                                        key={i}
-                                                                        style={{
-                                                                            display:
-                                                                          'block'
-                                                                        }}
-                                                                    >
-                                                                        {item.text}
-                                                                    </span>
-                                                                )),
-                                                        );
-                                                })()
-                                            ) : (
-                                                runOutput ||
-                                            'Output will appear here.'
-                                            )
-                                        ) : runError ? (
-                                            <div
-                                                style={{
-                                                    background: '#fff0f0',
-                                                    border: '1px solid #fcc',
-                                                    borderRadius: 8,
-                                                    padding: '0.75rem 1rem',
-                                                    color: '#b33030',
-                                                    fontWeight: 500,
-                                                    lineHeight: 1.6,
-                                                    whiteSpace: 'pre-wrap',
-                                                    wordBreak: 'break-word'
-                                                }}
-                                            >
-                                                {formatPythonError(runError)}
-                                            </div>
+                                                          ) : (
+                                                              <span
+                                                                  key={i}
+                                                                  style={{
+                                                                      display:
+                                                                          "block",
+                                                                  }}
+                                                              >
+                                                                  {item.text}
+                                                              </span>
+                                                          ),
+                                                      );
+                                            })()
                                         ) : (
-                                            'Errors will appear here.'
-                                        )}
-                                    </pre>
-                                )}
+                                            runOutput ||
+                                            "Output will appear here."
+                                        )
+                                    ) : runError ? (
+                                        <div
+                                            style={{
+                                                background: "#fff0f0",
+                                                border: "1px solid #fcc",
+                                                borderRadius: 8,
+                                                padding: "0.75rem 1rem",
+                                                color: "#b33030",
+                                                fontWeight: 500,
+                                                lineHeight: 1.6,
+                                                whiteSpace: "pre-wrap",
+                                                wordBreak: "break-word",
+                                            }}
+                                        >
+                                            {formatPythonError(runError)}
+                                        </div>
+                                    ) : (
+                                        "Errors will appear here."
+                                    )}
+                                </pre>
+                            </div>
                         </Box>
                     </Box>
-                    {activeBottomTab !== 'serial' &&
-                        activeBottomTab !== 'upload' &&
-                        activeBottomTab !== 'repl' && (
-                        <FloatingToolbar
-                            isAutoScroll={isAutoScroll}
-                            onToggleAutoScroll={() =>
-                                setIsAutoScroll(v => !v)
-                            }
-                            onSearch={() => setShowSearch(v => !v)}
-                            onCopy={() => {
-                                const text = Array.isArray(runOutput) ?
-                                    runOutput
-                                        .map(i =>
-                                            (i.type === 'line' ?
-                                                i.text :
-                                                i.text),
-                                        )
-                                        .join('\n') :
-                                    runOutput;
+                    {activeBottomTab !== "serial" &&
+                        activeBottomTab !== "upload" &&
+                        activeBottomTab !== "repl" && (
+                            <FloatingToolbar
+                                isAutoScroll={isAutoScroll}
+                                onToggleAutoScroll={() =>
+                                    setIsAutoScroll((v) => !v)
+                                }
+                                onSearch={() => setShowSearch((v) => !v)}
+                                onCopy={() => {
+                                    const text = Array.isArray(runOutput)
+                                        ? runOutput
+                                              .map((i) =>
+                                                  i.type === "line"
+                                                      ? i.text
+                                                      : i.text,
+                                              )
+                                              .join("\n")
+                                        : runOutput;
                                     navigator.clipboard?.writeText(text);
-                            }}
-                            onScrollBottom={() =>
+                                }}
+                                onScrollBottom={() =>
                                     terminalRef.current?.scrollTo({
                                         top: terminalRef.current.scrollHeight,
-                                        behavior: 'smooth'
+                                        behavior: "smooth",
                                     })
-                            }
-                            onClear={() => onClear?.()}
-                        />
-                    )}
+                                }
+                                onClear={() => onClear?.()}
+                            />
+                        )}
                 </Box>
             </Box>
-
             {contextMenu && (
                 <ContextMenu
                     x={contextMenu.x}
@@ -1646,15 +1631,13 @@ const PythonIdeComponent = props => {
                     onClose={() => setContextMenu(null)}
                 />
             )}
-
             <input
                 type="file"
                 ref={uploadInputRef}
                 accept={uploadConfig}
-                style={{display: 'none'}}
+                style={{ display: "none" }}
                 onChange={handleUploadedFile}
             />
-
             <InputModal
                 isOpen={inputModal.isOpen}
                 title={inputModal.title}
@@ -1662,12 +1645,10 @@ const PythonIdeComponent = props => {
                 onConfirm={inputModal.callback}
                 onCancel={closeModal}
             />
-
             <DesktopTools
                 isOpen={isDesktopToolsOpen}
                 onClose={() => setIsDesktopToolsOpen(false)}
             />
-
             {showTutorial && (
                 <TutorialOverlay
                     currentStep={tutorialStep}
@@ -1682,14 +1663,13 @@ const PythonIdeComponent = props => {
         </Box>
     );
 };
-
 PythonIdeComponent.propTypes = {
     activeFile: PropTypes.string,
     activeTargetId: PropTypes.string,
     fileList: PropTypes.arrayOf(
         PropTypes.shape({
             targetId: PropTypes.string.isRequired,
-            fileName: PropTypes.string.isRequired
+            fileName: PropTypes.string.isRequired,
         }),
     ),
     fileTree: PropTypes.arrayOf(PropTypes.object),
@@ -1699,7 +1679,7 @@ PythonIdeComponent.propTypes = {
     isRunning: PropTypes.bool,
     runOutput: PropTypes.oneOfType([
         PropTypes.string,
-        PropTypes.arrayOf(PropTypes.object)
+        PropTypes.arrayOf(PropTypes.object),
     ]),
     runError: PropTypes.string,
     spriteNames: PropTypes.arrayOf(PropTypes.string),
@@ -1709,8 +1689,9 @@ PythonIdeComponent.propTypes = {
     onSerialSend: PropTypes.func,
     onSerialBaudrate: PropTypes.func,
     onReplSend: PropTypes.func,
-    onUploadToDevice: PropTypes.func,
-    onUploadAsMain: PropTypes.func,
+    onRunRepl: PropTypes.func,
+    onUploadMain: PropTypes.func,
+    onUploadMulti: PropTypes.func,
     realtimeMode: PropTypes.bool,
     onRealtimeModeChange: PropTypes.func,
     onCodeChange: PropTypes.func,
@@ -1737,15 +1718,15 @@ PythonIdeComponent.propTypes = {
     mpIsUploading: PropTypes.bool,
     mpUploadProgress: PropTypes.shape({
         stage: PropTypes.string,
-        percent: PropTypes.number
+        percent: PropTypes.number,
     }),
     mpUploadLog: PropTypes.arrayOf(PropTypes.string),
     onFlashFirmware: PropTypes.func,
     onDetectFirmware: PropTypes.func,
-    onUploadRun: PropTypes.func,
-    onUploadOnly: PropTypes.func,
+    onUploadMain: PropTypes.func,
+    onUploadMulti: PropTypes.func,
+    onRunRepl: PropTypes.func,
     onStopBoard: PropTypes.func,
-    stageSizeMode: PropTypes.string
+    stageSizeMode: PropTypes.string,
 };
-
 export default PythonIdeComponent;

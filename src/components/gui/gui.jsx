@@ -40,6 +40,7 @@ import Alerts from "../../containers/alerts.jsx";
 import DragLayer from "../../containers/drag-layer.jsx";
 import ConnectionModal from "../../containers/connection-modal.jsx";
 import UploadProgress from "../../containers/upload-progress.jsx";
+import Onboarding from "../../containers/onboarding.jsx";
 import Modal from "../modal/modal.jsx";
 import TelemetryModal from "../telemetry-modal/telemetry-modal.jsx";
 import UpdateModal from "../../containers/update-modal.jsx";
@@ -104,6 +105,7 @@ const GUIComponent = (props) => {
         onShowLandingPage,
         connectionModalVisible,
         uploadProgressVisible,
+        onboardingVisible,
         costumeLibraryVisible,
         costumesTabVisible,
         updateModalVisible,
@@ -251,6 +253,7 @@ const GUIComponent = (props) => {
                             )}
                             {tipsLibraryVisible ? <TipsLibrary /> : null}
                             {cardsVisible ? <Cards /> : null}
+                            {onboardingVisible ? <Onboarding /> : null}
                             {showSwitchModeDialog ? (
                                 <Modal
                                     className={styles.switchModeModal}
@@ -752,6 +755,7 @@ GUIComponent.propTypes = {
     targetIsStage: PropTypes.bool,
     telemetryModalVisible: PropTypes.bool,
     tipsLibraryVisible: PropTypes.bool,
+    onboardingVisible: PropTypes.bool,
     showSwitchModeDialog: PropTypes.bool,
     switchFromMode: PropTypes.string,
     switchToMode: PropTypes.string,

@@ -1,0 +1,169 @@
+@import "../../css/colors.css";
+@import "../../css/units.css";
+@import "../../css/z-index.css";
+
+/* Override z-index ReactModal overlay biar di atas tutorial overlay (z-index 1300) */
+.modal-content + .modal-overlay {
+    z-index: 1400 !important;
+}
+
+.modal-content {
+    width: 780px;
+}
+
+.body {
+    background: $ui-white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1.5rem 2rem;
+    position: relative;
+}
+
+/* Slide counter "1/4" */
+.counter {
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    font-size: 0.8rem;
+    color: $text-primary;
+    background: $ui-white-dim;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    z-index: 1;
+}
+
+/* Viewport transisi fade */
+.carousel-viewport {
+    width: 100%;
+    min-height: 380px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background: $ui-secondary;
+}
+
+.image {
+    position: absolute;
+    max-width: 100%;
+    max-height: 420px;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+    pointer-events: none;
+}
+
+.image-active {
+    opacity: 1;
+    position: relative;
+    pointer-events: auto;
+}
+
+/* Caption */
+.caption {
+    text-align: center;
+    font-size: 1rem;
+    color: $text-primary;
+    margin-top: 1rem;
+    line-height: 1.5;
+    max-width: 90%;
+}
+
+/* Navigasi */
+.nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+    width: 100%;
+}
+
+.nav-btn {
+    background: $motion-primary;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.nav-btn:hover {
+    background: $motion-tertiary;
+}
+
+.dots {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid $motion-primary;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    transition:
+        background 0.2s,
+        transform 0.2s;
+}
+
+.dot:hover {
+    transform: scale(1.3);
+}
+
+.dot-active {
+    background: $motion-primary;
+    transform: scale(1.2);
+}
+
+/* Tombol aksi */
+.actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    align-items: center;
+}
+
+.dismiss-btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: $text-primary;
+    font-size: 0.8rem;
+    border: 1px solid $ui-tertiary;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.dismiss-btn:hover {
+    background: $ui-secondary;
+}
+
+.close-btn {
+    padding: 0.5rem 1.75rem;
+    border-radius: 0.5rem;
+    background: $motion-primary;
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.close-btn:hover {
+    background: $motion-tertiary;
+}

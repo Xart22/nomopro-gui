@@ -12,65 +12,65 @@ export const createBridgeCommandRegistry = ({
     setTargetSize,
     setTargetVisible,
     buildCommandResultContext,
-    executeExtensionOpcode
+    executeExtensionOpcode,
 }) => ({
     greenFlag: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({runtime}) => {
+        execute: async ({ runtime }) => {
             runtime.greenFlag();
-        }
+        },
     },
     triggerKeyPressed: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({runtime, args}) => {
-            const key = String(args[0] || 'any').toLowerCase();
-            runtime.startHats('event_whenkeypressed', {
-                KEY_OPTION: key
+        execute: async ({ runtime, args }) => {
+            const key = String(args[0] || "any").toLowerCase();
+            runtime.startHats("event_whenkeypressed", {
+                KEY_OPTION: key,
             });
-            if (key !== 'any') {
-                runtime.startHats('event_whenkeypressed', {
-                    KEY_OPTION: 'any'
+            if (key !== "any") {
+                runtime.startHats("event_whenkeypressed", {
+                    KEY_OPTION: "any",
                 });
             }
-        }
+        },
     },
     triggerStageClicked: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({runtime}) => {
-            runtime.startHats('event_whenstageclicked');
-        }
+        execute: async ({ runtime }) => {
+            runtime.startHats("event_whenstageclicked");
+        },
     },
     triggerSpriteClicked: {
         resolveTarget: true,
         emitTargetsUpdate: false,
-        execute: async ({runtime, target}) => {
-            runtime.startHats('event_whenthisspriteclicked', null, target);
-        }
+        execute: async ({ runtime, target }) => {
+            runtime.startHats("event_whenthisspriteclicked", null, target);
+        },
     },
     triggerBackdropSwitch: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({runtime, args}) => {
-            const backdropName = String(args[0] || '');
-            runtime.startHats('event_whenbackdropswitchesto', {
-                BACKDROP: backdropName
+        execute: async ({ runtime, args }) => {
+            const backdropName = String(args[0] || "");
+            runtime.startHats("event_whenbackdropswitchesto", {
+                BACKDROP: backdropName,
             });
-        }
+        },
     },
     createClone: {
         resolveTarget: true,
         emitTargetsUpdate: false,
-        execute: async ({runtime, target, args}) => {
-            const option = String(args[0] || '_myself_');
+        execute: async ({ runtime, target, args }) => {
+            const option = String(args[0] || "_myself_");
             const cloneTarget =
-                option === '_myself_' ?
-                    target :
-                    runtime.getSpriteTargetByName(option);
+                option === "_myself_"
+                    ? target
+                    : runtime.getSpriteTargetByName(option);
 
-            if (!cloneTarget || typeof cloneTarget.makeClone !== 'function') {
+            if (!cloneTarget || typeof cloneTarget.makeClone !== "function") {
                 return;
             }
 
@@ -80,45 +80,45 @@ export const createBridgeCommandRegistry = ({
             }
 
             runtime.addTarget(newClone);
-            if (typeof newClone.goBehindOther === 'function') {
+            if (typeof newClone.goBehindOther === "function") {
                 newClone.goBehindOther(cloneTarget);
             }
-        }
+        },
     },
     deleteClone: {
         resolveTarget: true,
         emitTargetsUpdate: false,
-        execute: async ({runtime, target}) => {
+        execute: async ({ runtime, target }) => {
             if (!target || target.isOriginal) {
                 return;
             }
 
             runtime.disposeTarget(target);
             runtime.stopForTarget(target);
-        }
+        },
     },
     broadcast: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({runtime, args}) => {
-            const message = String(args[0] || '').trim();
+        execute: async ({ runtime, args }) => {
+            const message = String(args[0] || "").trim();
             if (!message) return;
-            runtime.startHats('event_whenbroadcastreceived', {
-                BROADCAST_OPTION: message
+            runtime.startHats("event_whenbroadcastreceived", {
+                BROADCAST_OPTION: message,
             });
-        }
+        },
     },
     broadcastAndWait: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({runtime, args}) => {
-            const message = String(args[0] || '').trim();
+        execute: async ({ runtime, args }) => {
+            const message = String(args[0] || "").trim();
             if (!message) return;
 
             const startedThreads = runtime.startHats(
-                'event_whenbroadcastreceived',
+                "event_whenbroadcastreceived",
                 {
-                    BROADCAST_OPTION: message
+                    BROADCAST_OPTION: message,
                 },
             );
 
@@ -129,414 +129,505 @@ export const createBridgeCommandRegistry = ({
             // Keep polling runtime thread list until all spawned threads finish.
             for (let i = 0; i < 500; i++) {
                 const activeThreads = runtime.threads || [];
-                const stillRunning = startedThreads.some(thread =>
+                const stillRunning = startedThreads.some((thread) =>
                     activeThreads.includes(thread),
                 );
                 if (!stillRunning) return;
                 await sleep(0);
             }
-        }
+        },
     },
     selectTarget: {
         resolveTarget: true,
         emitTargetsUpdate: false,
-        execute: async ({target, context}) =>
-            buildCommandResultContext(context, target)
+        execute: async ({ target, context }) =>
+            buildCommandResultContext(context, target),
     },
     move: {
         resolveTarget: true,
-        execute: async ({vm, target, args}) => {
+        execute: async ({ vm, target, args }) => {
             moveBySteps(vm, target, toNumber(args[0], 0));
-        }
+        },
     },
     turn: {
         resolveTarget: true,
-        execute: async ({target, args}) => {
+        execute: async ({ target, args }) => {
             target.setDirection(target.direction + toNumber(args[0], 0));
-        }
+        },
     },
     point: {
         resolveTarget: true,
-        execute: async ({target, args}) => {
+        execute: async ({ target, args }) => {
             target.setDirection(toNumber(args[0], target.direction));
-        }
+        },
     },
     say: {
         resolveTarget: true,
-        execute: async ({runtime, target, args}) => {
-            runtime.emit('SAY', target, 'say', String(args[0] || ''));
-        }
+        execute: async ({ runtime, target, args }) => {
+            runtime.emit("SAY", target, "say", String(args[0] || ""));
+        },
     },
     think: {
         resolveTarget: true,
-        execute: async ({runtime, target, args}) => {
-            runtime.emit('SAY', target, 'think', String(args[0] || ''));
-        }
+        execute: async ({ runtime, target, args }) => {
+            runtime.emit("SAY", target, "think", String(args[0] || ""));
+        },
     },
     gotoXY: {
         resolveTarget: true,
-        execute: async ({target, args}) => {
+        execute: async ({ target, args }) => {
             target.setXY(
                 toNumber(args[0], target.x),
                 toNumber(args[1], target.y),
             );
-        }
+        },
     },
     setX: {
         resolveTarget: true,
-        execute: async ({target, args}) => {
+        execute: async ({ target, args }) => {
             target.setXY(toNumber(args[0], target.x), target.y);
-        }
+        },
     },
     setY: {
         resolveTarget: true,
-        execute: async ({target, args}) => {
+        execute: async ({ target, args }) => {
             target.setXY(target.x, toNumber(args[0], target.y));
-        }
+        },
     },
     changeX: {
         resolveTarget: true,
-        execute: async ({target, args}) => {
+        execute: async ({ target, args }) => {
             target.setXY(target.x + toNumber(args[0], 0), target.y);
-        }
+        },
     },
     changeY: {
         resolveTarget: true,
-        execute: async ({target, args}) => {
+        execute: async ({ target, args }) => {
             target.setXY(target.x, target.y + toNumber(args[0], 0));
-        }
+        },
     },
     ifOnEdgeBounce: {
         resolveTarget: true,
-        execute: async ({runtime, target}) => {
+        execute: async ({ runtime, target }) => {
             bounceOnEdge(runtime, target);
-        }
+        },
+    },
+    glideToXY: {
+        resolveTarget: true,
+        emitTargetsUpdate: false,
+        execute: async ({ runtime, target, args }) => {
+            const secs = toNumber(args[0], 0);
+            const x = toNumber(args[1], 0);
+            const y = toNumber(args[2], 0);
+            if (runtime && runtime.ext_scratch3_motion) {
+                runtime.ext_scratch3_motion.glideSecsToXY(
+                    { SECS: secs, X: x, Y: y },
+                    { target },
+                );
+            }
+        },
+    },
+    glideTo: {
+        resolveTarget: true,
+        emitTargetsUpdate: false,
+        execute: async ({ runtime, target, args }) => {
+            const secs = toNumber(args[0], 0);
+            const targetName = String(args[1] || "");
+            if (runtime && runtime.ext_scratch3_motion) {
+                runtime.ext_scratch3_motion.glideTo(
+                    { SECS: secs, TO: targetName },
+                    { target },
+                );
+            }
+        },
+    },
+    pointTowards: {
+        resolveTarget: true,
+        emitTargetsUpdate: false,
+        execute: async ({ runtime, target, args }) => {
+            const targetName = String(args[0] || "");
+            if (targetName === "_mouse_") {
+                target.setDirection(target.rotateTowardsMouse());
+            } else {
+                const targetObj = runtime.getSpriteTargetByName(targetName);
+                if (targetObj) {
+                    target.pointTowards(targetObj.x, targetObj.y);
+                }
+            }
+        },
+    },
+    setRotationStyle: {
+        resolveTarget: true,
+        emitTargetsUpdate: true,
+        execute: async ({ runtime, target, args }) => {
+            const style = String(args[0] || "all around");
+            if (runtime && runtime.ext_scratch3_motion) {
+                runtime.ext_scratch3_motion.setRotationStyle(
+                    { STYLE: style },
+                    { target },
+                );
+            }
+        },
     },
     setCostume: {
         resolveTarget: true,
-        execute: async ({target, args}) => {
-            const applied = setCostumeByName(target, String(args[0] || ''));
+        execute: async ({ target, args }) => {
+            const applied = setCostumeByName(target, String(args[0] || ""));
             if (!applied) {
-                throw new Error(`Costume not found: ${String(args[0] || '')}`);
+                throw new Error(`Costume not found: ${String(args[0] || "")}`);
             }
-        }
+        },
     },
     setBackdrop: {
         resolveTarget: true,
-        execute: async ({target, args}) => {
-            const applied = setCostumeByName(target, String(args[0] || ''));
+        execute: async ({ target, args }) => {
+            const applied = setCostumeByName(target, String(args[0] || ""));
             if (!applied) {
-                throw new Error(`Backdrop not found: ${String(args[0] || '')}`);
+                throw new Error(`Backdrop not found: ${String(args[0] || "")}`);
             }
-        }
+        },
     },
     nextCostume: {
         resolveTarget: true,
-        execute: async ({target}) => {
+        execute: async ({ target }) => {
             const applied = nextCostume(target);
             if (!applied) {
                 throw new Error(
-                    'Unable to switch to next costume for current target.',
+                    "Unable to switch to next costume for current target.",
                 );
             }
-        }
+        },
     },
     nextBackdrop: {
         resolveTarget: true,
-        execute: async ({target}) => {
+        execute: async ({ target }) => {
             const applied = nextCostume(target);
             if (!applied) {
                 throw new Error(
-                    'Unable to switch to next backdrop for current target.',
+                    "Unable to switch to next backdrop for current target.",
                 );
             }
-        }
+        },
     },
     show: {
         resolveTarget: true,
-        execute: async ({target}) => {
+        execute: async ({ target }) => {
             setTargetVisible(target, true);
-        }
+        },
     },
     hide: {
         resolveTarget: true,
-        execute: async ({target}) => {
+        execute: async ({ target }) => {
             setTargetVisible(target, false);
-        }
+        },
     },
     setSize: {
         resolveTarget: true,
-        execute: async ({target, args}) => {
+        execute: async ({ target, args }) => {
             setTargetSize(target, toNumber(args[0], target.size));
-        }
+        },
     },
     changeSize: {
         resolveTarget: true,
-        execute: async ({target, args}) => {
+        execute: async ({ target, args }) => {
             setTargetSize(
                 target,
                 toNumber(target.size, 100) + toNumber(args[0], 0),
             );
-        }
+        },
+    },
+    goToFrontBack: {
+        resolveTarget: true,
+        emitTargetsUpdate: true,
+        execute: async ({ runtime, target, args }) => {
+            const layer = String(args[0] || "front");
+            if (runtime && runtime.ext_scratch3_looks) {
+                runtime.ext_scratch3_looks.goToFrontBack(
+                    { FRONT_BACK: layer },
+                    { target },
+                );
+            }
+        },
+    },
+    goForwardBackwardLayers: {
+        resolveTarget: true,
+        emitTargetsUpdate: true,
+        execute: async ({ runtime, target, args }) => {
+            const num = toNumber(args[0], 1);
+            if (runtime && runtime.ext_scratch3_looks) {
+                runtime.ext_scratch3_looks.goForwardBackwardLayers(
+                    { NUM: num },
+                    { target },
+                );
+            }
+        },
     },
     playSound: {
         resolveTarget: true,
-        execute: async ({target, args}) => {
-            const played = playSoundByName(target, String(args[0] || ''));
+        execute: async ({ target, args }) => {
+            const played = playSoundByName(target, String(args[0] || ""));
             if (!played) {
                 throw new Error(
-                    `Sound not found or cannot be played: ${String(args[0] || '')}`,
+                    `Sound not found or cannot be played: ${String(args[0] || "")}`,
                 );
             }
-        }
+        },
     },
     setEffect: {
         resolveTarget: true,
-        execute: async ({target, args}) => {
-            setSoundEffect(target, String(args[0] || 'pitch'), toNumber(args[1], 0));
-        }
+        execute: async ({ target, args }) => {
+            setSoundEffect(
+                target,
+                String(args[0] || "pitch"),
+                toNumber(args[1], 0),
+            );
+        },
     },
     changeEffect: {
         resolveTarget: true,
-        execute: async ({target, args}) => {
-            changeSoundEffect(target, String(args[0] || 'pitch'), toNumber(args[1], 0));
-        }
+        execute: async ({ target, args }) => {
+            changeSoundEffect(
+                target,
+                String(args[0] || "pitch"),
+                toNumber(args[1], 0),
+            );
+        },
     },
     clearEffects: {
         resolveTarget: true,
-        execute: async ({target}) => {
+        execute: async ({ target }) => {
             clearSoundEffects(target);
-        }
+        },
     },
     penClear: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'pen', 'clear');
-        }
+        execute: async ({ vm, runtime }) => {
+            await executeExtensionOpcode(vm, runtime, null, "pen", "clear");
+        },
     },
     penStamp: {
         resolveTarget: true,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, target}) => {
-            await executeExtensionOpcode(vm, runtime, target, 'pen', 'stamp');
-        }
+        execute: async ({ vm, runtime, target }) => {
+            await executeExtensionOpcode(vm, runtime, target, "pen", "stamp");
+        },
     },
     penDown: {
         resolveTarget: true,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, target}) => {
-            await executeExtensionOpcode(vm, runtime, target, 'pen', 'penDown');
-        }
+        execute: async ({ vm, runtime, target }) => {
+            await executeExtensionOpcode(vm, runtime, target, "pen", "penDown");
+        },
     },
     penUp: {
         resolveTarget: true,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, target}) => {
-            await executeExtensionOpcode(vm, runtime, target, 'pen', 'penUp');
-        }
+        execute: async ({ vm, runtime, target }) => {
+            await executeExtensionOpcode(vm, runtime, target, "pen", "penUp");
+        },
     },
     setPenColor: {
         resolveTarget: true,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, target, args}) => {
+        execute: async ({ vm, runtime, target, args }) => {
             await executeExtensionOpcode(
                 vm,
                 runtime,
                 target,
-                'pen',
-                'setPenColorToColor',
+                "pen",
+                "setPenColorToColor",
                 {
-                    COLOR: String(args[0] || '#000000')
+                    COLOR: String(args[0] || "#000000"),
                 },
             );
-        }
+        },
     },
     changePenColorParam: {
         resolveTarget: true,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, target, args}) => {
+        execute: async ({ vm, runtime, target, args }) => {
             await executeExtensionOpcode(
                 vm,
                 runtime,
                 target,
-                'pen',
-                'changePenColorParamBy',
+                "pen",
+                "changePenColorParamBy",
                 {
-                    COLOR_PARAM: String(args[0] || 'color'),
-                    VALUE: toNumber(args[1], 0)
+                    COLOR_PARAM: String(args[0] || "color"),
+                    VALUE: toNumber(args[1], 0),
                 },
             );
-        }
+        },
     },
     setPenColorParam: {
         resolveTarget: true,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, target, args}) => {
+        execute: async ({ vm, runtime, target, args }) => {
             await executeExtensionOpcode(
                 vm,
                 runtime,
                 target,
-                'pen',
-                'setPenColorParamTo',
+                "pen",
+                "setPenColorParamTo",
                 {
-                    COLOR_PARAM: String(args[0] || 'color'),
-                    VALUE: toNumber(args[1], 50)
+                    COLOR_PARAM: String(args[0] || "color"),
+                    VALUE: toNumber(args[1], 50),
                 },
             );
-        }
+        },
     },
     changePenSize: {
         resolveTarget: true,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, target, args}) => {
+        execute: async ({ vm, runtime, target, args }) => {
             await executeExtensionOpcode(
                 vm,
                 runtime,
                 target,
-                'pen',
-                'changePenSizeBy',
+                "pen",
+                "changePenSizeBy",
                 {
-                    SIZE: toNumber(args[0], 1)
+                    SIZE: toNumber(args[0], 1),
                 },
             );
-        }
+        },
     },
     setPenSize: {
         resolveTarget: true,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, target, args}) => {
+        execute: async ({ vm, runtime, target, args }) => {
             await executeExtensionOpcode(
                 vm,
                 runtime,
                 target,
-                'pen',
-                'setPenSizeTo',
+                "pen",
+                "setPenSizeTo",
                 {
-                    SIZE: toNumber(args[0], 1)
+                    SIZE: toNumber(args[0], 1),
                 },
             );
-        }
+        },
     },
     videoToggle: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
+        execute: async ({ vm, runtime, args }) => {
             await executeExtensionOpcode(
                 vm,
                 runtime,
                 null,
-                'videoSensing',
-                'videoToggle',
+                "videoSensing",
+                "videoToggle",
                 {
-                    VIDEO_STATE: String(args[0] || 'on')
+                    VIDEO_STATE: String(args[0] || "on"),
                 },
             );
-        }
+        },
     },
     setVideoTransparency: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
+        execute: async ({ vm, runtime, args }) => {
             await executeExtensionOpcode(
                 vm,
                 runtime,
                 null,
-                'videoSensing',
-                'setVideoTransparency',
+                "videoSensing",
+                "setVideoTransparency",
                 {
-                    TRANSPARENCY: toNumber(args[0], 50)
+                    TRANSPARENCY: toNumber(args[0], 50),
                 },
             );
-        }
+        },
     },
     speakAndWait: {
         resolveTarget: true,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, target, args}) => {
-            const words = String(args[0] || '');
+        execute: async ({ vm, runtime, target, args }) => {
+            const words = String(args[0] || "");
             try {
                 await executeExtensionOpcode(
                     vm,
                     runtime,
                     target,
-                    'text2speech',
-                    'speakAndWait',
+                    "text2speech",
+                    "speakAndWait",
                     {
-                        WORDS: words
+                        WORDS: words,
                     },
                 );
             } catch (_error) {
                 // Fallback so user still gets immediate feedback when TTS provider is unavailable.
-                runtime.emit('SAY', target, 'say', words);
+                runtime.emit("SAY", target, "say", words);
             }
-        }
+        },
     },
     setVoice: {
         resolveTarget: true,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, target, args}) => {
+        execute: async ({ vm, runtime, target, args }) => {
             await executeExtensionOpcode(
                 vm,
                 runtime,
                 target,
-                'text2speech',
-                'setVoice',
+                "text2speech",
+                "setVoice",
                 {
-                    VOICE: String(args[0] || 'ALTO')
+                    VOICE: String(args[0] || "ALTO"),
                 },
             );
-        }
+        },
     },
     setSpeechLanguage: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
+        execute: async ({ vm, runtime, args }) => {
             await executeExtensionOpcode(
                 vm,
                 runtime,
                 null,
-                'text2speech',
-                'setLanguage',
+                "text2speech",
+                "setLanguage",
                 {
-                    LANGUAGE: String(args[0] || 'en')
+                    LANGUAGE: String(args[0] || "en"),
                 },
             );
-        }
+        },
     },
     loadDevice: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, args}) => {
+        execute: async ({ vm, args }) => {
             if (!vm || !vm.extensionManager) {
                 return;
             }
 
-            const deviceId = String(args[0] || 'null');
-            const deviceType = String(args[1] || '');
+            const deviceId = String(args[0] || "null");
+            const deviceType = String(args[1] || "");
             const pnpidList = Array.isArray(args[2]) ? args[2] : [];
 
-            if (typeof vm.extensionManager.loadDeviceURL === 'function') {
+            if (typeof vm.extensionManager.loadDeviceURL === "function") {
                 await vm.extensionManager.loadDeviceURL(
                     deviceId,
                     deviceType,
                     pnpidList,
                 );
             }
-        }
+        },
     },
     clearDevice: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm}) => {
+        execute: async ({ vm }) => {
             if (
                 vm &&
                 vm.extensionManager &&
-                typeof vm.extensionManager.clearDevice === 'function'
+                typeof vm.extensionManager.clearDevice === "function"
             ) {
                 vm.extensionManager.clearDevice();
             }
-        }
+        },
     },
 
     // ─── Device Realtime Control Commands ────────────────────────────────────────
@@ -546,29 +637,29 @@ export const createBridgeCommandRegistry = ({
     devicePinMode: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({runtime, args}) => {
-            const deviceId = String(args[0] || '');
-            const pin = String(args[1] || '');
-            const mode = String(args[2] || 'OUTPUT').toUpperCase();
+        execute: async ({ runtime, args }) => {
+            const deviceId = String(args[0] || "");
+            const pin = String(args[1] || "");
+            const mode = String(args[2] || "OUTPUT").toUpperCase();
             if (!deviceId || !pin) return;
             const peripheral =
                 runtime.peripheralExtensions &&
                 runtime.peripheralExtensions[deviceId];
-            if (!peripheral || typeof peripheral.setPinMode !== 'function') {
+            if (!peripheral || typeof peripheral.setPinMode !== "function") {
                 throw new Error(
                     `Device '${deviceId}' not connected or does not support pinMode`,
                 );
             }
             peripheral.setPinMode(pin, mode);
-        }
+        },
     },
 
     deviceDigitalWrite: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({runtime, args}) => {
-            const deviceId = String(args[0] || '');
-            const pin = String(args[1] || '');
+        execute: async ({ runtime, args }) => {
+            const deviceId = String(args[0] || "");
+            const pin = String(args[1] || "");
             const rawValue = args[2];
             if (!deviceId || !pin || rawValue === undefined) return;
             const peripheral =
@@ -576,7 +667,7 @@ export const createBridgeCommandRegistry = ({
                 runtime.peripheralExtensions[deviceId];
             if (
                 !peripheral ||
-                typeof peripheral.setDigitalOutput !== 'function'
+                typeof peripheral.setDigitalOutput !== "function"
             ) {
                 throw new Error(
                     `Device '${deviceId}' not connected or does not support digitalWrite`,
@@ -585,83 +676,83 @@ export const createBridgeCommandRegistry = ({
             const level =
                 rawValue === true ||
                 rawValue === 1 ||
-                String(rawValue).toUpperCase() === 'HIGH' ?
-                    'HIGH' :
-                    'LOW';
+                String(rawValue).toUpperCase() === "HIGH"
+                    ? "HIGH"
+                    : "LOW";
             peripheral.setDigitalOutput(pin, level);
-        }
+        },
     },
 
     deviceDigitalRead: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({runtime, args}) => {
-            const deviceId = String(args[0] || '');
-            const pin = String(args[1] || '');
+        execute: async ({ runtime, args }) => {
+            const deviceId = String(args[0] || "");
+            const pin = String(args[1] || "");
             if (!deviceId || !pin) return null;
             const peripheral =
                 runtime.peripheralExtensions &&
                 runtime.peripheralExtensions[deviceId];
             if (
                 !peripheral ||
-                typeof peripheral.readDigitalPin !== 'function'
+                typeof peripheral.readDigitalPin !== "function"
             ) {
                 throw new Error(
                     `Device '${deviceId}' not connected or does not support digitalRead`,
                 );
             }
             const value = await peripheral.readDigitalPin(pin);
-            return {_deviceResult: {requestId: args[2], value}};
-        }
+            return { _deviceResult: { requestId: args[2], value } };
+        },
     },
 
     deviceAnalogWrite: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({runtime, args}) => {
-            const deviceId = String(args[0] || '');
-            const pin = String(args[1] || '');
+        execute: async ({ runtime, args }) => {
+            const deviceId = String(args[0] || "");
+            const pin = String(args[1] || "");
             const rawValue = Number(args[2]);
             if (!deviceId || !pin || isNaN(rawValue)) return;
             const peripheral =
                 runtime.peripheralExtensions &&
                 runtime.peripheralExtensions[deviceId];
-            if (!peripheral || typeof peripheral.setPwmOutput !== 'function') {
+            if (!peripheral || typeof peripheral.setPwmOutput !== "function") {
                 throw new Error(
                     `Device '${deviceId}' not connected or does not support analogWrite`,
                 );
             }
             const clamped = Math.max(0, Math.min(255, Math.round(rawValue)));
             peripheral.setPwmOutput(pin, clamped);
-        }
+        },
     },
 
     deviceAnalogRead: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({runtime, args}) => {
-            const deviceId = String(args[0] || '');
-            const pin = String(args[1] || '');
+        execute: async ({ runtime, args }) => {
+            const deviceId = String(args[0] || "");
+            const pin = String(args[1] || "");
             if (!deviceId || !pin) return null;
             const peripheral =
                 runtime.peripheralExtensions &&
                 runtime.peripheralExtensions[deviceId];
-            if (!peripheral || typeof peripheral.readAnalogPin !== 'function') {
+            if (!peripheral || typeof peripheral.readAnalogPin !== "function") {
                 throw new Error(
                     `Device '${deviceId}' not connected or does not support analogRead`,
                 );
             }
             const value = await peripheral.readAnalogPin(pin);
-            return {_deviceResult: {requestId: args[2], value}};
-        }
+            return { _deviceResult: { requestId: args[2], value } };
+        },
     },
 
     deviceServoWrite: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({runtime, args}) => {
-            const deviceId = String(args[0] || '');
-            const pin = String(args[1] || '');
+        execute: async ({ runtime, args }) => {
+            const deviceId = String(args[0] || "");
+            const pin = String(args[1] || "");
             const rawAngle = Number(args[2]);
             if (!deviceId || !pin || isNaN(rawAngle)) return;
             const peripheral =
@@ -669,7 +760,7 @@ export const createBridgeCommandRegistry = ({
                 runtime.peripheralExtensions[deviceId];
             if (
                 !peripheral ||
-                typeof peripheral.setServoOutput !== 'function'
+                typeof peripheral.setServoOutput !== "function"
             ) {
                 throw new Error(
                     `Device '${deviceId}' not connected or does not support servoWrite`,
@@ -677,42 +768,50 @@ export const createBridgeCommandRegistry = ({
             }
             const clamped = Math.max(0, Math.min(180, Math.round(rawAngle)));
             peripheral.setServoOutput(pin, clamped);
-        }
+        },
     },
 
     deviceSerialWrite: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, args}) => {
-            const deviceId = String(args[0] || '');
-            const text = String(args[1] || '');
-            if (!deviceId || !vm || typeof vm.writeToPeripheral !== 'function') {
+        execute: async ({ vm, args }) => {
+            const deviceId = String(args[0] || "");
+            const text = String(args[1] || "");
+            if (
+                !deviceId ||
+                !vm ||
+                typeof vm.writeToPeripheral !== "function"
+            ) {
                 return;
             }
             vm.writeToPeripheral(deviceId, text);
-        }
+        },
     },
 
     deviceSerialWriteLn: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, args}) => {
-            const deviceId = String(args[0] || '');
-            const text = String(args[1] || '');
-            if (!deviceId || !vm || typeof vm.writeToPeripheral !== 'function') {
+        execute: async ({ vm, args }) => {
+            const deviceId = String(args[0] || "");
+            const text = String(args[1] || "");
+            if (
+                !deviceId ||
+                !vm ||
+                typeof vm.writeToPeripheral !== "function"
+            ) {
                 return;
             }
             vm.writeToPeripheral(deviceId, `${text}\n`);
-        }
+        },
     },
 
     // ─── End Device Realtime Control Commands ────────────────────────────────────
 
     wait: {
         resolveTarget: true,
-        execute: async ({args}) => {
+        execute: async ({ args }) => {
             await sleep(toNumber(args[0], 0) * 1000);
-        }
+        },
     },
 
     // ─── Music Extension ─────────────────────────────────────────────────────────
@@ -720,69 +819,122 @@ export const createBridgeCommandRegistry = ({
     extMusicPlayDrumForBeats: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'music', 'playDrumForBeats', {
-                DRUM: toNumber(args[0], 1),
-                BEATS: toNumber(args[1], 0.25)
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "music",
+                "playDrumForBeats",
+                {
+                    DRUM: toNumber(args[0], 1),
+                    BEATS: toNumber(args[1], 0.25),
+                },
+            );
+        },
     },
     extMusicRestForBeats: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'music', 'restForBeats', {
-                BEATS: toNumber(args[0], 0.25)
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "music",
+                "restForBeats",
+                {
+                    BEATS: toNumber(args[0], 0.25),
+                },
+            );
+        },
     },
     extMusicPlayNoteForBeats: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'music', 'playNoteForBeats', {
-                NOTE: toNumber(args[0], 60),
-                BEATS: toNumber(args[1], 0.25)
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "music",
+                "playNoteForBeats",
+                {
+                    NOTE: toNumber(args[0], 60),
+                    BEATS: toNumber(args[1], 0.25),
+                },
+            );
+        },
     },
     extMusicSetInstrument: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'music', 'setInstrument', {
-                INSTRUMENT: toNumber(args[0], 1)
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "music",
+                "setInstrument",
+                {
+                    INSTRUMENT: toNumber(args[0], 1),
+                },
+            );
+        },
     },
     extMusicSetTempo: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'music', 'setTempo', {
-                TEMPO: toNumber(args[0], 60)
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "music",
+                "setTempo",
+                {
+                    TEMPO: toNumber(args[0], 60),
+                },
+            );
+        },
     },
     extMusicChangeTempo: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'music', 'changeTempo', {
-                TEMPO: toNumber(args[0], 20)
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "music",
+                "changeTempo",
+                {
+                    TEMPO: toNumber(args[0], 20),
+                },
+            );
+        },
     },
     extMusicGetTempo: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'music', 'getTempo');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "music",
+                "getTempo",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
 
     // ─── Handpose Extension ──────────────────────────────────────────────────────
@@ -790,68 +942,125 @@ export const createBridgeCommandRegistry = ({
     extHandposeVideoToggle: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'handpose2scratch', 'videoToggle', {
-                VIDEO_STATE: String(args[0] || 'off')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "handpose2scratch",
+                "videoToggle",
+                {
+                    VIDEO_STATE: String(args[0] || "off"),
+                },
+            );
+        },
     },
     extHandposeSetVideoTransparency: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'handpose2scratch', 'setVideoTransparency', {
-                TRANSPARENCY: toNumber(args[0], 50)
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "handpose2scratch",
+                "setVideoTransparency",
+                {
+                    TRANSPARENCY: toNumber(args[0], 50),
+                },
+            );
+        },
     },
     extHandposeSetRatio: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'handpose2scratch', 'setRatio', {
-                RATIO: String(args[0] || '0.75')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "handpose2scratch",
+                "setRatio",
+                {
+                    RATIO: String(args[0] || "0.75"),
+                },
+            );
+        },
     },
     extHandposeGetX: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command, args}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'handpose2scratch', 'getX', {
-                LANDMARK: String(args[0] || '1')
-            });
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command, args }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "handpose2scratch",
+                "getX",
+                {
+                    LANDMARK: String(args[0] || "1"),
+                },
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extHandposeGetY: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command, args}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'handpose2scratch', 'getY', {
-                LANDMARK: String(args[0] || '1')
-            });
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command, args }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "handpose2scratch",
+                "getY",
+                {
+                    LANDMARK: String(args[0] || "1"),
+                },
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extHandposeGetZ: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command, args}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'handpose2scratch', 'getZ', {
-                LANDMARK: String(args[0] || '1')
-            });
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command, args }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "handpose2scratch",
+                "getZ",
+                {
+                    LANDMARK: String(args[0] || "1"),
+                },
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
 
     // ─── Speech to Text Extension ────────────────────────────────────────────────
@@ -859,20 +1068,37 @@ export const createBridgeCommandRegistry = ({
     extSpeechListenAndWait: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'speech2text', 'listenAndWait');
-        }
+        execute: async ({ vm, runtime }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "speech2text",
+                "listenAndWait",
+            );
+        },
     },
     extSpeechGetSpeech: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'speech2text', 'getSpeech');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "speech2text",
+                "getSpeech",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
 
     // ─── Translate Extension ─────────────────────────────────────────────────────
@@ -880,27 +1106,50 @@ export const createBridgeCommandRegistry = ({
     extTranslateGetTranslate: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command, args}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'translate', 'getTranslate', {
-                WORDS: String(args[0] || 'hello'),
-                LANGUAGE: String(args[1] || 'en')
-            });
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command, args }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "translate",
+                "getTranslate",
+                {
+                    WORDS: String(args[0] || "hello"),
+                    LANGUAGE: String(args[1] || "en"),
+                },
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extTranslateGetViewerLanguage: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'translate', 'getViewerLanguage');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "translate",
+                "getViewerLanguage",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
 
     // ─── Object Detection (OB2Scratch) Extension ─────────────────────────────────
@@ -908,92 +1157,171 @@ export const createBridgeCommandRegistry = ({
     extOb2AnalyseImage: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ob2scratch', 'analyseImageFrom');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ob2scratch",
+                "analyseImageFrom",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extOb2VideoToggle: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ob2scratch', 'videoToggle', {
-                VIDEO_STATE: String(args[0] || 'on'),
-                TRANSPARENCY: toNumber(args[1], 0)
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ob2scratch",
+                "videoToggle",
+                {
+                    VIDEO_STATE: String(args[0] || "on"),
+                    TRANSPARENCY: toNumber(args[1], 0),
+                },
+            );
+        },
     },
     extOb2ShowBoundingBoxes: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ob2scratch', 'showBoundingBoxes', {
-                SHOW_BOUNDING_BOXES: String(args[0] || 'show')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ob2scratch",
+                "showBoundingBoxes",
+                {
+                    SHOW_BOUNDING_BOXES: String(args[0] || "show"),
+                },
+            );
+        },
     },
     extOb2SetDetectionThreshold: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ob2scratch', 'setDetectionThreshold', {
-                DETECTION_THRESHOLD: toNumber(args[0], 0.5)
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ob2scratch",
+                "setDetectionThreshold",
+                {
+                    DETECTION_THRESHOLD: toNumber(args[0], 0.5),
+                },
+            );
+        },
     },
     extOb2GetCounts: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ob2scratch', 'getCounts');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ob2scratch",
+                "getCounts",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extOb2IsDetected: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command, args}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ob2scratch', 'isDetected', {
-                LABEL: String(args[0] || 'person')
-            });
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command, args }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ob2scratch",
+                "isDetected",
+                {
+                    LABEL: String(args[0] || "person"),
+                },
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extOb2GetCountOf: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command, args}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ob2scratch', 'getCountOf', {
-                LABEL: String(args[0] || 'person')
-            });
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command, args }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ob2scratch",
+                "getCountOf",
+                {
+                    LABEL: String(args[0] || "person"),
+                },
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extOb2GetObjects: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command, args}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ob2scratch', 'getObjects', {
-                PROPERTY: String(args[0] || 'label'),
-                INDEX: toNumber(args[1], 0)
-            });
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command, args }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ob2scratch",
+                "getObjects",
+                {
+                    PROPERTY: String(args[0] || "label"),
+                    INDEX: toNumber(args[1], 0),
+                },
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
 
     // ─── ML Extension ────────────────────────────────────────────────────────────
@@ -1001,252 +1329,431 @@ export const createBridgeCommandRegistry = ({
     extMlAddExample1: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ml', 'addExample1');
-        }
+        execute: async ({ vm, runtime }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "addExample1",
+            );
+        },
     },
     extMlAddExample2: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ml', 'addExample2');
-        }
+        execute: async ({ vm, runtime }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "addExample2",
+            );
+        },
     },
     extMlAddExample3: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ml', 'addExample3');
-        }
+        execute: async ({ vm, runtime }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "addExample3",
+            );
+        },
     },
     extMlTrain: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ml', 'train', {
-                LABEL: String(args[0] || '4')
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(vm, runtime, null, "ml", "train", {
+                LABEL: String(args[0] || "4"),
             });
-        }
+        },
     },
     extMlTrainAny: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ml', 'trainAny', {
-                LABEL: String(args[0] || '11')
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(vm, runtime, null, "ml", "trainAny", {
+                LABEL: String(args[0] || "11"),
             });
-        }
+        },
     },
     extMlGetLabel: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ml', 'getLabel');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "getLabel",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extMlGetCountByLabel: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command, args}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ml', 'getCountByLabel', {
-                LABEL: String(args[0] || '11')
-            });
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command, args }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "getCountByLabel",
+                {
+                    LABEL: String(args[0] || "11"),
+                },
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extMlGetCountByLabel1: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ml', 'getCountByLabel1');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "getCountByLabel1",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extMlGetCountByLabel2: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ml', 'getCountByLabel2');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "getCountByLabel2",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extMlGetCountByLabel3: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ml', 'getCountByLabel3');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "getCountByLabel3",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extMlGetCountByLabel4: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ml', 'getCountByLabel4');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "getCountByLabel4",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extMlGetCountByLabel5: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ml', 'getCountByLabel5');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "getCountByLabel5",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extMlGetCountByLabel6: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ml', 'getCountByLabel6');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "getCountByLabel6",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extMlGetCountByLabel7: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ml', 'getCountByLabel7');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "getCountByLabel7",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extMlGetCountByLabel8: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ml', 'getCountByLabel8');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "getCountByLabel8",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extMlGetCountByLabel9: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ml', 'getCountByLabel9');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "getCountByLabel9",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extMlGetCountByLabel10: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'ml', 'getCountByLabel10');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "getCountByLabel10",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extMlReset: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ml', 'reset', {
-                LABEL: String(args[0] || 'all')
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(vm, runtime, null, "ml", "reset", {
+                LABEL: String(args[0] || "all"),
             });
-        }
+        },
     },
     extMlResetAny: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ml', 'resetAny', {
-                LABEL: String(args[0] || '11')
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(vm, runtime, null, "ml", "resetAny", {
+                LABEL: String(args[0] || "11"),
             });
-        }
+        },
     },
     extMlDownload: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ml', 'download');
-        }
+        execute: async ({ vm, runtime }) => {
+            await executeExtensionOpcode(vm, runtime, null, "ml", "download");
+        },
     },
     extMlUpload: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ml', 'upload');
-        }
+        execute: async ({ vm, runtime }) => {
+            await executeExtensionOpcode(vm, runtime, null, "ml", "upload");
+        },
     },
     extMlToggleClassification: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ml', 'toggleClassification', {
-                CLASSIFICATION_STATE: String(args[0] || 'off')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "toggleClassification",
+                {
+                    CLASSIFICATION_STATE: String(args[0] || "off"),
+                },
+            );
+        },
     },
     extMlSetClassificationInterval: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ml', 'setClassificationInterval', {
-                CLASSIFICATION_INTERVAL: String(args[0] || '1')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "setClassificationInterval",
+                {
+                    CLASSIFICATION_INTERVAL: String(args[0] || "1"),
+                },
+            );
+        },
     },
     extMlVideoToggle: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ml', 'videoToggle', {
-                VIDEO_STATE: String(args[0] || 'off')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "videoToggle",
+                {
+                    VIDEO_STATE: String(args[0] || "off"),
+                },
+            );
+        },
     },
     extMlSetVideoTransparency: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ml', 'setVideoTransparency', {
-                TRANSPARENCY: toNumber(args[0], 50)
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "ml",
+                "setVideoTransparency",
+                {
+                    TRANSPARENCY: toNumber(args[0], 50),
+                },
+            );
+        },
     },
     extMlSetInput: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'ml', 'setInput', {
-                INPUT: String(args[0] || 'webcam')
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(vm, runtime, null, "ml", "setInput", {
+                INPUT: String(args[0] || "webcam"),
             });
-        }
+        },
     },
 
     // ─── TM2Scratch Extension ────────────────────────────────────────────────────
@@ -1254,158 +1761,294 @@ export const createBridgeCommandRegistry = ({
     extTm2SetInput: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'setInput', {
-                INPUT: String(args[0] || 'webcam')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "setInput",
+                {
+                    INPUT: String(args[0] || "webcam"),
+                },
+            );
+        },
     },
     extTm2IsImageLabelDetected: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command, args}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'isImageLabelDetected', {
-                LABEL: String(args[0] || 'any')
-            });
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command, args }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "isImageLabelDetected",
+                {
+                    LABEL: String(args[0] || "any"),
+                },
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extTm2ImageLabelConfidence: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command, args}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'imageLabelConfidence', {
-                LABEL: String(args[0] || '')
-            });
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command, args }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "imageLabelConfidence",
+                {
+                    LABEL: String(args[0] || ""),
+                },
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extTm2SetImageClassificationModelURL: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'setImageClassificationModelURL', {
-                URL: String(args[0] || ' ')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "setImageClassificationModelURL",
+                {
+                    URL: String(args[0] || " "),
+                },
+            );
+        },
     },
     extTm2ClassifyVideoImage: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'classifyVideoImageBlock');
-        }
+        execute: async ({ vm, runtime }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "classifyVideoImageBlock",
+            );
+        },
     },
     extTm2GetImageLabel: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'getImageLabel');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "getImageLabel",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extTm2IsSoundLabelDetected: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command, args}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'isSoundLabelDetected', {
-                LABEL: String(args[0] || 'any')
-            });
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command, args }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "isSoundLabelDetected",
+                {
+                    LABEL: String(args[0] || "any"),
+                },
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extTm2SoundLabelConfidence: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command, args}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'soundLabelConfidence', {
-                LABEL: String(args[0] || '')
-            });
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command, args }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "soundLabelConfidence",
+                {
+                    LABEL: String(args[0] || ""),
+                },
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extTm2SetSoundClassificationModelURL: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'setSoundClassificationModelURL', {
-                URL: String(args[0] || ' ')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "setSoundClassificationModelURL",
+                {
+                    URL: String(args[0] || " "),
+                },
+            );
+        },
     },
     extTm2GetSoundLabel: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'getSoundLabel');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "getSoundLabel",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extTm2ToggleClassification: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'toggleClassification', {
-                CLASSIFICATION_STATE: String(args[0] || 'off')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "toggleClassification",
+                {
+                    CLASSIFICATION_STATE: String(args[0] || "off"),
+                },
+            );
+        },
     },
     extTm2SetClassificationInterval: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'setClassificationInterval', {
-                CLASSIFICATION_INTERVAL: String(args[0] || '1')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "setClassificationInterval",
+                {
+                    CLASSIFICATION_INTERVAL: String(args[0] || "1"),
+                },
+            );
+        },
     },
     extTm2SetConfidenceThreshold: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'setConfidenceThreshold', {
-                CONFIDENCE_THRESHOLD: toNumber(args[0], 0.5)
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "setConfidenceThreshold",
+                {
+                    CONFIDENCE_THRESHOLD: toNumber(args[0], 0.5),
+                },
+            );
+        },
     },
     extTm2GetConfidenceThreshold: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'getConfidenceThreshold');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "getConfidenceThreshold",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extTm2VideoToggle: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'tm2scratch', 'videoToggle', {
-                VIDEO_STATE: String(args[0] || 'on'),
-                TRANSPARENCY: toNumber(args[1], 0)
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tm2scratch",
+                "videoToggle",
+                {
+                    VIDEO_STATE: String(args[0] || "on"),
+                    TRANSPARENCY: toNumber(args[1], 0),
+                },
+            );
+        },
     },
 
     // ─── TMPose2Scratch Extension ────────────────────────────────────────────────
@@ -1413,102 +2056,189 @@ export const createBridgeCommandRegistry = ({
     extTmposeIsPoseLabelDetected: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command, args}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'tmpose2scratch', 'isPoseLabelDetected', {
-                LABEL: String(args[0] || 'any')
-            });
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command, args }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tmpose2scratch",
+                "isPoseLabelDetected",
+                {
+                    LABEL: String(args[0] || "any"),
+                },
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extTmposePoseLabelConfidence: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command, args}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'tmpose2scratch', 'poseLabelConfidence', {
-                LABEL: String(args[0] || '')
-            });
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command, args }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tmpose2scratch",
+                "poseLabelConfidence",
+                {
+                    LABEL: String(args[0] || ""),
+                },
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extTmposeSetPoseClassificationModelURL: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'tmpose2scratch', 'setPoseClassificationModelURL', {
-                URL: String(args[0] || ' ')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tmpose2scratch",
+                "setPoseClassificationModelURL",
+                {
+                    URL: String(args[0] || " "),
+                },
+            );
+        },
     },
     extTmposeClassifyVideoPose: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'tmpose2scratch', 'classifyVideoPoseBlock');
-        }
+        execute: async ({ vm, runtime }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tmpose2scratch",
+                "classifyVideoPoseBlock",
+            );
+        },
     },
     extTmposeGetPoseLabel: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'tmpose2scratch', 'getPoseLabel');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tmpose2scratch",
+                "getPoseLabel",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extTmposeToggleClassification: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'tmpose2scratch', 'toggleClassification', {
-                CLASSIFICATION_STATE: String(args[0] || 'off')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tmpose2scratch",
+                "toggleClassification",
+                {
+                    CLASSIFICATION_STATE: String(args[0] || "off"),
+                },
+            );
+        },
     },
     extTmposeSetClassificationInterval: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'tmpose2scratch', 'setClassificationInterval', {
-                CLASSIFICATION_INTERVAL: String(args[0] || '1')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tmpose2scratch",
+                "setClassificationInterval",
+                {
+                    CLASSIFICATION_INTERVAL: String(args[0] || "1"),
+                },
+            );
+        },
     },
     extTmposeSetConfidenceThreshold: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'tmpose2scratch', 'setConfidenceThreshold', {
-                CONFIDENCE_THRESHOLD: toNumber(args[0], 0.5)
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tmpose2scratch",
+                "setConfidenceThreshold",
+                {
+                    CONFIDENCE_THRESHOLD: toNumber(args[0], 0.5),
+                },
+            );
+        },
     },
     extTmposeGetConfidenceThreshold: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, command}) => {
-            const result = await executeExtensionOpcode(vm, runtime, null, 'tmpose2scratch', 'getConfidenceThreshold');
-            if (command && typeof command._requestId !== 'undefined') {
-                return {_deviceResult: {requestId: command._requestId, value: result}};
+        execute: async ({ vm, runtime, command }) => {
+            const result = await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tmpose2scratch",
+                "getConfidenceThreshold",
+            );
+            if (command && typeof command._requestId !== "undefined") {
+                return {
+                    _deviceResult: {
+                        requestId: command._requestId,
+                        value: result,
+                    },
+                };
             }
             return result;
-        }
+        },
     },
     extTmposeVideoToggle: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({vm, runtime, args}) => {
-            await executeExtensionOpcode(vm, runtime, null, 'tmpose2scratch', 'videoToggle', {
-                VIDEO_STATE: String(args[0] || 'off')
-            });
-        }
+        execute: async ({ vm, runtime, args }) => {
+            await executeExtensionOpcode(
+                vm,
+                runtime,
+                null,
+                "tmpose2scratch",
+                "videoToggle",
+                {
+                    VIDEO_STATE: String(args[0] || "off"),
+                },
+            );
+        },
     },
 
     // ─── NLP Extension ───────────────────────────────────────────────────────────
@@ -1516,184 +2246,269 @@ export const createBridgeCommandRegistry = ({
     nlp_sentiment: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({command, args}) => {
-            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+        execute: async ({ command, args }) => {
+            const api =
+                typeof window !== "undefined" && window.electronAPI?.nlp;
             if (!api) return;
             try {
-                const text = String(args[0] || '');
+                const text = String(args[0] || "");
                 const value = await api.sentiment(text);
-                if (command && typeof command._requestId !== 'undefined') {
-                    return {_deviceResult: {requestId: command._requestId, value: value || 'neutral'}};
+                if (command && typeof command._requestId !== "undefined") {
+                    return {
+                        _deviceResult: {
+                            requestId: command._requestId,
+                            value: value || "neutral",
+                        },
+                    };
                 }
             } catch (e) {}
-        }
+        },
     },
     nlp_classify: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({command, args}) => {
-            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+        execute: async ({ command, args }) => {
+            const api =
+                typeof window !== "undefined" && window.electronAPI?.nlp;
             if (!api) return;
             try {
-                const text = String(args[0] || '');
-                const raw = api.classifySync ? api.classifySync(text) : await api.classify(text);
+                const text = String(args[0] || "");
+                const raw = api.classifySync
+                    ? api.classifySync(text)
+                    : await api.classify(text);
                 // classifySync now returns {label, confidence}; extract label
-                const value = (raw && raw.label) || raw || '';
-                if (command && typeof command._requestId !== 'undefined') {
-                    return {_deviceResult: {requestId: command._requestId, value: value || ''}};
+                const value = (raw && raw.label) || raw || "";
+                if (command && typeof command._requestId !== "undefined") {
+                    return {
+                        _deviceResult: {
+                            requestId: command._requestId,
+                            value: value || "",
+                        },
+                    };
                 }
             } catch (e) {}
-        }
+        },
     },
     nlp_classifyResult: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({command, args}) => {
-            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+        execute: async ({ command, args }) => {
+            const api =
+                typeof window !== "undefined" && window.electronAPI?.nlp;
             if (!api) return;
             try {
-                const text = String(args[0] || '');
+                const text = String(args[0] || "");
                 const raw = await api.classifyResult(text);
-                const value = (raw && raw.label) || '';
-                if (command && typeof command._requestId !== 'undefined') {
-                    return {_deviceResult: {requestId: command._requestId, value: value || ''}};
+                const value = (raw && raw.label) || "";
+                if (command && typeof command._requestId !== "undefined") {
+                    return {
+                        _deviceResult: {
+                            requestId: command._requestId,
+                            value: value || "",
+                        },
+                    };
                 }
             } catch (e) {}
-        }
+        },
     },
     nlp_sentimentScore: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({command, args}) => {
-            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+        execute: async ({ command, args }) => {
+            const api =
+                typeof window !== "undefined" && window.electronAPI?.nlp;
             if (!api) return;
             try {
-                const text = String(args[0] || '');
+                const text = String(args[0] || "");
                 const value = await api.sentimentScore(text);
-                if (command && typeof command._requestId !== 'undefined') {
-                    return {_deviceResult: {requestId: command._requestId, value: typeof value === 'number' ? value : 0}};
+                if (command && typeof command._requestId !== "undefined") {
+                    return {
+                        _deviceResult: {
+                            requestId: command._requestId,
+                            value: typeof value === "number" ? value : 0,
+                        },
+                    };
                 }
             } catch (e) {}
-        }
+        },
     },
     nlp_entities: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({command, args}) => {
-            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+        execute: async ({ command, args }) => {
+            const api =
+                typeof window !== "undefined" && window.electronAPI?.nlp;
             if (!api) return;
             try {
-                const text = String(args[0] || '');
+                const text = String(args[0] || "");
                 const value = await api.entities(text);
-                if (command && typeof command._requestId !== 'undefined') {
-                    return {_deviceResult: {requestId: command._requestId, value: value || ''}};
+                if (command && typeof command._requestId !== "undefined") {
+                    return {
+                        _deviceResult: {
+                            requestId: command._requestId,
+                            value: value || "",
+                        },
+                    };
                 }
             } catch (e) {}
-        }
+        },
     },
     nlp_train: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({command, args}) => {
-            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+        execute: async ({ command, args }) => {
+            const api =
+                typeof window !== "undefined" && window.electronAPI?.nlp;
             if (!api) return;
             try {
-                const label = String(args[0] || '');
+                const label = String(args[0] || "");
                 const examples = Array.isArray(args[1]) ? args[1] : [];
                 await api.train(label, examples);
-                if (command && typeof command._requestId !== 'undefined') {
-                    return {_deviceResult: {requestId: command._requestId, value: null}};
+                if (command && typeof command._requestId !== "undefined") {
+                    return {
+                        _deviceResult: {
+                            requestId: command._requestId,
+                            value: null,
+                        },
+                    };
                 }
             } catch (e) {}
-        }
+        },
     },
     nlp_similarity: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({command, args}) => {
-            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+        execute: async ({ command, args }) => {
+            const api =
+                typeof window !== "undefined" && window.electronAPI?.nlp;
             if (!api) return;
             try {
-                const t1 = String(args[0] || '');
-                const t2 = String(args[1] || '');
+                const t1 = String(args[0] || "");
+                const t2 = String(args[1] || "");
                 const value = await api.similarity(t1, t2);
-                if (command && typeof command._requestId !== 'undefined') {
-                    return {_deviceResult: {requestId: command._requestId, value: typeof value === 'number' ? value : 0}};
+                if (command && typeof command._requestId !== "undefined") {
+                    return {
+                        _deviceResult: {
+                            requestId: command._requestId,
+                            value: typeof value === "number" ? value : 0,
+                        },
+                    };
                 }
             } catch (e) {}
-        }
+        },
     },
     nlp_loadSampleIntents: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({command, args}) => {
-            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+        execute: async ({ command, args }) => {
+            const api =
+                typeof window !== "undefined" && window.electronAPI?.nlp;
             if (!api) return;
             try {
-                await api.train('greeting', ['hi','hello','hey','good morning']);
-                await api.train('goodbye', ['bye','see you','farewell']);
-                await api.train('question', ['what','how','why','when','where']);
-                if (command && typeof command._requestId !== 'undefined') {
-                    return {_deviceResult: {requestId: command._requestId, value: null}};
+                await api.train("greeting", [
+                    "hi",
+                    "hello",
+                    "hey",
+                    "good morning",
+                ]);
+                await api.train("goodbye", ["bye", "see you", "farewell"]);
+                await api.train("question", [
+                    "what",
+                    "how",
+                    "why",
+                    "when",
+                    "where",
+                ]);
+                if (command && typeof command._requestId !== "undefined") {
+                    return {
+                        _deviceResult: {
+                            requestId: command._requestId,
+                            value: null,
+                        },
+                    };
                 }
             } catch (e) {}
-        }
+        },
     },
     nlp_exportTraining: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({command}) => {
-            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+        execute: async ({ command }) => {
+            const api =
+                typeof window !== "undefined" && window.electronAPI?.nlp;
             if (!api) return;
             try {
                 await api.exportTraining();
-                if (command && typeof command._requestId !== 'undefined') {
-                    return {_deviceResult: {requestId: command._requestId, value: null}};
+                if (command && typeof command._requestId !== "undefined") {
+                    return {
+                        _deviceResult: {
+                            requestId: command._requestId,
+                            value: null,
+                        },
+                    };
                 }
             } catch (e) {}
-        }
+        },
     },
     nlp_importTraining: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({command}) => {
-            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+        execute: async ({ command }) => {
+            const api =
+                typeof window !== "undefined" && window.electronAPI?.nlp;
             if (!api) return;
             try {
                 await api.importTraining();
-                if (command && typeof command._requestId !== 'undefined') {
-                    return {_deviceResult: {requestId: command._requestId, value: null}};
+                if (command && typeof command._requestId !== "undefined") {
+                    return {
+                        _deviceResult: {
+                            requestId: command._requestId,
+                            value: null,
+                        },
+                    };
                 }
             } catch (e) {}
-        }
+        },
     },
     nlp_resetAll: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({command}) => {
-            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+        execute: async ({ command }) => {
+            const api =
+                typeof window !== "undefined" && window.electronAPI?.nlp;
             if (!api) return;
             try {
                 await api.resetAll();
-                if (command && typeof command._requestId !== 'undefined') {
-                    return {_deviceResult: {requestId: command._requestId, value: null}};
+                if (command && typeof command._requestId !== "undefined") {
+                    return {
+                        _deviceResult: {
+                            requestId: command._requestId,
+                            value: null,
+                        },
+                    };
                 }
             } catch (e) {}
-        }
+        },
     },
     nlp_removeIntent: {
         resolveTarget: false,
         emitTargetsUpdate: false,
-        execute: async ({command, args}) => {
-            const api = typeof window !== 'undefined' && window.electronAPI?.nlp;
+        execute: async ({ command, args }) => {
+            const api =
+                typeof window !== "undefined" && window.electronAPI?.nlp;
             if (!api) return;
             try {
-                const label = String(args[0] || '');
+                const label = String(args[0] || "");
                 await api.removeIntent(label);
-                if (command && typeof command._requestId !== 'undefined') {
-                    return {_deviceResult: {requestId: command._requestId, value: null}};
+                if (command && typeof command._requestId !== "undefined") {
+                    return {
+                        _deviceResult: {
+                            requestId: command._requestId,
+                            value: null,
+                        },
+                    };
                 }
             } catch (e) {}
-        }
-    }
+        },
+    },
 });

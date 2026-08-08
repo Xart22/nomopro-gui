@@ -1,58 +1,61 @@
-const PROMPT = '>>> ';
-const CONTINUE_PROMPT = '... ';
-const RAW_REPL_READY = '>';
-const PASTE_MODE_MSG = 'paste mode';
+const PROMPT = ">>> ";
+const CONTINUE_PROMPT = "... ";
+const RAW_REPL_READY = ">";
+const PASTE_MODE_MSG = "paste mode";
 
 class MicropythonRepl {
-    constructor () {
-        this._buffer = '';
+    constructor() {
+        this._buffer = "";
         this._expecting = null;
         this._responseResolve = null;
         this._responseTimeout = null;
     }
 
-    static isPrompt (text) {
+    static isPrompt(text) {
         return text.endsWith(PROMPT) || text.endsWith(CONTINUE_PROMPT);
     }
 
-    static stripPrompt (text) {
+    static stripPrompt(text) {
         return text
-            .replace(new RegExp(`${PROMPT.replace(/\s/g, '\\s')}$`), '')
-            .replace(new RegExp(`${CONTINUE_PROMPT.replace(/\s/g, '\\s')}$`), '');
+            .replace(new RegExp(`${PROMPT.replace(/\s/g, "\\s")}$`), "")
+            .replace(
+                new RegExp(`${CONTINUE_PROMPT.replace(/\s/g, "\\s")}$`),
+                "",
+            );
     }
 
-    sendSoftReset (onSend) {
-        onSend('\x04');
+    sendSoftReset(onSend) {
+        onSend("\x04");
     }
 
-    sendInterrupt (onSend) {
-        onSend('\x03');
+    sendInterrupt(onSend) {
+        onSend("\x03");
     }
 
-    sendEnterRawRepl (onSend) {
-        onSend('\x02');
+    sendEnterRawRepl(onSend) {
+        onSend("\x02");
     }
 
-    sendExitRawRepl (onSend) {
-        onSend('\x02');
+    sendExitRawRepl(onSend) {
+        onSend("\x02");
     }
 
-    sendEnterPasteMode (onSend) {
-        onSend('\x05');
+    sendEnterPasteMode(onSend) {
+        onSend("\x05");
     }
 
-    sendExecutePaste (onSend) {
-        onSend('\x04');
+    sendExecutePaste(onSend) {
+        onSend("\x04");
     }
 
-    sendLine (line, onSend) {
+    sendLine(line, onSend) {
         onSend(`${line}\r\n`);
     }
 
-    sendCode (code, onSend) {
+    sendCode(code, onSend) {
         this.sendEnterPasteMode(onSend);
         setTimeout(() => {
-            const lines = code.split('\n');
+            const lines = code.split("\n");
             for (const line of lines) {
                 onSend(`${line}\r\n`);
             }
@@ -62,14 +65,14 @@ class MicropythonRepl {
         }, 100);
     }
 
-    sendFile (name, content, onSend) {
-    // MicroPython raw REPL file write
-    // format: f = open('filename', 'w'); f.write(content); f.close()
+    sendFile(name, content, onSend) {
+        // MicroPython raw REPL file write
+        // format: f = open('filename', 'w'); f.write(content); f.close()
         const escaped = content
-            .replace(/\\/g, '\\\\')
+            .replace(/\\/g, "\\\\")
             .replace(/'/g, "\\'")
-            .replace(/\n/g, '\\n')
-            .replace(/\r/g, '\\r');
+            .replace(/\n/g, "\\n")
+            .replace(/\r/g, "\\r");
         const script = `f=open('${name}','w');f.write('${escaped}');f.close()\r\n`;
         this.sendEnterRawRepl(onSend);
         setTimeout(() => {
@@ -77,8 +80,25 @@ class MicropythonRepl {
         }, 100);
     }
 
-    processChunk (chunk) {
+    processChunk(chunk) {
         this._buffer += chunk;
+
+        // Deteksi prompt sinkron — selalu cek, tidak bergantung _expecting
+        const promptIdx = this._buffer.lastIndexOf(PROMPT);
+        if (promptIdx >= 0) {
+            const output = this._buffer.substring(0, promptIdx);
+            this._buffer = this._buffer.substring(promptIdx + PROMPT.length);
+            return { output, prompt: true };
+        }
+
+        const contIdx = this._buffer.lastIndexOf(CONTINUE_PROMPT);
+        if (contIdx >= 0) {
+            const output = this._buffer.substring(0, contIdx);
+            this._buffer = this._buffer.substring(
+                contIdx + CONTINUE_PROMPT.length,
+            );
+            return { output, prompt: true };
+        }
 
         if (this._responseResolve) {
             const result = this._checkForResponse();
@@ -90,68 +110,69 @@ class MicropythonRepl {
         return null;
     }
 
-    _checkForResponse () {
+    _checkForResponse() {
         const buffer = this._buffer;
         const expecting = this._expecting;
 
-        if (expecting === 'prompt') {
+        if (expecting === "prompt") {
             if (buffer.includes(PROMPT)) {
                 const idx = buffer.lastIndexOf(PROMPT) + PROMPT.length;
                 const output = buffer.substring(0, idx - PROMPT.length);
                 this._buffer = buffer.substring(idx);
                 this._expecting = null;
                 this._clearTimeout();
-                this._responseResolve({output, prompt: true});
+                this._responseResolve({ output, prompt: true });
                 this._responseResolve = null;
-                return {output, prompt: true};
+                return { output, prompt: true };
             }
-        } else if (expecting === 'raw_reply') {
+        } else if (expecting === "raw_reply") {
             const readyIdx = buffer.lastIndexOf(RAW_REPL_READY);
             if (readyIdx >= 0) {
                 const output = buffer.substring(0, readyIdx);
                 this._buffer = buffer.substring(readyIdx + 1);
                 this._expecting = null;
                 this._clearTimeout();
-                this._responseResolve({output, rawReady: true});
+                this._responseResolve({ output, rawReady: true });
                 this._responseResolve = null;
-                return {output, rawReady: true};
+                return { output, rawReady: true };
             }
-        } else if (expecting === 'paste_ok') {
+        } else if (expecting === "paste_ok") {
             if (buffer.includes(PASTE_MODE_MSG)) {
-                this._expecting = 'prompt';
+                this._expecting = "prompt";
                 const output = this._buffer.substring(
                     0,
-                    this._buffer.indexOf(PASTE_MODE_MSG) + PASTE_MODE_MSG.length
+                    this._buffer.indexOf(PASTE_MODE_MSG) +
+                        PASTE_MODE_MSG.length,
                 );
-                this._buffer = '';
-                return {output, pasteMode: true};
+                this._buffer = "";
+                return { output, pasteMode: true };
             }
         }
 
         return null;
     }
 
-    waitForPrompt (timeout = 5000) {
+    waitForPrompt(timeout = 5000) {
         return new Promise((resolve, reject) => {
-            this._expecting = 'prompt';
+            this._expecting = "prompt";
             this._responseResolve = resolve;
             this._responseTimeout = setTimeout(() => {
                 this._expecting = null;
                 this._responseResolve = null;
-                reject(new Error('Timeout waiting for MicroPython prompt'));
+                reject(new Error("Timeout waiting for MicroPython prompt"));
             }, timeout);
         });
     }
 
-    _clearTimeout () {
+    _clearTimeout() {
         if (this._responseTimeout) {
             clearTimeout(this._responseTimeout);
             this._responseTimeout = null;
         }
     }
 
-    reset () {
-        this._buffer = '';
+    reset() {
+        this._buffer = "";
         this._expecting = null;
         this._responseResolve = null;
         this._clearTimeout();

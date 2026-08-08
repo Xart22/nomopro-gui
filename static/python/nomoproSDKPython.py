@@ -4,6 +4,7 @@ import random as _random
 import sys
 import threading as _threading
 import time
+import queue
 
 try:
     import numpy as np
@@ -27,6 +28,12 @@ class NumpyEncoder(json.JSONEncoder):
 
 def _json_dumps(obj, **kwargs):
     return json.dumps(obj, cls=NumpyEncoder, ensure_ascii=False, **kwargs)
+
+
+def _output(payload):
+    """Emit a JSON payload to stdout for the bridge to consume."""
+    sys.stdout.write(_json_dumps(payload) + "\n")
+    sys.stdout.flush()
 
 
 __all__ = [
@@ -230,6 +237,57 @@ _event_handlers = {
 }
 _clone_handlers = []
 
+# ── Event Loop (background thread that dispatches UI events) ──
+
+_event_queue = queue.Queue()
+_event_loop_started = False
+_event_loop_thread = None
+
+def _start_event_loop():
+    """Start a background daemon thread that reads events from the bridge
+    and dispatches them to registered @when_* decorator handlers.
+
+    Call once before user code. Safe to call multiple times (no-op after
+    the first call).
+    """
+    global _event_loop_started, _event_loop_thread
+    if _event_loop_started:
+        return
+
+    def _loop():
+        global _event_loop_started
+        while _event_loop_started:
+            try:
+                event = _event_queue.get(timeout=0.1)
+                name = event.get("name", "")
+                value = event.get("value")
+                if name == "_stop_":
+                    _event_loop_started = False
+                    break
+                if name == "broadcast":
+                    _dispatch_local_broadcast(value)
+                else:
+                    _dispatch_local_event(name, value)
+            except queue.Empty:
+                pass
+
+    _event_loop_started = True
+    _event_loop_thread = _threading.Thread(target=_loop, daemon=True)
+    _event_loop_thread.start()
+
+def _stop_event_loop():
+    """Stop the event loop thread. Called when the Python process is about
+    to terminate or when the user stops execution."""
+    global _event_loop_started
+    _event_loop_started = False
+
+def _push_event(event):
+    """Push an event from the bridge into the event queue so the background
+    thread can dispatch it to registered handlers."""
+    _event_queue.put(event)
+
+# ── End Event Loop ──
+
 
 class Sprite:
     def __init__(self, name=None):
@@ -264,9 +322,18 @@ class Sprite:
         self._y += float(steps) * math.sin(radians)
         self._emit("move", [steps])
 
+    def move_steps(self, steps):
+        return self.move(steps)
+
     def turn(self, degrees):
         self._direction += float(degrees)
         self._emit("turn", [degrees])
+
+    def turn_right(self, degrees):
+        return self.turn(degrees)
+
+    def turn_left(self, degrees):
+        return self.turn(-degrees)
 
     def point(self, direction):
         self._direction = float(direction)
@@ -280,10 +347,16 @@ class Sprite:
         if sec is not None:
             self.wait(sec)
 
+    def say_sec(self, msg, secs):
+        return self.say(msg, secs)
+
     def think(self, text, sec=None):
         self._emit("think", [text])
         if sec is not None:
             self.wait(sec)
+
+    def think_sec(self, msg, secs):
+        return self.think(msg, secs)
 
     def gotoXY(self, x, y):
         self._x = float(x)
@@ -300,32 +373,59 @@ class Sprite:
         self._x = float(x)
         self._emit("setX", [x])
 
+    def set_x(self, x):
+        return self.setX(x)
+
     def setY(self, y):
         self._y = float(y)
         self._emit("setY", [y])
+
+    def set_y(self, y):
+        return self.setY(y)
 
     def changeX(self, dx):
         self._x += float(dx)
         self._emit("changeX", [dx])
 
+    def change_x(self, dx):
+        return self.changeX(dx)
+
     def changeY(self, dy):
         self._y += float(dy)
         self._emit("changeY", [dy])
 
+    def change_y(self, dy):
+        return self.changeY(dy)
+
     def ifOnEdgeBounce(self):
         self._emit("ifOnEdgeBounce", [])
+
+    def bounce_on_edge(self):
+        return self.ifOnEdgeBounce()
 
     def setCostume(self, name):
         self._emit("setCostume", [name])
 
+    def switch_costume_to(self, costume):
+        return self.setCostume(costume)
+
     def setBackdrop(self, name):
         self._emit("setBackdrop", [name])
+
+    def switch_backdrop_to(self, backdrop):
+        return self.setBackdrop(backdrop)
 
     def nextCostume(self):
         self._emit("nextCostume", [])
 
+    def next_costume(self):
+        return self.nextCostume()
+
     def nextBackdrop(self):
         self._emit("nextBackdrop", [])
+
+    def next_backdrop(self):
+        return self.nextBackdrop()
 
     def show(self):
         self._visible = True
@@ -339,40 +439,68 @@ class Sprite:
         self._size = float(size)
         self._emit("setSize", [size])
 
+    def set_size_to(self, size):
+        return self.setSize(size)
+
     def changeSize(self, delta):
         self._size += float(delta)
         self._emit("changeSize", [delta])
 
+    def change_size_by(self, change):
+        return self.changeSize(change)
+
     def playSound(self, name):
         self._emit("playSound", [name])
+
+    def start_sound(self, sound_name):
+        return self.playSound(sound_name)
+
+    def play_sound_until_done(self, sound_name):
+        return self.playSound(sound_name)
 
     def setEffect(self, effect, value):
         self._emit("setEffect", [str(effect), value])
 
+    def set_effect_to(self, effect, value):
+        return self.setEffect(effect, value)
+
     def changeEffect(self, effect, value):
         self._emit("changeEffect", [str(effect), value])
+
+    def change_effect_by(self, effect, value):
+        return self.changeEffect(effect, value)
 
     def clearEffects(self):
         self._emit("clearEffects", [])
 
+    def clear_graphic_effects(self):
+        return self.clearEffects()
+
     def wait(self, sec):
+        time.sleep(sec)
         self._emit("wait", [sec])
 
     def penClear(self):
         self._emit("penClear", [])
 
+    def erase_all(self):
+        return self.penClear()
+
     def penStamp(self):
         self._emit("penStamp", [])
+
+    def stamp(self):
+        return self.penStamp()
 
     def penDown(self):
         self._emit("penDown", [])
 
-    def penUp(self):
-        self._emit("penUp", [])
-
     # Python-friendly snake_case aliases for pen APIs.
     def pen_down(self, *_args, **_kwargs):
         self.penDown()
+
+    def penUp(self):
+        self._emit("penUp", [])
 
     def pen_up(self, *_args, **_kwargs):
         self.penUp()
@@ -382,6 +510,9 @@ class Sprite:
 
     def set_pen_color(self, color):
         self.setPenColor(color)
+
+    def set_pen_color_to(self, color):
+        return self.setPenColor(color)
 
     def changePenColorParam(self, param, value):
         self._emit("changePenColorParam", [str(param), value])
@@ -416,8 +547,14 @@ class Sprite:
     def videoToggle(self, state="on"):
         self._emit("videoToggle", [str(state)])
 
+    def set_video_state(self, state):
+        return self.videoToggle(state)
+
     def setVideoTransparency(self, value):
         self._emit("setVideoTransparency", [value])
+
+    def set_video_transparency(self, transparency):
+        return self.setVideoTransparency(transparency)
 
     # Music
     def playDrum(self, drum, beats):
@@ -426,17 +563,32 @@ class Sprite:
     def rest(self, beats):
         self._emit("extMusicRestForBeats", [beats])
 
+    def rest_for_beats(self, beats):
+        return self.rest(beats)
+
     def playNote(self, note, beats):
         self._emit("extMusicPlayNoteForBeats", [note, beats])
+
+    def play_note_for_beats(self, note, beats):
+        return self.playNote(note, beats)
 
     def setInstrument(self, instrument):
         self._emit("extMusicSetInstrument", [instrument])
 
+    def set_instrument_to(self, instrument):
+        return self.setInstrument(instrument)
+
     def setTempo(self, tempo):
         self._emit("extMusicSetTempo", [tempo])
 
+    def set_tempo_to(self, tempo):
+        return self.setTempo(tempo)
+
     def changeTempo(self, delta):
         self._emit("extMusicChangeTempo", [delta])
+
+    def change_tempo_by(self, change):
+        return self.changeTempo(change)
 
     def getTempo(self):
         return _extension_rpc("extMusicGetTempo")
@@ -624,6 +776,83 @@ class Sprite:
 
     def tmposeVideo(self, state="off"):
         self._emit("extTmposeVideoToggle", [str(state)])
+
+    # ── Motion ─────────────────────────────────────────────────────────────
+
+    def glide_secs_to_xy(self, secs, x, y):
+        """Glide to x:y in secs seconds."""
+        _output({
+            "cmd": "glideToXY",
+            "secs": secs,
+            "x": x,
+            "y": y
+        })
+
+    def glide_to(self, target_name, secs):
+        """Glide to a sprite or random position."""
+        if target_name == "_random_":
+            target_name = "_random_"
+        _output({
+            "cmd": "glideTo",
+            "target_name": target_name,
+            "secs": secs
+        })
+
+    def point_towards(self, target_name):
+        """Point towards a sprite or mouse-pointer."""
+        if target_name == "_mouse_":
+            target_name = "_mouse_"
+        _output({
+            "cmd": "pointTowards",
+            "target_name": target_name
+        })
+
+    def set_rotation_style(self, style):
+        """Set rotation style: 'all around', 'left-right', or 'don't rotate'."""
+        _output({
+            "cmd": "setRotationStyle",
+            "style": style
+        })
+
+    # ── Looks ──────────────────────────────────────────────────────────────
+
+    def go_to_front_back(self, layer):
+        """Go to front or back layer."""
+        _output({
+            "cmd": "goToFrontBack",
+            "layer": layer
+        })
+
+    def go_forward_backward_layers(self, num):
+        """Go forward or backward by num layers."""
+        _output({
+            "cmd": "goForwardBackwardLayers",
+            "num": num
+        })
+
+    def get_size(self):
+        """Return current sprite size."""
+        return self._size
+
+    def costume_number_name(self, option):
+        """Get costume number or name. 'number' or 'name'."""
+        # This returns via RPC — the bridge handles the async query
+        _output({
+            "cmd": "costumeNumberName",
+            "option": option
+        })
+
+    def when_touching_object(self, target_name):
+        """Decorator: run when touching target_name or mouse-pointer or edge."""
+        if target_name == "_mouse_":
+            target_name = "_mouse_"
+        elif target_name == "_edge_":
+            target_name = "_edge_"
+        _output({
+            "cmd": "touchingObject",
+            "target_name": target_name,
+            "hat": True
+        })
 
 
 sprite = Sprite()
@@ -1453,6 +1682,7 @@ def set_volume(_volume):
 
 
 def wait(sec):
+    time.sleep(sec)
     sprite.wait(sec)
 
 

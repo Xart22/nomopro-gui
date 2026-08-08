@@ -1,10 +1,52 @@
-import {createBridgeCommandRegistry} from './bridge-command-registry';
+import { createBridgeCommandRegistry } from "./bridge-command-registry";
 
 const DEFAULT_WAIT_MS = 0;
 
 // Queue for device read results that need to be sent back to the Python runner.
 // The runner should call drainPendingDeviceResults() after each command batch.
 const _pendingDeviceResults = [];
+
+/**
+ * Global event forwarder for sending UI events (green flag, key press,
+ * sprite click) to the active Python process when the event-driven
+ * runtime is enabled.
+ *
+ * Set by the Python runner (desktop or Pyodide) during run(). Cleared
+ * when execution stops.
+ * @type {((event: {name: string, value?: string}) => void)|null}
+ */
+let _pythonEventTarget = null;
+
+/**
+ * Register a callback that will receive UI events to forward to the
+ * running Python process.
+ * @param {((event: {name: string, value?: string}) => void)|null} target
+ */
+export const setPythonEventTarget = (target) => {
+    console.log(
+        "[Bridge] setPythonEventTarget called, target type:",
+        typeof target,
+        "stack:",
+        new Error().stack.split("\n").slice(2, 5).join(" <- "),
+    );
+    _pythonEventTarget = target;
+};
+
+/**
+ * Forward a UI event to the running Python process so that @when_*
+ * decorator handlers can react to it.
+ * @param {{name: string, value?: string}} event
+ */
+export const forwardEventToPython = (event) => {
+    if (typeof _pythonEventTarget === "function") {
+        console.log("[Bridge] forwardEventToPython:", event);
+        _pythonEventTarget(event);
+    } else {
+        console.log(
+            "[Bridge] forwardEventToPython: no target set (Python not running)",
+        );
+    }
+};
 
 /**
  * Drain and return all pending device read results.
@@ -22,23 +64,23 @@ const toNumber = (value, fallback) => {
     return Number.isFinite(parsed) ? parsed : fallback;
 };
 
-const sleep = ms =>
-    new Promise(resolve => {
+const sleep = (ms) =>
+    new Promise((resolve) => {
         setTimeout(resolve, Math.max(DEFAULT_WAIT_MS, ms));
     });
 
 const findTargetByName = (runtime, targetName) => {
     if (!runtime || !targetName) return null;
 
-    if (typeof runtime.getSpriteTargetByName === 'function') {
+    if (typeof runtime.getSpriteTargetByName === "function") {
         const spriteTarget = runtime.getSpriteTargetByName(targetName);
         if (spriteTarget) return spriteTarget;
     }
 
     if (!Array.isArray(runtime.targets)) return null;
-    return runtime.targets.find(target => {
+    return runtime.targets.find((target) => {
         const name =
-            typeof target.getName === 'function' ? target.getName() : '';
+            typeof target.getName === "function" ? target.getName() : "";
         return name === targetName;
     });
 };
@@ -50,7 +92,7 @@ const resolveTarget = (vm, command, context) => {
     if (
         command &&
         command.targetId &&
-        typeof runtime.getTargetById === 'function'
+        typeof runtime.getTargetById === "function"
     ) {
         const byId = runtime.getTargetById(command.targetId);
         if (byId) return byId;
@@ -64,113 +106,128 @@ const resolveTarget = (vm, command, context) => {
     if (
         context &&
         context.selectedTargetId &&
-        typeof runtime.getTargetById === 'function'
+        typeof runtime.getTargetById === "function"
     ) {
         const selected = runtime.getTargetById(context.selectedTargetId);
         if (selected) return selected;
     }
 
     if (vm.editingTarget) return vm.editingTarget;
-    if (typeof runtime.getEditingTarget === 'function') {
+    if (typeof runtime.getEditingTarget === "function") {
         const editingTarget = runtime.getEditingTarget();
         if (editingTarget) return editingTarget;
     }
-    if (typeof runtime.getTargetForStage === 'function') {
+    if (typeof runtime.getTargetForStage === "function") {
         return runtime.getTargetForStage();
     }
     return null;
 };
 
-const emitTargetsUpdate = vm => {
-    if (typeof vm.emitTargetsUpdate === 'function') {
+const emitTargetsUpdate = (vm) => {
+    if (typeof vm.emitTargetsUpdate === "function") {
         vm.emitTargetsUpdate(false);
     }
 };
 
-const normalizeCommand = rawCommand => {
-    if (!rawCommand || typeof rawCommand !== 'object') return null;
+const normalizeCommand = (rawCommand) => {
+    if (!rawCommand || typeof rawCommand !== "object") return null;
 
-    if (typeof rawCommand.cmd === 'string') {
+    if (typeof rawCommand.cmd === "string") {
         return {
             cmd: rawCommand.cmd,
             args: Array.isArray(rawCommand.args) ? rawCommand.args : [],
             targetId: rawCommand.targetId,
             targetName: rawCommand.targetName,
-            _requestId: rawCommand._requestId
+            _requestId: rawCommand._requestId,
         };
     }
 
     // Backward compatibility with older Python runner payloads.
-    if (typeof rawCommand.action === 'string') {
+    if (typeof rawCommand.action === "string") {
         const action = rawCommand.action;
         const map = {
-            green_flag: {cmd: 'greenFlag', args: []},
+            green_flag: { cmd: "greenFlag", args: [] },
             key_pressed_event: {
-                cmd: 'triggerKeyPressed',
-                args: [rawCommand.value]
+                cmd: "triggerKeyPressed",
+                args: [rawCommand.value],
             },
-            stage_clicked: {cmd: 'triggerStageClicked', args: []},
-            sprite_clicked: {cmd: 'triggerSpriteClicked', args: []},
+            stage_clicked: { cmd: "triggerStageClicked", args: [] },
+            sprite_clicked: { cmd: "triggerSpriteClicked", args: [] },
             backdrop_switched_to: {
-                cmd: 'triggerBackdropSwitch',
-                args: [rawCommand.value]
+                cmd: "triggerBackdropSwitch",
+                args: [rawCommand.value],
             },
-            broadcast: {cmd: 'broadcast', args: [rawCommand.value]},
+            broadcast: { cmd: "broadcast", args: [rawCommand.value] },
             broadcast_and_wait: {
-                cmd: 'broadcastAndWait',
-                args: [rawCommand.value]
+                cmd: "broadcastAndWait",
+                args: [rawCommand.value],
             },
-            move: {cmd: 'move', args: [rawCommand.value]},
-            turn_right: {cmd: 'turn', args: [rawCommand.value]},
-            turn_left: {cmd: 'turn', args: [-toNumber(rawCommand.value, 0)]},
-            point: {cmd: 'point', args: [rawCommand.value]},
-            point_direction: {cmd: 'point', args: [rawCommand.value]},
-            point_in_direction: {cmd: 'point', args: [rawCommand.value]},
-            say: {cmd: 'say', args: [rawCommand.value]},
-            think: {cmd: 'think', args: [rawCommand.value]},
-            goto: {cmd: 'gotoXY', args: [rawCommand.x, rawCommand.y]},
-            go_to_xy: {cmd: 'gotoXY', args: [rawCommand.x, rawCommand.y]},
-            set_x: {cmd: 'setX', args: [toNumber(rawCommand.value, 0)]},
-            set_y: {cmd: 'setY', args: [toNumber(rawCommand.value, 0)]},
+            move: { cmd: "move", args: [rawCommand.value] },
+            turn_right: { cmd: "turn", args: [rawCommand.value] },
+            turn_left: { cmd: "turn", args: [-toNumber(rawCommand.value, 0)] },
+            point: { cmd: "point", args: [rawCommand.value] },
+            point_direction: { cmd: "point", args: [rawCommand.value] },
+            point_in_direction: { cmd: "point", args: [rawCommand.value] },
+            say: { cmd: "say", args: [rawCommand.value] },
+            think: { cmd: "think", args: [rawCommand.value] },
+            goto: { cmd: "gotoXY", args: [rawCommand.x, rawCommand.y] },
+            go_to_xy: { cmd: "gotoXY", args: [rawCommand.x, rawCommand.y] },
+            set_x: { cmd: "setX", args: [toNumber(rawCommand.value, 0)] },
+            set_y: { cmd: "setY", args: [toNumber(rawCommand.value, 0)] },
             change_x: {
-                cmd: 'changeX',
-                args: [toNumber(rawCommand.value, 0)]
+                cmd: "changeX",
+                args: [toNumber(rawCommand.value, 0)],
             },
             change_y: {
-                cmd: 'changeY',
-                args: [toNumber(rawCommand.value, 0)]
+                cmd: "changeY",
+                args: [toNumber(rawCommand.value, 0)],
             },
-            show: {cmd: 'show', args: []},
-            hide: {cmd: 'hide', args: []},
+            show: { cmd: "show", args: [] },
+            hide: { cmd: "hide", args: [] },
             set_size: {
-                cmd: 'setSize',
-                args: [toNumber(rawCommand.value, 100)]
+                cmd: "setSize",
+                args: [toNumber(rawCommand.value, 100)],
             },
             change_size: {
-                cmd: 'changeSize',
-                args: [toNumber(rawCommand.value, 0)]
+                cmd: "changeSize",
+                args: [toNumber(rawCommand.value, 0)],
             },
-            set_costume: {cmd: 'setCostume', args: [rawCommand.value]},
-            set_backdrop: {cmd: 'setBackdrop', args: [rawCommand.value]},
-            next_costume: {cmd: 'nextCostume', args: []},
-            next_backdrop: {cmd: 'nextBackdrop', args: []},
-            play_sound: {cmd: 'playSound', args: [rawCommand.value]},
-            playSound: {cmd: 'playSound', args: [rawCommand.value]},
-            play_sound_until_done: {cmd: 'playSound', args: [rawCommand.value]},
-            setEffect: {cmd: 'setEffect', args: [rawCommand.effect, rawCommand.value]},
-            set_effect: {cmd: 'setEffect', args: [rawCommand.effect, rawCommand.value]},
-            changeEffect: {cmd: 'changeEffect', args: [rawCommand.effect, rawCommand.value]},
-            change_effect: {cmd: 'changeEffect', args: [rawCommand.effect, rawCommand.value]},
-            clearEffects: {cmd: 'clearEffects', args: []},
-            clear_effects: {cmd: 'clearEffects', args: []},
-            if_on_edge_bounce: {cmd: 'ifOnEdgeBounce', args: []},
-            bounce_on_edge: {cmd: 'ifOnEdgeBounce', args: []},
+            set_costume: { cmd: "setCostume", args: [rawCommand.value] },
+            set_backdrop: { cmd: "setBackdrop", args: [rawCommand.value] },
+            next_costume: { cmd: "nextCostume", args: [] },
+            next_backdrop: { cmd: "nextBackdrop", args: [] },
+            play_sound: { cmd: "playSound", args: [rawCommand.value] },
+            playSound: { cmd: "playSound", args: [rawCommand.value] },
+            play_sound_until_done: {
+                cmd: "playSound",
+                args: [rawCommand.value],
+            },
+            setEffect: {
+                cmd: "setEffect",
+                args: [rawCommand.effect, rawCommand.value],
+            },
+            set_effect: {
+                cmd: "setEffect",
+                args: [rawCommand.effect, rawCommand.value],
+            },
+            changeEffect: {
+                cmd: "changeEffect",
+                args: [rawCommand.effect, rawCommand.value],
+            },
+            change_effect: {
+                cmd: "changeEffect",
+                args: [rawCommand.effect, rawCommand.value],
+            },
+            clearEffects: { cmd: "clearEffects", args: [] },
+            clear_effects: { cmd: "clearEffects", args: [] },
+            if_on_edge_bounce: { cmd: "ifOnEdgeBounce", args: [] },
+            bounce_on_edge: { cmd: "ifOnEdgeBounce", args: [] },
             create_clone: {
-                cmd: 'createClone',
-                args: [rawCommand.value || '_myself_']
+                cmd: "createClone",
+                args: [rawCommand.value || "_myself_"],
             },
-            delete_clone: {cmd: 'deleteClone', args: []},
-            wait: {cmd: 'wait', args: [rawCommand.value]}
+            delete_clone: { cmd: "deleteClone", args: [] },
+            wait: { cmd: "wait", args: [rawCommand.value] },
         };
         const mapped = map[action];
         if (!mapped) return null;
@@ -178,7 +235,7 @@ const normalizeCommand = rawCommand => {
             cmd: mapped.cmd,
             args: mapped.args,
             targetId: rawCommand.targetId,
-            targetName: rawCommand.targetName
+            targetName: rawCommand.targetName,
         };
     }
 
@@ -187,7 +244,7 @@ const normalizeCommand = rawCommand => {
 
 const moveBySteps = (vm, target, steps) => {
     const runtimeSprite = vm && vm.runtime && vm.runtime.sprite;
-    if (runtimeSprite && typeof runtimeSprite.moveSteps === 'function') {
+    if (runtimeSprite && typeof runtimeSprite.moveSteps === "function") {
         runtimeSprite.moveSteps(steps);
         return;
     }
@@ -202,8 +259,8 @@ const moveBySteps = (vm, target, steps) => {
 const bounceOnEdge = (runtime, target) => {
     if (
         !target ||
-        typeof target.getBounds !== 'function' ||
-        typeof target.keepInFence !== 'function'
+        typeof target.getBounds !== "function" ||
+        typeof target.keepInFence !== "function"
     ) {
         return;
     }
@@ -212,36 +269,36 @@ const bounceOnEdge = (runtime, target) => {
     if (!bounds) return;
 
     const stageWidth =
-        runtime && runtime.constructor && runtime.constructor.STAGE_WIDTH ?
-            runtime.constructor.STAGE_WIDTH :
-            480;
+        runtime && runtime.constructor && runtime.constructor.STAGE_WIDTH
+            ? runtime.constructor.STAGE_WIDTH
+            : 480;
     const stageHeight =
-        runtime && runtime.constructor && runtime.constructor.STAGE_HEIGHT ?
-            runtime.constructor.STAGE_HEIGHT :
-            360;
+        runtime && runtime.constructor && runtime.constructor.STAGE_HEIGHT
+            ? runtime.constructor.STAGE_HEIGHT
+            : 360;
 
     const distLeft = Math.max(0, stageWidth / 2 + bounds.left);
     const distTop = Math.max(0, stageHeight / 2 - bounds.top);
     const distRight = Math.max(0, stageWidth / 2 - bounds.right);
     const distBottom = Math.max(0, stageHeight / 2 + bounds.bottom);
 
-    let nearestEdge = '';
+    let nearestEdge = "";
     let minDist = Infinity;
     if (distLeft < minDist) {
         minDist = distLeft;
-        nearestEdge = 'left';
+        nearestEdge = "left";
     }
     if (distTop < minDist) {
         minDist = distTop;
-        nearestEdge = 'top';
+        nearestEdge = "top";
     }
     if (distRight < minDist) {
         minDist = distRight;
-        nearestEdge = 'right';
+        nearestEdge = "right";
     }
     if (distBottom < minDist) {
         minDist = distBottom;
-        nearestEdge = 'bottom';
+        nearestEdge = "bottom";
     }
     if (minDist > 0) return;
 
@@ -249,13 +306,13 @@ const bounceOnEdge = (runtime, target) => {
     let dx = Math.cos(radians);
     let dy = -Math.sin(radians);
 
-    if (nearestEdge === 'left') {
+    if (nearestEdge === "left") {
         dx = Math.max(0.2, Math.abs(dx));
-    } else if (nearestEdge === 'top') {
+    } else if (nearestEdge === "top") {
         dy = Math.max(0.2, Math.abs(dy));
-    } else if (nearestEdge === 'right') {
+    } else if (nearestEdge === "right") {
         dx = 0 - Math.max(0.2, Math.abs(dx));
-    } else if (nearestEdge === 'bottom') {
+    } else if (nearestEdge === "bottom") {
         dy = 0 - Math.max(0.2, Math.abs(dy));
     }
 
@@ -266,17 +323,17 @@ const bounceOnEdge = (runtime, target) => {
 };
 
 const setCostumeByName = (target, costumeName) => {
-    if (typeof target.getCostumes !== 'function' || !costumeName) return false;
+    if (typeof target.getCostumes !== "function" || !costumeName) return false;
     const costumes = target.getCostumes();
-    const index = costumes.findIndex(costume => costume.name === costumeName);
-    if (index < 0 || typeof target.setCostume !== 'function') return false;
+    const index = costumes.findIndex((costume) => costume.name === costumeName);
+    if (index < 0 || typeof target.setCostume !== "function") return false;
     target.setCostume(index);
     return true;
 };
 
-const nextCostume = target => {
-    if (typeof target.getCostumes !== 'function') return false;
-    if (typeof target.setCostume !== 'function') return false;
+const nextCostume = (target) => {
+    if (typeof target.getCostumes !== "function") return false;
+    if (typeof target.setCostume !== "function") return false;
 
     const costumes = target.getCostumes();
     if (!costumes || costumes.length === 0) return false;
@@ -290,13 +347,13 @@ const playSoundByName = (target, soundName) => {
     if (!soundName) return false;
 
     if (
-        typeof target.getSounds === 'function' &&
+        typeof target.getSounds === "function" &&
         target.sprite &&
         target.sprite.soundBank &&
-        typeof target.sprite.soundBank.playSound === 'function'
+        typeof target.sprite.soundBank.playSound === "function"
     ) {
         const sounds = target.getSounds();
-        const sound = sounds.find(item => item.name === soundName);
+        const sound = sounds.find((item) => item.name === soundName);
         if (!sound) return false;
         target.sprite.soundBank.playSound(target.id, sound.soundId);
         return true;
@@ -305,27 +362,30 @@ const playSoundByName = (target, soundName) => {
     return false;
 };
 
-const SOUND_STATE_KEY = 'Scratch.sound';
+const SOUND_STATE_KEY = "Scratch.sound";
 
-const getSoundState = target => {
+const getSoundState = (target) => {
     if (!target) return null;
-    if (typeof target.getCustomState !== 'function') return null;
+    if (typeof target.getCustomState !== "function") return null;
     let state = target.getCustomState(SOUND_STATE_KEY);
     if (!state) {
-        state = {effects: {pitch: 0, pan: 0}};
-        if (typeof target.setCustomState === 'function') {
+        state = { effects: { pitch: 0, pan: 0 } };
+        if (typeof target.setCustomState === "function") {
             target.setCustomState(SOUND_STATE_KEY, state);
         }
     }
     return state;
 };
 
-const syncSoundEffects = target => {
+const syncSoundEffects = (target) => {
     const state = getSoundState(target);
     if (!state) return;
     target.soundEffects = state.effects;
-    if (target.sprite && target.sprite.soundBank &&
-        typeof target.sprite.soundBank.setEffects === 'function') {
+    if (
+        target.sprite &&
+        target.sprite.soundBank &&
+        typeof target.sprite.soundBank.setEffects === "function"
+    ) {
         target.sprite.soundBank.setEffects(target);
     }
 };
@@ -333,8 +393,8 @@ const syncSoundEffects = target => {
 const setSoundEffect = (target, effect, value) => {
     const state = getSoundState(target);
     if (!state) return;
-    const validEffects = {pitch: true, pan: true};
-    const key = String(effect || '').toLowerCase();
+    const validEffects = { pitch: true, pan: true };
+    const key = String(effect || "").toLowerCase();
     if (!validEffects[key]) return;
     state.effects[key] = value;
     syncSoundEffects(target);
@@ -343,14 +403,14 @@ const setSoundEffect = (target, effect, value) => {
 const changeSoundEffect = (target, effect, value) => {
     const state = getSoundState(target);
     if (!state) return;
-    const validEffects = {pitch: true, pan: true};
-    const key = String(effect || '').toLowerCase();
+    const validEffects = { pitch: true, pan: true };
+    const key = String(effect || "").toLowerCase();
     if (!validEffects[key]) return;
     state.effects[key] += value;
     syncSoundEffects(target);
 };
 
-const clearSoundEffects = target => {
+const clearSoundEffects = (target) => {
     const state = getSoundState(target);
     if (!state) return;
     for (const key of Object.keys(state.effects)) {
@@ -361,7 +421,7 @@ const clearSoundEffects = target => {
 
 const setTargetVisible = (target, visible) => {
     if (!target) return;
-    if (typeof target.setVisible === 'function') {
+    if (typeof target.setVisible === "function") {
         target.setVisible(visible);
         return;
     }
@@ -370,7 +430,7 @@ const setTargetVisible = (target, visible) => {
 
 const setTargetSize = (target, size) => {
     if (!target) return;
-    if (typeof target.setSize === 'function') {
+    if (typeof target.setSize === "function") {
         target.setSize(size);
         return;
     }
@@ -380,17 +440,17 @@ const setTargetSize = (target, size) => {
 const ensureExtensionLoaded = async (vm, extensionId) => {
     if (!vm || !vm.extensionManager || !extensionId) return false;
 
-    const {extensionManager} = vm;
+    const { extensionManager } = vm;
     if (extensionManager.isExtensionLoaded(extensionId)) {
         return true;
     }
 
-    if (typeof extensionManager.loadExtensionIdSync === 'function') {
+    if (typeof extensionManager.loadExtensionIdSync === "function") {
         extensionManager.loadExtensionIdSync(extensionId);
         return extensionManager.isExtensionLoaded(extensionId);
     }
 
-    if (typeof extensionManager.loadExtensionURL === 'function') {
+    if (typeof extensionManager.loadExtensionURL === "function") {
         await extensionManager.loadExtensionURL(extensionId);
         return extensionManager.isExtensionLoaded(extensionId);
     }
@@ -413,18 +473,22 @@ const executeExtensionOpcode = async (
         );
     }
 
-    if (typeof runtime.getOpcodeFunction !== 'function') {
-        throw new Error('Runtime opcode registry is unavailable.');
+    if (typeof runtime.getOpcodeFunction !== "function") {
+        throw new Error("Runtime opcode registry is unavailable.");
     }
 
     const primitive = runtime.getOpcodeFunction(`${extensionId}_${opcode}`);
-    if (typeof primitive !== 'function') {
+    if (typeof primitive !== "function") {
         throw new Error(
             `Extension opcode '${extensionId}_${opcode}' is not available.`,
         );
     }
 
-    const safeTarget = target || runtime.getEditingTarget() || runtime.getTargetForStage() || null;
+    const safeTarget =
+        target ||
+        runtime.getEditingTarget() ||
+        runtime.getTargetForStage() ||
+        null;
     const stackFrame = {};
     const primitiveUtil = {
         target: safeTarget,
@@ -436,18 +500,18 @@ const executeExtensionOpcode = async (
             if (
                 runtime.ioDevices &&
                 runtime.ioDevices[device] &&
-                typeof runtime.ioDevices[device][func] === 'function'
+                typeof runtime.ioDevices[device][func] === "function"
             ) {
                 return runtime.ioDevices[device][func](...queryArgs);
             }
         },
         startHats: () => [],
         startBranch: () => {},
-        stopAll: () => runtime.stopAll()
+        stopAll: () => runtime.stopAll(),
     };
 
     let result = primitive(args, primitiveUtil);
-    if (result && typeof result.then === 'function') {
+    if (result && typeof result.then === "function") {
         result = await result;
     }
 
@@ -458,7 +522,7 @@ const buildCommandResultContext = (context, target) => {
     if (!target) return context;
     return {
         ...context,
-        selectedTargetId: target.id
+        selectedTargetId: target.id,
     };
 };
 
@@ -476,7 +540,7 @@ const commandRegistry = createBridgeCommandRegistry({
     setTargetSize,
     setTargetVisible,
     buildCommandResultContext,
-    executeExtensionOpcode
+    executeExtensionOpcode,
 });
 
 export const getBridgeRegisteredCommands = () => Object.keys(commandRegistry);
@@ -485,10 +549,10 @@ export const executeBridgeCommand = async (vm, rawCommand, context = {}) => {
     const command = normalizeCommand(rawCommand);
     if (!command) return context;
 
-    const {cmd, args} = command;
+    const { cmd, args } = command;
     const runtime = vm && vm.runtime;
     if (!runtime) {
-        throw new Error('VM runtime is not available.');
+        throw new Error("VM runtime is not available.");
     }
 
     const commandHandler = commandRegistry[cmd];
@@ -496,9 +560,9 @@ export const executeBridgeCommand = async (vm, rawCommand, context = {}) => {
         throw new Error(`Unsupported bridge command: ${cmd}`);
     }
 
-    const target = commandHandler.resolveTarget ?
-        resolveTarget(vm, command, context) :
-        null;
+    const target = commandHandler.resolveTarget
+        ? resolveTarget(vm, command, context)
+        : null;
 
     if (commandHandler.resolveTarget && !target) {
         throw new Error(`No target available for command '${cmd}'.`);
@@ -510,7 +574,7 @@ export const executeBridgeCommand = async (vm, rawCommand, context = {}) => {
         command,
         args,
         target,
-        context
+        context,
     });
 
     // Capture device read results (from deviceDigitalRead, deviceAnalogRead, etc.)
@@ -539,7 +603,10 @@ export const executeBridgeBatch = async (
     commands,
     initialContext = {},
     onCommandResult,
+    options = {},
 ) => {
+    const { yieldPerCommand = false } = options;
+
     if (!Array.isArray(commands) || commands.length === 0) {
         return initialContext;
     }
@@ -552,8 +619,13 @@ export const executeBridgeBatch = async (
             onCommandResult({
                 command,
                 index,
-                context
+                context,
             });
+        }
+        // Yield to browser renderer so each command gets its own frame,
+        // making movement appear smooth instead of teleporting.
+        if (yieldPerCommand && index < commands.length - 1) {
+            await new Promise((r) => requestAnimationFrame(r));
         }
     }
 
