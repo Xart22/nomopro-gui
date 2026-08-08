@@ -234,6 +234,7 @@ _event_handlers = {
     "sprite_clicked": [],
     "stage_clicked": [],
     "backdrop_switched": {},
+    "touching_object": {},
 }
 _clone_handlers = []
 
@@ -844,15 +845,21 @@ class Sprite:
 
     def when_touching_object(self, target_name):
         """Decorator: run when touching target_name or mouse-pointer or edge."""
-        if target_name == "_mouse_":
-            target_name = "_mouse_"
-        elif target_name == "_edge_":
-            target_name = "_edge_"
-        _output({
-            "cmd": "touchingObject",
-            "target_name": target_name,
-            "hat": True
-        })
+
+        def _decorator(handler):
+            key = str(target_name)
+            if key not in _event_handlers["touching_object"]:
+                _event_handlers["touching_object"][key] = []
+            _event_handlers["touching_object"][key].append(handler)
+            # Tell the bridge to start edge-triggered polling for this target.
+            _output({
+                "cmd": "touchingObject",
+                "target_name": target_name,
+                "hat": True
+            })
+            return handler
+
+        return _decorator
 
 
 sprite = Sprite()
@@ -1836,6 +1843,12 @@ def _dispatch_local_event(event_name, value=None):
     if event_name == "backdrop_switched":
         key = str(value)
         for handler in _event_handlers["backdrop_switched"].get(key, []):
+            handler()
+        return
+
+    if event_name == "touching_object":
+        key = str(value)
+        for handler in _event_handlers["touching_object"].get(key, []):
             handler()
         return
 

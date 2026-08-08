@@ -133,9 +133,14 @@ const normalizeCommand = (rawCommand) => {
     if (!rawCommand || typeof rawCommand !== "object") return null;
 
     if (typeof rawCommand.cmd === "string") {
+        const args = Array.isArray(rawCommand.args)
+            ? rawCommand.args
+            : typeof rawCommand.target_name !== "undefined"
+              ? [rawCommand.target_name]
+              : [];
         return {
             cmd: rawCommand.cmd,
-            args: Array.isArray(rawCommand.args) ? rawCommand.args : [],
+            args,
             targetId: rawCommand.targetId,
             targetName: rawCommand.targetName,
             _requestId: rawCommand._requestId,
@@ -541,6 +546,7 @@ const commandRegistry = createBridgeCommandRegistry({
     setTargetVisible,
     buildCommandResultContext,
     executeExtensionOpcode,
+    forwardEventToPython,
 });
 
 export const getBridgeRegisteredCommands = () => Object.keys(commandRegistry);
