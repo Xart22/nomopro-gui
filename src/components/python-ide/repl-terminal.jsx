@@ -37,6 +37,7 @@ const normalizeTerminalText = (input) => {
 const ReplTerminal = ({ deviceId, peripheralName, isConnected, onSend }) => {
     const [lines, setLines] = useState([]);
     const [inputText, setInputText] = useState("");
+    const [blockText, setBlockText] = useState("");
     const [history, setHistory] = useState([]);
     const [historyIdx, setHistoryIdx] = useState(-1);
     const [isExecuting, setIsExecuting] = useState(false);
@@ -299,19 +300,26 @@ const ReplTerminal = ({ deviceId, peripheralName, isConnected, onSend }) => {
 
     const executeLine = useCallback(
         (line) => {
-            if (!line || !onSend) return;
+            if (!onSend) return;
 
-            // Add to history
-            setHistory((prev) => {
-                const next = [line, ...prev.filter((h) => h !== line)].slice(
-                    0,
-                    MAX_HISTORY,
-                );
-                return next;
-            });
-            setHistoryIdx(-1);
+            // Baris kosong wajib dikirim untuk menutup blok multiline
+            // (for/while/def). MicroPython baru mengeksekusi blok setelah
+            // menerima baris kosong; tanpa ini kode multiline tidak jalan.
+            const isEmpty = !line;
 
-            appendLine(`>>> ${line}`, "input");
+            // Add to history (lewati baris kosong penutup blok)
+            if (!isEmpty) {
+                setHistory((prev) => {
+                    const next = [
+                        line,
+                        ...prev.filter((h) => h !== line),
+                    ].slice(0, MAX_HISTORY);
+                    return next;
+                });
+                setHistoryIdx(-1);
+            }
+
+            appendLine(isEmpty ? "..." : `>>> ${line}`, "input");
             isExecutingRef.current = true;
             setIsExecuting(true);
             hasSentCommandRef.current = true;
@@ -325,6 +333,41 @@ const ReplTerminal = ({ deviceId, peripheralName, isConnected, onSend }) => {
             }, 20);
 
             // Safety timeout — auto-reset setelah 15 detik kalau prompt tidak kembali
+            if (safetyTimeoutRef.current) {
+                clearTimeout(safetyTimeoutRef.current);
+            }
+            safetyTimeoutRef.current = setTimeout(() => {
+                if (isExecutingRef.current) {
+                    appendLine("[Timeout] No response from device", "system");
+                    isExecutingRef.current = false;
+                    setIsExecuting(false);
+                    safetyTimeoutRef.current = null;
+                    if (inputRef.current) inputRef.current.focus();
+                }
+            }, 15000);
+        },
+        [onSend, appendLine],
+    );
+
+    const executeBlock = useCallback(
+        (code) => {
+            if (!onSend || !code || !code.trim()) return;
+
+            const clean = code.replace(/\r/g, "");
+            const lines = clean.split("\n");
+            lines.forEach((line, i) => {
+                appendLine(i === 0 ? `>>> ${line}` : `... ${line}`, "input");
+            });
+
+            isExecutingRef.current = true;
+            setIsExecuting(true);
+            hasSentCommandRef.current = true;
+            lastSentLineRef.current = clean;
+
+            // Paste mode: \x05 ... baris ... \x04. Eksekusi seluruh blok
+            // sekaligus — aman untuk for/while/def tanpa perlu baris kosong.
+            replRef.current.sendCode(clean, onSend);
+
             if (safetyTimeoutRef.current) {
                 clearTimeout(safetyTimeoutRef.current);
             }
@@ -544,12 +587,12 @@ const ReplTerminal = ({ deviceId, peripheralName, isConnected, onSend }) => {
                 />
                 <button
                     onClick={() => {
-                        if (inputText && !isExecutingRef.current) {
+                        if (!isExecutingRef.current) {
                             executeLine(inputText);
                             setInputText("");
                         }
                     }}
-                    disabled={!isConnected || isExecuting || !inputText}
+                    disabled={!isConnected || isExecuting}
                     style={{
                         padding: "4px 12px",
                         border: "1px solid #45475a",
@@ -583,6 +626,82 @@ const ReplTerminal = ({ deviceId, peripheralName, isConnected, onSend }) => {
                     Clear
                 </button>
             </div>
+
+            {/* Block input area — untuk kode multiline (for/while/def) */}
+            {/* <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 4,
+                    padding: "6px 8px",
+                    borderTop: "1px solid #313244",
+                    background: "#181825",
+                }}
+            >
+                <textarea
+                    value={blockText}
+                    onChange={(e) => setBlockText(e.target.value)}
+                    placeholder={
+                        isConnected
+                            ? "Multiline code (for/while/def)..."
+                            : "Connect a device first"
+                    }
+                    disabled={!isConnected || isExecuting}
+                    rows={4}
+                    style={{
+                        width: "100%",
+                        padding: "4px 8px",
+                        border: "1px solid #45475a",
+                        borderRadius: 4,
+                        fontSize: "0.82rem",
+                        fontFamily: "monospace",
+                        outline: "none",
+                        resize: "vertical",
+                        background:
+                            isConnected && !isExecuting ? "#1e1e2e" : "#11111b",
+                        color: "#cdd6f4",
+                        minHeight: 60,
+                    }}
+                />
+                <div
+                    style={{
+                        display: "flex",
+                        gap: 4,
+                        justifyContent: "flex-end",
+                    }}
+                >
+                    <button
+                        onClick={() => {
+                            if (!isExecutingRef.current) {
+                                executeBlock(blockText);
+                                setBlockText("");
+                            }
+                        }}
+                        disabled={
+                            !isConnected || isExecuting || !blockText.trim()
+                        }
+                        style={{
+                            padding: "4px 12px",
+                            border: "1px solid #45475a",
+                            borderRadius: 4,
+                            cursor: "pointer",
+                            background:
+                                isConnected && !isExecuting && blockText.trim()
+                                    ? "#89b4fa"
+                                    : "#45475a",
+                            color:
+                                isConnected && !isExecuting && blockText.trim()
+                                    ? "#1e1e2e"
+                                    : "#6c7086",
+                            fontWeight: 600,
+                            fontSize: "0.8rem",
+                            lineHeight: 1,
+                        }}
+                    >
+                        Run Block
+                    </button>
+                </div>
+            </div> */}
 
             {/* Help bar */}
             <div

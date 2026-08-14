@@ -109,10 +109,9 @@ const PythonIde = (props) => {
         : false;
 
     const isMicroPythonDevice =
-        supportsMicroPython &&
-        (props.firmwareMode === "microPython" ||
-            deviceId === "microbitV2" ||
-            deviceId === "microbit");
+        supportsMicroPython ||
+        deviceId === "microbitV2" ||
+        deviceId === "microbit";
 
     // MicroPython upload mode state
     const [runtimeTarget, setRuntimeTarget] = useState("vm");
@@ -193,6 +192,16 @@ const PythonIde = (props) => {
             ) {
                 window.__serialTerminalListeners.forEach((fn) => fn(uint8));
             }
+
+            // Feed raw REPL read-back ke MicropythonRunner
+            try {
+                const text = Buffer.from(uint8).toString("utf8");
+                if (micropythonRunnerRef.current) {
+                    micropythonRunnerRef.current.feedRx(text);
+                }
+            } catch (e) {
+                // feedRx best-effort; jangan ganggu alur serial
+            }
         };
 
         vm.addListener("PERIPHERAL_RECIVE_DATA", handleSerialData);
@@ -234,6 +243,10 @@ const PythonIde = (props) => {
             setUploadLog([]);
             setFirmwareStatus("micropython");
             props.onSetFirmwareMode("microPython");
+            if (uploadMultiPromiseRef.current) {
+                uploadMultiPromiseRef.current.resolve();
+                uploadMultiPromiseRef.current = null;
+            }
         };
         const handleError = (data) => {
             setIsUploading(false);
@@ -243,6 +256,10 @@ const PythonIde = (props) => {
                 data?.message || data?.params?.message || "Unknown error";
             setUploadLog((prev) => [...prev, `Error: ${msg}`]);
             setRunError((prev) => `${prev}Error: ${msg}\n`);
+            if (uploadMultiPromiseRef.current) {
+                uploadMultiPromiseRef.current.reject(new Error(msg));
+                uploadMultiPromiseRef.current = null;
+            }
         };
 
         vm.addListener("PERIPHERAL_UPLOAD_STDOUT", handleStdout);
@@ -740,6 +757,10 @@ const PythonIde = (props) => {
         micropythonRunnerRef.current = new MicropythonRunner();
     }
 
+    // Promise upload multi-file; diselesaikan listener uploadSuccess/uploadError
+    // (backend async), bukan langsung setelah micropythonUploadFiles().
+    const uploadMultiPromiseRef = useRef(null);
+
     // Cleanup timeout on unmount
     useEffect(() => {
         return () => {
@@ -781,39 +802,6 @@ const PythonIde = (props) => {
         });
     };
 
-    // === Handler: Upload main.py (permanent, langsung jalan) ===
-    const handleUploadMain = (maybeCode) => {
-        if (!isDeviceConnected || !deviceId || !vm) return;
-        // UploadToolbar onClick kirim event, bukan string.
-        const code = typeof maybeCode === "string" ? maybeCode : code;
-        if (!code || !code.trim) return;
-        if (code.trim().length === 0) return;
-
-        if (isMicrobit) {
-            setIsUploading(true);
-            setUploadProgress({
-                stage: "upload",
-                percent: 0,
-                text: "Uploading...",
-            });
-            vm.uploadToPeripheral(deviceId, code);
-            return;
-        }
-        if (typeof vm.writeToPeripheral !== "function") return;
-
-        setIsUploading(true);
-        setUploadProgress({
-            stage: "upload",
-            percent: 0,
-            text: "Uploading main.py...",
-        });
-        const onSend = (data) => vm.writeToPeripheral(deviceId, data);
-        micropythonRunnerRef.current.uploadMain(code, onSend, () => {
-            setIsUploading(false);
-            setUploadProgress({ stage: "", percent: 0, text: "" });
-        });
-    };
-
     // MicroPython Upload Mode handlers (VM peripheral path)
     const getPeripheral = () =>
         vm && vm.runtime && vm.runtime.peripheralExtensions
@@ -822,29 +810,73 @@ const PythonIde = (props) => {
 
     const handleDetectFirmware = () => {
         if (!peripheralName || !deviceId || !vm) return;
+        if (typeof vm.writeToPeripheral !== "function") {
+            setFirmwareStatus("error");
+            return;
+        }
         setUploadLog([]);
         setFirmwareStatus("checking");
 
-        const peripheral = getPeripheral();
-        if (peripheral && typeof peripheral.micropythonUpload === "function") {
-            try {
-                peripheral.micropythonUpload("", {
-                    detectOnly: true,
-                    board: deviceId,
-                });
-            } catch (e) {
-                setFirmwareStatus("error");
-            }
-            return;
-        }
+        // Probe via koneksi existing — jangan buka port kedua.
+        // Ctrl+C interrupt + Ctrl+B (tampilkan versi MicroPython di friendly REPL).
+        let collected = "";
+        let done = false;
 
-        // Fallback: VM path via _micropythonMode
+        const finish = (status) => {
+            if (done) return;
+            done = true;
+            vm.removeListener("PERIPHERAL_RECIVE_DATA", onData);
+            setFirmwareStatus(status);
+        };
+
+        const onData = (data) => {
+            try {
+                let uint8;
+                if (data instanceof Uint8Array) {
+                    uint8 = new Uint8Array(
+                        data.buffer,
+                        data.byteOffset,
+                        data.byteLength,
+                    );
+                } else if (typeof data === "string") {
+                    uint8 = new TextEncoder().encode(data);
+                } else {
+                    return;
+                }
+                collected += Buffer.from(uint8).toString("utf8");
+            } catch (e) {
+                return;
+            }
+            if (/MicroPython/i.test(collected)) {
+                finish("micropython");
+            } else if (/Arduino|ready/i.test(collected)) {
+                finish("arduino");
+            }
+        };
+
+        vm.addListener("PERIPHERAL_RECIVE_DATA", onData);
+
+        const timeout = setTimeout(() => finish("unknown"), 1500);
+
         try {
-            vm.runtime._micropythonMode = "detect";
-            vm.uploadToPeripheral(deviceId, "");
-        } catch (e) {
-            setFirmwareStatus("error");
-        }
+            vm.writeToPeripheral(deviceId, "\r\x03");
+        } catch (e) {}
+        setTimeout(() => {
+            try {
+                vm.writeToPeripheral(deviceId, "\x03");
+            } catch (e) {}
+        }, 80);
+        setTimeout(() => {
+            try {
+                vm.writeToPeripheral(deviceId, "\r\x02");
+            } catch (e) {}
+        }, 160);
+
+        // Jaga-jaga bersihkan listener meskipun finish belum terpanggil.
+        setTimeout(() => {
+            clearTimeout(timeout);
+            finish("unknown");
+        }, 1600);
     };
 
     const handleFlashFirmware = () => {
@@ -1014,30 +1046,34 @@ const PythonIde = (props) => {
                 });
             };
 
-            micropythonRunnerRef.current.uploadFiles(
-                filesToUpload,
-                folders,
-                onSend,
-                onProgress,
-                (result) => {
+            const peripheral = getPeripheral();
+            if (
+                peripheral &&
+                typeof peripheral.micropythonUploadFiles === "function"
+            ) {
+                try {
+                    setUploadProgress({
+                        stage: "upload",
+                        percent: 0,
+                        text: "Connecting to board...",
+                    });
+                    uploadMultiPromiseRef.current = { resolve, reject };
+                    peripheral.micropythonUploadFiles(filesToUpload, folders, {
+                        board: "esp32",
+                    });
+                } catch (e) {
+                    uploadMultiPromiseRef.current = null;
                     setIsUploading(false);
-                    if (result.success) {
-                        setUploadProgress({
-                            stage: "",
-                            percent: 100,
-                            text: `Done: ${filesToUpload.length} files, ${folders.length} folders.`,
-                        });
-                        resolve();
-                    } else {
-                        setUploadProgress({
-                            stage: "",
-                            percent: 0,
-                            text: "Upload cancelled.",
-                        });
-                        reject(new Error("Upload cancelled"));
-                    }
-                },
-            );
+                    setRunError(
+                        (prev) => `${prev}Upload error: ${e.message}\n`,
+                    );
+                    reject(e);
+                }
+                return;
+            }
+
+            setIsUploading(false);
+            reject(new Error("micropythonUploadFiles unavailable"));
         });
     };
 
@@ -1085,7 +1121,6 @@ const PythonIde = (props) => {
             onSerialBaudrate={handleSerialBaudrate}
             onReplSend={handleReplSend}
             onRunRepl={handleRunRepl}
-            onUploadMain={handleUploadMain}
             onUploadMulti={handleUploadMulti}
             onCodeChange={handleCodeChange}
             onRun={handleRun}
@@ -1117,8 +1152,6 @@ const PythonIde = (props) => {
             mpUploadLog={uploadLog}
             onFlashFirmware={handleFlashFirmware}
             onDetectFirmware={handleDetectFirmware}
-            onUploadRun={handleUploadMain}
-            onUploadOnly={handleUploadMain}
             onStopBoard={() => {
                 if (micropythonRunnerRef.current) {
                     micropythonRunnerRef.current.cancelUpload();

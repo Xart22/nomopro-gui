@@ -3,6 +3,16 @@ const CONTINUE_PROMPT = "... ";
 const RAW_REPL_READY = ">";
 const PASTE_MODE_MSG = "paste mode";
 
+// Base64 encode UTF-8 dengan aman untuk browser (btoa hanya Latin1).
+const toBase64 = (str) => {
+    const bytes = new TextEncoder().encode(str);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+};
+
 class MicropythonRepl {
     constructor() {
         this._buffer = "";
@@ -33,7 +43,9 @@ class MicropythonRepl {
     }
 
     sendEnterRawRepl(onSend) {
-        onSend("\x02");
+        // MicroPython: enter raw REPL = Ctrl+A (0x01). Ctrl+B (0x02)
+        // adalah soft reset/normal boot, bukan enter raw REPL.
+        onSend("\x01");
     }
 
     sendExitRawRepl(onSend) {
@@ -66,14 +78,11 @@ class MicropythonRepl {
     }
 
     sendFile(name, content, onSend) {
-        // MicroPython raw REPL file write
-        // format: f = open('filename', 'w'); f.write(content); f.close()
-        const escaped = content
-            .replace(/\\/g, "\\\\")
-            .replace(/'/g, "\\'")
-            .replace(/\n/g, "\\n")
-            .replace(/\r/g, "\\r");
-        const script = `f=open('${name}','w');f.write('${escaped}');f.close()\r\n`;
+        // MicroPython raw REPL file write via Base64 (aman semua karakter).
+        const b64 = toBase64(content);
+        const script =
+            `import ubinascii;f=open('${name}','wb');` +
+            `f.write(ubinascii.a2b_base64('${b64}'));f.close()\r\n`;
         this.sendEnterRawRepl(onSend);
         setTimeout(() => {
             onSend(`${script}\x04`);

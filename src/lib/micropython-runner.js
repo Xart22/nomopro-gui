@@ -1,5 +1,5 @@
 /**
- * Base64 encode string ke MicroPython compatible (pakai ubinascii.a2b_base64).
+ * Base64 encode string ke MicroPython compatible (pakai binascii.a2b_base64).
  * Selalu encode via TextEncoder → binary string → btoa().
  * btoa() cuma terima Latin1 (0-255), jadi kita harus convert UTF-8 bytes dulu.
  */
@@ -17,16 +17,40 @@ const toBase64 = (str) => {
     return btoa(binary);
 };
 
+/**
+ * Potong base64 string per raw-byte chunk (bukan per karakter base64),
+ * agar tiap potongan decode-nya tidak melewati batas heap MicroPython.
+ * CHUNK_BYTES = 3000 raw bytes → ~4000 karakter base64 → ~3000 bytes hasil decode.
+ */
+const CHUNK_BYTES = 3000;
+
+const chunkBase64 = (b64, chunkBytes) => {
+    // base64 4 karakter = 3 raw bytes. Jaga alignment ke kelipatan 3.
+    const charCount = Math.floor(chunkBytes / 3) * 4;
+    const chunks = [];
+    for (let i = 0; i < b64.length; i += charCount) {
+        chunks.push(b64.slice(i, i + charCount));
+    }
+    return chunks;
+};
+
+const RAW_BANNER = "raw REPL";
+const RAW_TERMINATOR = "\x04";
+
 class MicropythonRunner {
     constructor() {
         this._outputBuffer = "";
         this._listener = null;
         this._timeoutIds = [];
+        this._rxBuffer = "";
+        this._rxWaiter = null;
+        this._cancelled = false;
     }
 
     dispose() {
         this._timeoutIds.forEach(clearTimeout);
         this._timeoutIds = [];
+        this._clearRxWaiter();
     }
 
     _delay(fn, ms) {
@@ -38,69 +62,128 @@ class MicropythonRunner {
         return id;
     }
 
-    /**
-     * Kirim 1 baris Python ke REPL.
-     * \r\n dan command DIPISAH waktu — biar gak ada framing error.
-     */
-    _sendLine(line, onSend, onComplete) {
-        onSend("\r\n");
-        this._delay(() => {
-            onSend(line);
-            this._delay(() => {
-                onSend("\r\n");
-                if (onComplete) this._delay(onComplete, 300);
-            }, 150);
-        }, 150);
+    _sleep(ms) {
+        return new Promise((resolve) => {
+            const id = setTimeout(() => {
+                this._timeoutIds = this._timeoutIds.filter((t) => t !== id);
+                resolve();
+            }, ms);
+            this._timeoutIds.push(id);
+        });
+    }
+
+    _clearRxWaiter() {
+        if (this._rxWaiter) {
+            if (this._rxWaiter.timer) clearTimeout(this._rxWaiter.timer);
+            this._rxWaiter.reject(new Error("cancelled"));
+            this._rxWaiter = null;
+        }
     }
 
     /**
-     * Kirim code ke REPL, dijalankan langsung (tidak permanen).
-     * Gunakan exec() — newline di dalam string Python via \n escape.
+     * Feed byte/string yang diterima dari stream PERIPHERAL_RECIVE_DATA.
+     * Dipanggil container saat ada data masuk dari device.
+     * @param {string} chunk
      */
-    sendCode(code, onSend, onComplete) {
-        // Escape: backslash, double-quote, lalu newlines jadi \n
-        let escaped = code.replace(/\\/g, "\\\\");
-        escaped = escaped.replace(/"/g, '\\"');
-        escaped = escaped.replace(/\r\n/g, "\\n");
-        escaped = escaped.replace(/\n/g, "\\n");
-        escaped = escaped.replace(/\r/g, "\\r");
-        const line = `exec("${escaped}")`;
-        this._sendLine(line, onSend, onComplete);
+    feedRx(chunk) {
+        if (!chunk) return;
+        this._rxBuffer += chunk;
+        // Cap buffer agar output user yang membanjiri (loop print) tidak
+        // membengkakkan memori renderer dan membebani jalur serial.
+        if (this._rxBuffer.length > 65536) {
+            this._rxBuffer = this._rxBuffer.slice(-32768);
+        }
+
+        const w = this._rxWaiter;
+        if (!w) return;
+        const idx = this._rxBuffer.indexOf(w.marker);
+        if (idx < 0) return;
+
+        this._rxBuffer = this._rxBuffer.substring(idx + w.marker.length);
+        this._rxWaiter = null;
+        if (w.timer) clearTimeout(w.timer);
+        w.resolve();
     }
 
     /**
-     * Upload code sebagai main.py (permanen) + jalanin.
-     *
-     * ALUR — BASE64:
-     *   import base64;f=open('main.py','wb');f.write(base64.b64decode('...'));f.close()
-     *
-     * Base64 aman: cuma [A-Za-z0-9+/=] — zero escape issues.
-     *
-     * Step 2: exec(open('main.py').read())
-     *
-     * @param {string} code
-     * @param {function} onSend
-     * @param {function} [onComplete]
+     * Tunggu marker muncul di stream RX.
+     * @param {string} marker
+     * @param {number} timeoutMs
      */
-    uploadMain(code, onSend, onComplete) {
-        const b64 = toBase64(code);
-        // MicroPython pake ubinascii, bukan base64.
-        // a2b_base64 decode string base64 jadi bytes.
-        const writeLine = `import ubinascii;f=open('main.py','wb');f.write(ubinascii.a2b_base64('${b64}'));f.close()`;
-        this._sendLine(writeLine, onSend, () => {
-            this._delay(() => {
-                const execLine = 'exec(open("main.py").read())';
-                this._sendLine(execLine, onSend, () => {
-                    if (onComplete)
-                        this._delay(() => onComplete({ success: true }), 300);
-                });
-            }, 2000);
+    waitForMarker(marker, timeoutMs = 10000) {
+        return new Promise((resolve, reject) => {
+            const idx = this._rxBuffer.indexOf(marker);
+            if (idx >= 0) {
+                this._rxBuffer = this._rxBuffer.substring(idx + marker.length);
+                resolve();
+                return;
+            }
+            const waiter = { marker, resolve, reject, timer: null };
+            waiter.timer = setTimeout(() => {
+                if (this._rxWaiter === waiter) this._rxWaiter = null;
+                reject(
+                    new Error(
+                        `Timeout menunggu marker ${JSON.stringify(marker)}`,
+                    ),
+                );
+            }, timeoutMs);
+            this._rxWaiter = waiter;
         });
     }
 
     /**
+     * Kirim command Python di raw REPL lalu tunggu terminator \x04.
+     * Raw REPL menjamin response berakhir dengan \x04 setelah OK + output.
+     */
+    async execRaw(command, onSend, timeoutMs = 10000) {
+        onSend(`${command}\x04`);
+        await this.waitForMarker(RAW_TERMINATOR, timeoutMs);
+    }
+
+    /**
+     * Masuk raw REPL: interrupt 2x + Ctrl+A, tunggu banner raw REPL.
+     * Tunggu banner lengkap "raw REPL" — bukan cuma ">" — karena friendly
+     * REPL banner ">>> " juga mengandung ">" dan membuat prompt ketemu
+     * sebelum device benar-benar masuk raw mode (desync → incorrect padding).
+     */
+    async enterRawRepl(onSend) {
+        this._rxBuffer = "";
+        onSend("\r\x03");
+        await this._sleep(200);
+        onSend("\x03");
+        await this._sleep(200);
+        onSend("\x01");
+        await this.waitForMarker("raw REPL", 3000);
+    }
+
+    /**
+     * Keluar raw REPL: Ctrl+B (soft reset ke friendly REPL).
+     */
+    exitRawRepl(onSend) {
+        onSend("\x02");
+    }
+
+    /**
+     * Kirim code ke REPL, dijalankan langsung (tidak permanen).
+     * Gunakan base64 + raw REPL agar bebas echo/prompt dan aman semua karakter.
+     */
+    async sendCode(code, onSend, onComplete) {
+        try {
+            await this.enterRawRepl(onSend);
+            const b64 = toBase64(code);
+            const command = `import binascii;exec(binascii.a2b_base64('${b64}').decode())`;
+            await this.execRaw(command, onSend, 15000);
+            this.exitRawRepl(onSend);
+            if (onComplete) onComplete({ success: true });
+        } catch (e) {
+            this.exitRawRepl(onSend);
+            if (onComplete) onComplete({ success: false, error: e.message });
+        }
+    }
+
+    /**
      * Upload multiple files ke MicroPython dengan folder structure preserved.
-     * Thonny-style: mkdir dulu, lalu write file via Base64.
+     * Thonny-style: raw REPL + base64 chunked + flow control per chunk.
      *
      * @param {Array<{path: string, name: string, content: string}>} files
      * @param {Array<string>} folders — daftar folder unik (sorted shortest first)
@@ -108,76 +191,91 @@ class MicropythonRunner {
      * @param {function} [onProgress] — (current, total, label) => void
      * @param {function} [onComplete] — ({success: boolean}) => void
      */
-    uploadFiles(files, folders, onSend, onProgress, onComplete) {
+    async uploadFiles(files, folders, onSend, onProgress, onComplete) {
         if (!files || files.length === 0) {
-            if (onComplete)
-                this._delay(() => onComplete({ success: false }), 100);
+            if (onComplete) onComplete({ success: false, error: "no files" });
             return;
         }
 
-        let step = 0;
-        const totalSteps = (folders ? folders.length : 0) + files.length;
         this._cancelled = false;
+        const folderList = folders || [];
+        const totalSteps = folderList.length + files.length;
 
-        const next = () => {
-            if (this._cancelled) {
-                if (onComplete)
-                    this._delay(() => onComplete({ success: false }), 100);
-                return;
-            }
+        try {
+            await this.enterRawRepl(onSend);
+            // Import sekali di awal raw REPL. sendCode memakai import inline,
+            // tapi uploadFiles menulis chunk dengan binascii.a2b_base64()
+            // tanpa import — tanpa ini tiap chunk melempar NameError.
+            await this.execRaw("import binascii", onSend, 10000);
 
-            // Step 1: Buat folder dulu
-            if (folders && step < folders.length) {
-                const folder = folders[step];
-                if (onProgress)
-                    onProgress(step, totalSteps, `mkdir: ${folder}`);
-                // Gunakan sendCode (sama seperti handleRunRepl) — sudah teruji
-                // untuk multi-line Python via exec() dengan \\n escape
-                const pyCode = `try:\n import uos; uos.mkdir('${folder}')\nexcept: pass`;
-                this.sendCode(pyCode, onSend, () => {
-                    step++;
-                    this._delay(next, 300);
-                });
-                return;
-            }
-
-            // Step 2: Upload file
-            const fileIdx = step - (folders ? folders.length : 0);
-            if (fileIdx >= files.length) {
-                // Semua selesai — cek main.py untuk auto-exec
-                const hasMain = files.some(
-                    (f) => f.path === "main.py" || f.name === "main.py",
-                );
-                if (hasMain) {
-                    this._delay(() => {
-                        const execLine = 'exec(open("main.py").read())';
-                        this._sendLine(execLine, onSend, () => {
-                            if (onComplete)
-                                this._delay(
-                                    () => onComplete({ success: true }),
-                                    300,
-                                );
-                        });
-                    }, 1000);
-                } else if (onComplete) {
-                    this._delay(() => onComplete({ success: true }), 300);
+            for (let i = 0; i < folderList.length; i++) {
+                if (this._cancelled) {
+                    this.exitRawRepl(onSend);
+                    if (onComplete)
+                        onComplete({ success: false, error: "cancelled" });
+                    return;
                 }
-                return;
+                const folder = folderList[i];
+                if (onProgress) onProgress(i, totalSteps, `mkdir: ${folder}`);
+                await this.execRaw(
+                    `try:\n import os; os.mkdir('${folder}')\nexcept: pass`,
+                    onSend,
+                    10000,
+                );
             }
 
-            const file = files[fileIdx];
-            if (onProgress) onProgress(step, totalSteps, file.path);
+            for (let i = 0; i < files.length; i++) {
+                if (this._cancelled) {
+                    this.exitRawRepl(onSend);
+                    if (onComplete)
+                        onComplete({ success: false, error: "cancelled" });
+                    return;
+                }
+                const file = files[i];
+                const stepIdx = folderList.length + i;
+                if (onProgress) onProgress(stepIdx, totalSteps, file.path);
 
-            const b64 = toBase64(file.content);
-            const writeLine = `import ubinascii;f=open('${file.path}','wb');f.write(ubinascii.a2b_base64('${b64}'));f.close()`;
+                await this.execRaw(
+                    `f=open('${file.path}','wb')`,
+                    onSend,
+                    10000,
+                );
 
-            this._sendLine(writeLine, onSend, () => {
-                step++;
-                this._delay(next, 500);
-            });
-        };
+                const b64 = toBase64(file.content);
+                const chunks = chunkBase64(b64, CHUNK_BYTES);
+                for (let c = 0; c < chunks.length; c++) {
+                    if (this._cancelled) break;
+                    await this.execRaw(
+                        `f.write(binascii.a2b_base64('${chunks[c]}'))`,
+                        onSend,
+                        15000,
+                    );
+                    // Jeda kecil antar chunk: jaga sustained burst write tidak
+                    // menjenuhkan driver USB-serial Windows (WDF_VIOLATION).
+                    await this._sleep(10);
+                    if ((c + 1) % 10 === 0) {
+                        await this.execRaw(
+                            "import gc;gc.collect()",
+                            onSend,
+                            10000,
+                        );
+                    }
+                }
 
-        next();
+                await this.execRaw("f.close()", onSend, 10000);
+            }
+
+            // exitRawRepl kirim \x02 = soft reset. MicroPython soft reset
+            // otomatis menjalankan boot.py lalu main.py. Jangan tambah
+            // exec(open("main.py").read()) lagi — itu menyebabkan main.py
+            // dieksekusi berkali-kali dan membanjiri jalur serial.
+            this.exitRawRepl(onSend);
+
+            if (onComplete) onComplete({ success: true });
+        } catch (e) {
+            this.exitRawRepl(onSend);
+            if (onComplete) onComplete({ success: false, error: e.message });
+        }
     }
 
     /**
@@ -185,6 +283,7 @@ class MicropythonRunner {
      */
     cancelUpload() {
         this._cancelled = true;
+        this._clearRxWaiter();
     }
 }
 

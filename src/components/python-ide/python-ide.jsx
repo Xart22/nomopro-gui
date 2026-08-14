@@ -57,7 +57,6 @@ const PythonIdeComponent = (props) => {
         onSerialBaudrate,
         onReplSend,
         onRunRepl,
-        onUploadMain,
         onUploadMulti,
         onCodeChange,
         onRun,
@@ -187,21 +186,10 @@ const PythonIdeComponent = (props) => {
             setIsUploading(false);
         }
     };
-    const handleUploadMain = async () => {
-        if (isUploading || !onUploadMain) return;
-        setIsUploading(true);
-        try {
-            await onUploadMain(code);
-            setActiveBottomTab("repl");
-        } catch (e) {
-            console.error("Upload main.py failed:", e);
-        } finally {
-            setIsUploading(false);
-        }
-    };
     const handleUploadMulti = async () => {
         if (isUploading || !onUploadMulti) return;
         setIsUploading(true);
+        setActiveBottomTab("upload");
         try {
             await onUploadMulti();
             setActiveBottomTab("repl");
@@ -1690,7 +1678,6 @@ PythonIdeComponent.propTypes = {
     onSerialBaudrate: PropTypes.func,
     onReplSend: PropTypes.func,
     onRunRepl: PropTypes.func,
-    onUploadMain: PropTypes.func,
     onUploadMulti: PropTypes.func,
     realtimeMode: PropTypes.bool,
     onRealtimeModeChange: PropTypes.func,
@@ -1723,7 +1710,6 @@ PythonIdeComponent.propTypes = {
     mpUploadLog: PropTypes.arrayOf(PropTypes.string),
     onFlashFirmware: PropTypes.func,
     onDetectFirmware: PropTypes.func,
-    onUploadMain: PropTypes.func,
     onUploadMulti: PropTypes.func,
     onRunRepl: PropTypes.func,
     onStopBoard: PropTypes.func,
