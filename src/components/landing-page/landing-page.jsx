@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 import styles from './landing-page.css';
 import nomokitJrIcon from './nomokit-jr.png';
 import nomoProIcon from './nomo.png';
+import nomoMlIcon from './nomokit-ml.png';
 
 const LandingPage = ({
     onSelectJuniorCode,
     onSelectBlockCode,
-    onSelectPythonIDE
+    onSelectPythonIDE,
+    onSelectML
 }) => (
     <div className={styles.overlay}>
         <div className={styles.container}>
@@ -58,6 +60,20 @@ const LandingPage = ({
                         Coding Python dengan editor lengkap
                     </p>
                 </div>
+                <div
+                    className={styles.card}
+                    onClick={onSelectML}
+                >
+                    <img
+                        className={styles.cardIcon}
+                        src={nomoMlIcon}
+                        alt="NomoML"
+                    />
+                    <div className={styles.cardLabel}>NomoML</div>
+                    <p className={styles.cardDesc}>
+                        Coding dengan kecerdasan buatan (ML)
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -66,7 +82,8 @@ const LandingPage = ({
 LandingPage.propTypes = {
     onSelectJuniorCode: PropTypes.func.isRequired,
     onSelectBlockCode: PropTypes.func.isRequired,
-    onSelectPythonIDE: PropTypes.func.isRequired
+    onSelectPythonIDE: PropTypes.func.isRequired,
+    onSelectML: PropTypes.func.isRequired
 };
 
 export default LandingPage;

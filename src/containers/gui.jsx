@@ -57,6 +57,7 @@ import cloudManagerHOC from "../lib/cloud-manager-hoc.jsx";
 import { PYODIDE_CONFIG } from "../components/python-ide/python-ide-config";
 import GUIComponent from "../components/gui/gui.jsx";
 import { setIsScratchDesktop } from "../lib/isScratchDesktop.js";
+import {startNomokitMlRelay} from '../lib/nomokit-ml-relay.js';
 
 class GUI extends React.Component {
     state = {
@@ -65,7 +66,8 @@ class GUI extends React.Component {
         switchFromMode: MODE_BLOCK,
         switchToMode: MODE_BLOCK,
         showLandingPage: true,
-        showJuniorContent: false,
+        showJuniorContent: false,,
+        showMLContent: false
     };
 
     isNeutralEditorTab = (tabIndex) =>
@@ -280,12 +282,30 @@ class GUI extends React.Component {
         if (event.data && event.data.type === "closeJuniorContent") {
             this.handleCloseJuniorContent();
         }
+        if (event.data && event.data.type === 'closeMLContent') {
+            this.handleCloseMLContent();
+        }
     };
     handleSelectJuniorCode = () => {
-        this.setState({ showJuniorContent: true });
+        if (window.electronAPI?.getAppPath) {
+            this.setState({ showJuniorContent: true });
+        } else {
+            window.location.href = '/nomokit-jr';
+        }
     };
     handleCloseJuniorContent = () => {
-        this.setState({ showJuniorContent: false });
+        this.setState({showJuniorContent: false});
+    };
+
+    handleSelectML = () => {
+        if (window.electronAPI?.getAppPath) {
+            this.setState({showMLContent: true});
+        } else {
+            window.location.href = '/nomokit-ml';
+        }
+    };
+    handleCloseMLContent = () => {
+        this.setState({showMLContent: false});
     };
 
     handleShowLandingPage = () => {
@@ -311,6 +331,9 @@ class GUI extends React.Component {
         setIsScratchDesktop(this.props.isScratchDesktop);
         this.props.onStorageInit(storage);
         this.props.onVmInit(this.props.vm);
+        // Relay the nested nomokit-ml iframe's postMessage protocol to the desktop Python IPC.
+        // No-op in web mode (window.nomoproDesktopPython is undefined there).
+        this._stopNomokitMlRelay = startNomokitMlRelay();
         // Listen for extension add/remove events from the Python IDE UI
         this._onPythonIdeAdd = async (evt) => {
             const name = evt && evt.detail && evt.detail.name;
@@ -451,6 +474,9 @@ class GUI extends React.Component {
         if (this._preloadPyodideTimer) {
             clearTimeout(this._preloadPyodideTimer);
         }
+        if (this._stopNomokitMlRelay) {
+            this._stopNomokitMlRelay();
+        }
         window.removeEventListener("message", this.handleMessage);
         if (this._onPythonIdeAdd) {
             window.removeEventListener(
@@ -541,10 +567,13 @@ class GUI extends React.Component {
                 loading={fetchingProject || isLoading || loadingStateVisible}
                 showLandingPage={this.state.showLandingPage}
                 showJuniorContent={this.state.showJuniorContent}
+                showMLContent={this.state.showMLContent}
                 onSelectJuniorCode={this.handleSelectJuniorCode}
                 onSelectBlockCode={this.handleSelectBlockCode}
                 onSelectPythonIDE={this.handleSelectPythonIDE}
+                onSelectML={this.handleSelectML}
                 onCloseJuniorContent={this.handleCloseJuniorContent}
+                onCloseMLContent={this.handleCloseMLContent}
                 onShowLandingPage={this.handleShowLandingPage}
                 onActivateCostumesTab={this.handleActivateCostumesTab}
                 onActivateSoundsTab={this.handleActivateSoundsTab}

@@ -95,10 +95,13 @@ const GUIComponent = (props) => {
         children,
         showLandingPage,
         showJuniorContent,
+        showMLContent,
         onSelectJuniorCode,
         onSelectBlockCode,
         onSelectPythonIDE,
+        onSelectML,
         onCloseJuniorContent,
+        onCloseMLContent,
         onShowLandingPage,
         connectionModalVisible,
         uploadProgressVisible,
@@ -196,6 +199,7 @@ const GUIComponent = (props) => {
                     onSelectJuniorCode={onSelectJuniorCode}
                     onSelectBlockCode={onSelectBlockCode}
                     onSelectPythonIDE={onSelectPythonIDE}
+                    onSelectML={onSelectML}
                 />
             ) : null}
             <MediaQuery minWidth={layout.fullSizeMinWidth}>
@@ -654,6 +658,25 @@ const GUIComponent = (props) => {
                                 : "/nomokitjr/index.html"
                         }
                         title="Nomokit Jr"
+                    />
+                </Box>
+            ) : null}
+            {showMLContent ? (
+                <Box className={styles.juniorOverlay}>
+                    <button
+                        className={styles.juniorCloseButton}
+                        onClick={onCloseMLContent}
+                    >
+                        &times;
+                    </button>
+                    <iframe
+                        className={styles.juniorIframe}
+                        src={
+                            window.electronAPI?.getAppPath ?
+                                `file:///${window.electronAPI.getAppPath().replace(/\\/g, '/')}/src/gui/nomokit-ml/index.html` :
+                                '/nomokit-ml/index.html'
+                        }
+                        title="NomoML"
                     />
                 </Box>
             ) : null}
