@@ -66,7 +66,7 @@ class GUI extends React.Component {
         switchFromMode: MODE_BLOCK,
         switchToMode: MODE_BLOCK,
         showLandingPage: true,
-        showJuniorContent: false,,
+        showJuniorContent: false,
         showMLContent: false
     };
 
