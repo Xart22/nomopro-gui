@@ -2,7 +2,16 @@ import extensionLibraryContent from '../../lib/libraries/extensions/index.jsx';
 
 export const STORAGE = {
     MODULES: 'python-ide-modules-v1',
-    PRELOAD: 'python-ide-preload-pyodide'
+    PRELOAD: 'python-ide-preload-pyodide',
+    SIDEBAR_WIDTH: 'python-ide-sidebar-width-v1',
+    SIDEBAR_COLLAPSED: 'python-ide-sidebar-collapsed-v1'
+};
+
+export const SIDEBAR_CONSTRAINTS = {
+    DEFAULT_WIDTH: 310,
+    MIN_WIDTH: 180,
+    MAX_WIDTH: 600,
+    COLLAPSE_THRESHOLD: 140
 };
 
 export const UPLOAD_CONFIG = {

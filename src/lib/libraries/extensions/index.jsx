@@ -45,11 +45,11 @@ import nlpInsetIconURL from './nlp/nlp-small.svg';
 // import ev3ConnectionIconURL from './ev3/ev3-hub-illustration.svg';
 // import ev3ConnectionSmallIconURL from './ev3/ev3-small.svg';
 
-// import wedo2IconURL from './wedo2/wedo.png'; // TODO: Rename file names to match variable/prop names?
-// import wedo2InsetIconURL from './wedo2/wedo-small.svg';
-// import wedo2ConnectionIconURL from './wedo2/wedo-illustration.svg';
-// import wedo2ConnectionSmallIconURL from './wedo2/wedo-small.svg';
-// import wedo2ConnectionTipIconURL from './wedo2/wedo-button-illustration.svg';
+import wedo2IconURL from './wedo2/wedo.png';
+import wedo2InsetIconURL from './wedo2/wedo-small.svg';
+import wedo2ConnectionIconURL from './wedo2/wedo-illustration.svg';
+import wedo2ConnectionSmallIconURL from './wedo2/wedo-small.svg';
+import wedo2ConnectionTipIconURL from './wedo2/wedo-button-illustration.svg';
 
 // import boostIconURL from './boost/boost.png';
 // import boostInsetIconURL from './boost/boost-small.svg';
@@ -327,6 +327,37 @@ export default [
         featured: true
     },
     {
+        name: 'LEGO Education WeDo 2.0',
+        extensionId: 'wedo2',
+        collaborator: 'LEGO',
+        iconURL: wedo2IconURL,
+        insetIconURL: wedo2InsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Build with motors and sensors."
+                description="Description for the 'LEGO WeDo 2.0' extension"
+                id="gui.extension.wedo2.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: true,
+        internetConnectionRequired: true,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: true,
+        connectionIconURL: wedo2ConnectionIconURL,
+        connectionSmallIconURL: wedo2ConnectionSmallIconURL,
+        connectionTipIconURL: wedo2ConnectionTipIconURL,
+        connectingMessage: (
+            <FormattedMessage
+                defaultMessage="Connecting"
+                description="Message to help people connect to their WeDo."
+                id="gui.extension.wedo2.connectingMessage"
+            />
+        ),
+        helpLink: 'https://scratch.mit.edu/wedo'
+    },
+    {
         name: (
             <FormattedMessage
                 defaultMessage="NLP"
@@ -339,7 +370,7 @@ export default [
         insetIconURL: nlpInsetIconURL,
         description: (
             <FormattedMessage
-                defaultMessage="Natural Language Processing blocks. Analyze text, train intents, classify, and more. Desktop only."
+                defaultMessage="Natural Language Processing blocks. Analyze text, train intents, classify, and more"
                 description="Description for the NLP extension"
                 id="gui.extension.nlp.description"
             />
@@ -350,6 +381,7 @@ export default [
         internetConnectionRequired: false,
         desktopOnly: true
     }
+  
     // {
     //     name: 'LEGO MINDSTORMS EV3',
     //     extensionId: 'ev3',
@@ -410,37 +442,6 @@ export default [
     //         />
     //     ),
     //     helpLink: 'https://scratch.mit.edu/boost'
-    // },
-    // {
-    //     name: 'LEGO Education WeDo 2.0',
-    //     extensionId: 'wedo2',
-    //     collaborator: 'LEGO',
-    //     iconURL: wedo2IconURL,
-    //     insetIconURL: wedo2InsetIconURL,
-    //     description: (
-    //         <FormattedMessage
-    //             defaultMessage="Build with motors and sensors."
-    //             description="Description for the 'LEGO WeDo 2.0' extension"
-    //             id="gui.extension.wedo2.description"
-    //         />
-    //     ),
-    //     featured: true,
-    //     disabled: false,
-    //     bluetoothRequired: true,
-    //     internetConnectionRequired: true,
-    //     launchPeripheralConnectionFlow: true,
-    //     useAutoScan: true,
-    //     connectionIconURL: wedo2ConnectionIconURL,
-    //     connectionSmallIconURL: wedo2ConnectionSmallIconURL,
-    //     connectionTipIconURL: wedo2ConnectionTipIconURL,
-    //     connectingMessage: (
-    //         <FormattedMessage
-    //             defaultMessage="Connecting"
-    //             description="Message to help people connect to their WeDo."
-    //             id="gui.extension.wedo2.connectingMessage"
-    //         />
-    //     ),
-    //     helpLink: 'https://scratch.mit.edu/wedo'
     // },
     // {
     //     name: 'Go Direct Force & Acceleration',

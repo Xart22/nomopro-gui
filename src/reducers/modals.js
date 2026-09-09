@@ -10,6 +10,7 @@ const MODAL_SOUND_LIBRARY = "soundLibrary";
 const MODAL_SPRITE_LIBRARY = "spriteLibrary";
 const MODAL_SOUND_RECORDER = "soundRecorder";
 const MODAL_CONNECTION = "connectionModal";
+const MODAL_EXTENSION_CONNECTION = "extensionConnectionModal";
 const MODAL_TIPS_LIBRARY = "tipsLibrary";
 const MODAL_UPLOAD_PROGRESS = "uploadProgress";
 const MODAL_ONBOARDING = "onboarding";
@@ -26,6 +27,7 @@ const initialState = {
     [MODAL_SPRITE_LIBRARY]: false,
     [MODAL_SOUND_RECORDER]: false,
     [MODAL_CONNECTION]: false,
+    [MODAL_EXTENSION_CONNECTION]: false,
     [MODAL_UPLOAD_PROGRESS]: false,
     [MODAL_DEVICE_LIBRARY]: false,
     [MODAL_TIPS_LIBRARY]: false,
@@ -87,6 +89,9 @@ const openSoundRecorder = function () {
 const openConnectionModal = function () {
     return openModal(MODAL_CONNECTION);
 };
+const openExtensionConnectionModal = function () {
+    return openModal(MODAL_EXTENSION_CONNECTION);
+};
 const openUploadProgress = function () {
     return openModal(MODAL_UPLOAD_PROGRESS);
 };
@@ -132,6 +137,9 @@ const closeTipsLibrary = function () {
 const closeConnectionModal = function () {
     return closeModal(MODAL_CONNECTION);
 };
+const closeExtensionConnectionModal = function () {
+    return closeModal(MODAL_EXTENSION_CONNECTION);
+};
 const closeUploadProgress = function () {
     return closeModal(MODAL_UPLOAD_PROGRESS);
 };
@@ -149,6 +157,7 @@ export {
     initialState as modalsInitialState,
     openBackdropLibrary,
     openConnectionModal,
+    openExtensionConnectionModal,
     openCostumeLibrary,
     openDeviceLibrary,
     openExtensionLibrary,
@@ -164,6 +173,7 @@ export {
     closeBackdropLibrary,
     closeOnboarding,
     closeConnectionModal,
+    closeExtensionConnectionModal,
     closeCostumeLibrary,
     closeDeviceLibrary,
     closeExtensionLibrary,

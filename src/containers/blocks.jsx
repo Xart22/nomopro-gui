@@ -33,8 +33,18 @@ import {
     closeExtensionLibrary,
     openSoundRecorder,
     openConnectionModal,
+    openExtensionConnectionModal,
     closeDeviceLibrary
 } from '../reducers/modals';
+import {
+    setExtensionConnectionModalExtensionId,
+    clearExtensionConnectionModalPeripheralName,
+    clearExtensionConnectionModalPeripheralId
+} from '../reducers/extension-connection-modal';
+
+// BLE peripheral extensions with their own connection flow, isolated from
+// device (arduino/microbit serial) flow. Whitelist to avoid affecting others.
+const BLE_EXTENSION_IDS = ['wedo2'];
 import {
     activateCustomProcedures,
     deactivateCustomProcedures
@@ -72,6 +82,8 @@ class Blocks extends React.Component {
             'handleBlocksInfoUpdate',
             'handleCategorySelected',
             'handleConnectionModalStart',
+            'handleExtensionConnectionModalStart',
+            'handleExtensionStatusButton',
             'handleDeviceExtensionAdded',
             'handleDeviceExtensionRemoved',
             'handleDeviceSelected',
@@ -102,7 +114,7 @@ class Blocks extends React.Component {
         ]);
         this.ScratchBlocks.prompt = this.handlePromptStart;
         this.ScratchBlocks.statusButtonCallback =
-            this.handleConnectionModalStart;
+            this.handleExtensionStatusButton;
         this.ScratchBlocks.recordSoundCallback = this.handleOpenSoundRecorder;
         this.ScratchBlocks.alert = message => {
             this.props.onShowMessageBox(MessageBoxType.alert, message);
@@ -781,7 +793,11 @@ class Blocks extends React.Component {
             ext => ext.extensionId === categoryId,
         );
         if (extension && extension.launchPeripheralConnectionFlow) {
-            this.handleConnectionModalStart();
+            // Isolated path: BLE extensions (wedo2) use their own modal.
+            // Other extensions fall through to toolbox selection only.
+            if (BLE_EXTENSION_IDS.includes(categoryId)) {
+                this.handleExtensionConnectionModalStart(categoryId);
+            }
         }
 
         this.withToolboxUpdates(() => {
@@ -825,6 +841,17 @@ class Blocks extends React.Component {
     }
     handleConnectionModalStart () {
         this.props.onOpenConnectionModal();
+    }
+    handleExtensionConnectionModalStart (extensionId) {
+        if (!BLE_EXTENSION_IDS.includes(extensionId)) return;
+        this.props.onOpenExtensionConnectionModal(extensionId);
+    }
+    handleExtensionStatusButton (extensionId) {
+        // Scratch-blocks passes extensionId (e.g. 'wedo2').
+        // Only BLE extensions open the extension modal. Device flow untouched.
+        if (BLE_EXTENSION_IDS.includes(extensionId)) {
+            this.handleExtensionConnectionModalStart(extensionId);
+        }
     }
     handleStatusButtonUpdate () {
         this.ScratchBlocks.refreshStatusButtons(this.workspace);
@@ -1021,6 +1048,7 @@ Blocks.propTypes = {
     onCodeEditorIsUnlocked: PropTypes.func,
     onDeviceSelected: PropTypes.func,
     onOpenConnectionModal: PropTypes.func,
+    onOpenExtensionConnectionModal: PropTypes.func,
     onOpenSoundRecorder: PropTypes.func,
     onUpdatePythonCode: PropTypes.func,
     onToolboxWillUpdate: PropTypes.func,
@@ -1132,6 +1160,12 @@ const mapDispatchToProps = dispatch => ({
     },
     onOpenConnectionModal: () => {
         dispatch(openConnectionModal());
+    },
+    onOpenExtensionConnectionModal: extensionId => {
+        dispatch(clearExtensionConnectionModalPeripheralName());
+        dispatch(clearExtensionConnectionModalPeripheralId());
+        dispatch(setExtensionConnectionModalExtensionId(extensionId));
+        dispatch(openExtensionConnectionModal());
     },
     onOpenSoundRecorder: () => {
         dispatch(activateTab(SOUNDS_TAB_INDEX));

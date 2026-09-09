@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import Box from "../box/box.jsx";
 import CodeEditor from "../../containers/code-editor.jsx";
 import { registerPythonCompletionProvider } from "../../lib/python-completion-provider";
-import { STORAGE, UPLOAD_CONFIG } from "./python-ide-config";
+import { STORAGE, UPLOAD_CONFIG, SIDEBAR_CONSTRAINTS } from "./python-ide-config";
 import {
     isFileAllowedForUploadType,
     isImageFile,
@@ -122,6 +122,133 @@ const PythonIdeComponent = (props) => {
     const [tutorialStep, setTutorialStep] = useState(0);
     const [tutorialDontShow, setTutorialDontShow] = useState(false);
     const tutorialSteps = TUTORIAL_STEPS.length;
+    const editorRef = useRef(null);
+    const monacoRef = useRef(null);
+    // === Sidebar resize + collapse (Project Explorer) ===
+    const [sidebarWidth, setSidebarWidth] = useState(() => {
+        try {
+            const stored = parseInt(
+                localStorage.getItem(STORAGE.SIDEBAR_WIDTH),
+                10,
+            );
+            if (
+                Number.isFinite(stored) &&
+                stored >= SIDEBAR_CONSTRAINTS.MIN_WIDTH &&
+                stored <= SIDEBAR_CONSTRAINTS.MAX_WIDTH
+            ) {
+                return stored;
+            }
+        } catch (e) {}
+        return SIDEBAR_CONSTRAINTS.DEFAULT_WIDTH;
+    });
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+        try {
+            return (
+                localStorage.getItem(STORAGE.SIDEBAR_COLLAPSED) === "1"
+            );
+        } catch (e) {
+            return false;
+        }
+    });
+    const [isSidebarResizing, setIsSidebarResizing] = useState(false);
+    const sidebarResizeRef = useRef({ startX: 0, startWidth: 0 });
+    useEffect(() => {
+        try {
+            localStorage.setItem(
+                STORAGE.SIDEBAR_WIDTH,
+                String(sidebarWidth),
+            );
+        } catch (e) {}
+    }, [sidebarWidth]);
+    useEffect(() => {
+        try {
+            localStorage.setItem(
+                STORAGE.SIDEBAR_COLLAPSED,
+                isSidebarCollapsed ? "1" : "0",
+            );
+        } catch (e) {}
+    }, [isSidebarCollapsed]);
+    // Trigger Monaco relayout saat sidebar di-resize agar editor tidak glitch
+    const relayoutEditor = () => {
+        try {
+            editorRef.current?.layout?.();
+        } catch (e) {}
+        if (typeof window !== "undefined") {
+            window.dispatchEvent(new Event("resize"));
+        }
+    };
+    useEffect(() => {
+        if (!isSidebarResizing) return;
+        const handleMove = (e) => {
+            if (e.cancelable && e.type === "touchmove") {
+                try {
+                    e.preventDefault();
+                } catch (err) {}
+            }
+            const clientX =
+                e.touches?.[0]?.clientX ?? e.clientX ?? 0;
+            const dx = clientX - sidebarResizeRef.current.startX;
+            let next =
+                sidebarResizeRef.current.startWidth + dx;
+            // Drag mentok ke kiri -> auto collapse (UX ala VS Code).
+            // Geser balik ke kanan -> auto expand lagi dalam gesture yang sama.
+            if (next < SIDEBAR_CONSTRAINTS.COLLAPSE_THRESHOLD) {
+                setIsSidebarCollapsed(true);
+                return;
+            }
+            next = Math.max(
+                SIDEBAR_CONSTRAINTS.MIN_WIDTH,
+                Math.min(SIDEBAR_CONSTRAINTS.MAX_WIDTH, next),
+            );
+            setIsSidebarCollapsed(false);
+            setSidebarWidth(next);
+            relayoutEditor();
+        };
+        const handleUp = () => {
+            setIsSidebarResizing(false);
+            // Layout final setelah drag selesai
+            setTimeout(relayoutEditor, 0);
+        };
+        window.addEventListener("mousemove", handleMove);
+        window.addEventListener("mouseup", handleUp);
+        window.addEventListener("touchmove", handleMove, {
+            passive: false,
+        });
+        window.addEventListener("touchend", handleUp);
+        document.body.style.userSelect = "none";
+        document.body.style.cursor = "ew-resize";
+        return () => {
+            window.removeEventListener("mousemove", handleMove);
+            window.removeEventListener("mouseup", handleUp);
+            window.removeEventListener("touchmove", handleMove);
+            window.removeEventListener("touchend", handleUp);
+            document.body.style.userSelect = "";
+            document.body.style.cursor = "";
+        };
+    }, [isSidebarResizing]);
+    // Relayout editor saat width / collapse berubah (throttled via rAF)
+    useEffect(() => {
+        let raf = 0;
+        const run = () => {
+            relayoutEditor();
+            raf = requestAnimationFrame(relayoutEditor);
+        };
+        run();
+        return () => cancelAnimationFrame(raf);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sidebarWidth, isSidebarCollapsed]);
+    const handleSidebarResizeStart = (e) => {
+        e.preventDefault();
+        sidebarResizeRef.current = {
+            startX: e.touches?.[0]?.clientX ?? e.clientX ?? 0,
+            startWidth: sidebarWidth,
+        };
+        setIsSidebarResizing(true);
+    };
+    const handleSidebarReset = () => {
+        setSidebarWidth(SIDEBAR_CONSTRAINTS.DEFAULT_WIDTH);
+        setIsSidebarCollapsed(false);
+    };
     // Tampilkan tutorial setiap kali halaman di-load (full reload),
     // selama user belum centang "Don't show again"
     useEffect(() => {
@@ -199,8 +326,6 @@ const PythonIdeComponent = (props) => {
             setIsUploading(false);
         }
     };
-    const editorRef = useRef(null);
-    const monacoRef = useRef(null);
     const validateTimerRef = useRef(null);
     const uploadInputRef = useRef();
     const pendingUploadRef = useRef({ type: "any", parentId: null });
@@ -594,7 +719,31 @@ const PythonIdeComponent = (props) => {
     return (
         <Box className={styles.pythonIdeWrapper}>
             <Box className={styles.workspaceArea}>
-                <Box className={styles.sidebar} data-tutorial="sidebar">
+                {isSidebarCollapsed ? (
+                    <Box className={styles.sidebarCollapsedRail}>
+                        <button
+                            className={styles.sidebarExpandButton}
+                            onClick={() => setIsSidebarCollapsed(false)}
+                            type="button"
+                            title="Show Project Explorer"
+                        >
+                            ▶
+                        </button>
+                        <span className={styles.sidebarCollapsedLabel}>
+                            Explorer
+                        </span>
+                    </Box>
+                ) : (
+                <Box
+                    className={`${styles.sidebar} ${isSidebarResizing ? styles.sidebarResizing : ""}`}
+                    data-tutorial="sidebar"
+                    style={{
+                        width: sidebarWidth,
+                        minWidth: SIDEBAR_CONSTRAINTS.MIN_WIDTH,
+                        maxWidth: SIDEBAR_CONSTRAINTS.MAX_WIDTH,
+                        flex: `0 0 ${sidebarWidth}px`,
+                    }}
+                >
                     <Box
                         className={`${styles.sidebarSection} ${styles.projectExplorerSection}`}
                     >
@@ -602,16 +751,30 @@ const PythonIdeComponent = (props) => {
                             <Box className={styles.sidebarTitle}>
                                 Project Explorer
                             </Box>
-                            <button
-                                className={styles.sidebarMenuButton}
-                                onClick={(e) =>
-                                    openContextMenuAt(e, { scope: "project" })
-                                }
-                                type="button"
-                                title="Project menu"
-                            >
-                                ⋮
-                            </button>
+                            <Box className={styles.sidebarTitleActions}>
+                                <button
+                                    className={styles.sidebarMenuButton}
+                                    onClick={(e) =>
+                                        openContextMenuAt(e, {
+                                            scope: "project",
+                                        })
+                                    }
+                                    type="button"
+                                    title="Project menu"
+                                >
+                                    ⋮
+                                </button>
+                                <button
+                                    className={styles.sidebarMenuButton}
+                                    onClick={() =>
+                                        setIsSidebarCollapsed(true)
+                                    }
+                                    type="button"
+                                    title="Hide sidebar (bisa drag untuk resize, double-click untuk reset)"
+                                >
+                                    ◀
+                                </button>
+                            </Box>
                         </Box>
                         <Box
                             className={styles.fileListContainer}
@@ -785,7 +948,38 @@ const PythonIdeComponent = (props) => {
                             ))}
                         </Box>
                     </Box>
+                    <div
+                        className={styles.sidebarResizer}
+                        onMouseDown={handleSidebarResizeStart}
+                        onTouchStart={handleSidebarResizeStart}
+                        onDoubleClick={handleSidebarReset}
+                        title="Drag untuk resize, double-click untuk reset"
+                        role="separator"
+                        aria-orientation="vertical"
+                        aria-label="Resize sidebar"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                            if (e.key === "ArrowLeft") {
+                                setSidebarWidth((w) =>
+                                    Math.max(
+                                        SIDEBAR_CONSTRAINTS.MIN_WIDTH,
+                                        w - 10,
+                                    ),
+                                );
+                            } else if (e.key === "ArrowRight") {
+                                setSidebarWidth((w) =>
+                                    Math.min(
+                                        SIDEBAR_CONSTRAINTS.MAX_WIDTH,
+                                        w + 10,
+                                    ),
+                                );
+                            } else if (e.key === "Enter") {
+                                handleSidebarReset();
+                            }
+                        }}
+                    />
                 </Box>
+                )}
                 <Box className={styles.editorArea} data-tutorial="editor-area">
                     <Box className={styles.pythonIdeToolbar}>
                         <span>{activeFile}</span>

@@ -101,7 +101,10 @@ e.g. STAGE_DIMENSION_DEFAULTS in lib/screen-utils.js */
 
 .sidebar {
     width: 310px;
-    min-width: 290px;
+    min-width: 180px;
+    max-width: 600px;
+    position: relative;
+    flex-shrink: 0;
     border-right: 1px solid hsla(0, 0%, 0%, 0.15);
     background: hsla(215, 50%, 90%, 1);
     display: -webkit-box;
@@ -122,6 +125,125 @@ e.g. STAGE_DIMENSION_DEFAULTS in lib/screen-utils.js */
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
+}
+
+.sidebar-resizing,
+.sidebarResizing {
+    user-select: none;
+    -webkit-user-select: none;
+    transition: none !important;
+}
+
+.sidebar-resizer,
+.sidebarResizer {
+    position: absolute;
+    top: 0;
+    right: -4px;
+    width: 9px;
+    bottom: 0;
+    cursor: ew-resize;
+    z-index: 20;
+    touch-action: none;
+    background: transparent;
+    outline: none;
+}
+
+.sidebar-resizer::after,
+.sidebarResizer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 4px;
+    width: 2px;
+    background: transparent;
+    border-radius: 2px;
+    transition: background 120ms ease;
+}
+
+.sidebar-resizer:hover::after,
+.sidebarResizer:hover::after,
+.sidebar-resizer:focus-visible::after,
+.sidebarResizer:focus-visible::after {
+    background: hsla(215, 100%, 65%, 0.7);
+}
+
+.sidebar-title-actions,
+.sidebarTitleActions {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    gap: 0.15rem;
+}
+
+.sidebar-collapsed-rail,
+.sidebarCollapsedRail {
+    width: 38px;
+    flex: 0 0 38px;
+    background: hsla(215, 50%, 90%, 1);
+    border-right: 1px solid hsla(0, 0%, 0%, 0.15);
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    padding: 0.85rem 0;
+    gap: 0.6rem;
+    height: 100%;
+    min-height: 0;
+}
+
+.sidebar-expand-button,
+.sidebarExpandButton {
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: hsla(0, 100%, 100%, 1);
+    color: hsla(225, 15%, 40%, 1);
+    cursor: pointer;
+    font-size: 0.7rem;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+
+.sidebar-expand-button:hover,
+.sidebarExpandButton:hover {
+    border-color: hsla(215, 100%, 65%, 1);
+    color: hsla(215, 100%, 65%, 1);
+}
+
+.sidebar-collapsed-label,
+.sidebarCollapsedLabel {
+    writing-mode: vertical-rl;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: hsla(225, 15%, 40%, 0.6);
 }
 
 .sidebar-section {
@@ -1144,7 +1266,7 @@ e.g. STAGE_DIMENSION_DEFAULTS in lib/screen-utils.js */
 @media (max-width: 1100px) {
     .sidebar {
         width: 280px;
-        min-width: 260px;
+        min-width: 180px;
     }
 }
 

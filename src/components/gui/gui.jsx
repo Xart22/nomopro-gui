@@ -39,6 +39,7 @@ import Cards from "../../containers/cards.jsx";
 import Alerts from "../../containers/alerts.jsx";
 import DragLayer from "../../containers/drag-layer.jsx";
 import ConnectionModal from "../../containers/connection-modal.jsx";
+import ExtensionConnectionModal from "../../containers/extension-connection-modal.jsx";
 import UploadProgress from "../../containers/upload-progress.jsx";
 import Onboarding from "../../containers/onboarding.jsx";
 import Modal from "../modal/modal.jsx";
@@ -104,6 +105,7 @@ const GUIComponent = (props) => {
         onCloseMLContent,
         onShowLandingPage,
         connectionModalVisible,
+        extensionConnectionModalVisible,
         uploadProgressVisible,
         onboardingVisible,
         costumeLibraryVisible,
@@ -327,6 +329,9 @@ const GUIComponent = (props) => {
                             ) : null}
                             {connectionModalVisible ? (
                                 <ConnectionModal vm={vm} />
+                            ) : null}
+                            {extensionConnectionModalVisible ? (
+                                <ExtensionConnectionModal vm={vm} />
                             ) : null}
                             {uploadProgressVisible ? (
                                 <UploadProgress vm={vm} />

@@ -644,6 +644,7 @@ const mapStateToProps = (state) => {
             state.scratchGui.editorTab.activeTabIndex === BLOCKS_TAB_INDEX,
         cardsVisible: state.scratchGui.cards.visible,
         connectionModalVisible: state.scratchGui.modals.connectionModal,
+        extensionConnectionModalVisible: state.scratchGui.modals.extensionConnectionModal,
         onboardingVisible: state.scratchGui.modals.onboarding,
         uploadProgressVisible: state.scratchGui.modals.uploadProgress,
         updateModalVisible: state.scratchGui.modals.updateModal,

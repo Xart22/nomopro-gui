@@ -6,6 +6,9 @@ import colorPickerReducer, {colorPickerInitialState} from './color-picker';
 import connectionModalReducer, {
     connectionModalInitialState
 } from './connection-modal';
+import extensionConnectionModalReducer, {
+    extensionConnectionModalInitialState
+} from './extension-connection-modal';
 import customProceduresReducer, {
     customProceduresInitialState
 } from './custom-procedures';
@@ -66,6 +69,7 @@ const guiInitialState = {
     code: codeInitialState,
     colorPicker: colorPickerInitialState,
     connectionModal: connectionModalInitialState,
+    extensionConnectionModal: extensionConnectionModalInitialState,
     customProcedures: customProceduresInitialState,
     device: deviceInitialState,
     deviceData: deviceDataInitialState,
@@ -159,6 +163,7 @@ const guiReducer = combineReducers({
     code: codeReducer,
     colorPicker: colorPickerReducer,
     connectionModal: connectionModalReducer,
+    extensionConnectionModal: extensionConnectionModalReducer,
     customProcedures: customProceduresReducer,
     device: deviceReducer,
     deviceData: deviceDataReducer,
