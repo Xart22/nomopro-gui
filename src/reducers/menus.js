@@ -5,6 +5,7 @@ const MENU_ABOUT = 'aboutMenu';
 const MENU_ACCOUNT = 'accountMenu';
 const MENU_FILE = 'fileMenu';
 const MENU_EDIT = 'editMenu';
+const MENU_LEARN = 'learnMenu';
 const MENU_LANGUAGE = 'languageMenu';
 const MENU_LOGIN = 'loginMenu';
 const MENU_SERIALPORT = 'serialportMenu';
@@ -16,6 +17,7 @@ const initialState = {
     [MENU_ACCOUNT]: false,
     [MENU_FILE]: false,
     [MENU_EDIT]: false,
+    [MENU_LEARN]: false,
     [MENU_LANGUAGE]: false,
     [MENU_LOGIN]: false,
     [MENU_SERIALPORT]: false,
@@ -57,6 +59,9 @@ const fileMenuOpen = state => state.scratchGui.menus[MENU_FILE];
 const openEditMenu = () => openMenu(MENU_EDIT);
 const closeEditMenu = () => closeMenu(MENU_EDIT);
 const editMenuOpen = state => state.scratchGui.menus[MENU_EDIT];
+const openLearnMenu = () => openMenu(MENU_LEARN);
+const closeLearnMenu = () => closeMenu(MENU_LEARN);
+const learnMenuOpen = state => state.scratchGui.menus[MENU_LEARN];
 const openLanguageMenu = () => openMenu(MENU_LANGUAGE);
 const closeLanguageMenu = () => closeMenu(MENU_LANGUAGE);
 const languageMenuOpen = state => state.scratchGui.menus[MENU_LANGUAGE];
@@ -85,6 +90,9 @@ export {
     openEditMenu,
     closeEditMenu,
     editMenuOpen,
+    openLearnMenu,
+    closeLearnMenu,
+    learnMenuOpen,
     openLanguageMenu,
     closeLanguageMenu,
     languageMenuOpen,

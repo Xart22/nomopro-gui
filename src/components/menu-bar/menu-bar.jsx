@@ -67,6 +67,9 @@ import {
     openEditMenu,
     closeEditMenu,
     editMenuOpen,
+    openLearnMenu,
+    closeLearnMenu,
+    learnMenuOpen,
     openSettingMenu,
     closeSettingMenu,
     settingMenuOpen,
@@ -98,7 +101,6 @@ import collectMetadata from "../../lib/collect-metadata";
 
 import styles from "./menu-bar.css";
 
-import helpIcon from "../../lib/assets/icon--tutorials.svg";
 import mystuffIcon from "./icon--mystuff.png"; // eslint-disable-line no-unused-vars
 import profileIcon from "./icon--profile.png"; // eslint-disable-line no-unused-vars
 import remixIcon from "./icon--remix.svg";
@@ -107,8 +109,6 @@ import languageIcon from "../language-selector/language-icon.svg";
 import aboutIcon from "./icon--about.svg";
 import saveIcon from "./icon--save.svg";
 import linkSocketIcon from "./icon--link-socket.svg"; // eslint-disable-line no-unused-vars
-import communityIcon from "./icon--community.svg";
-import wikiIcon from "./icon--wiki.svg";
 
 import scratchLogo from "./logo_nomobase.png";
 
@@ -137,19 +137,14 @@ const ariaMessages = defineMessages({
         defaultMessage: "Tutorials",
         description: "accessibility text for the tutorials button",
     },
+    learn: {
+        id: "gui.menuBar.learn",
+        defaultMessage: "Learn",
+        description: "accessibility text for the learn dropdown button",
+    },
     community: {
         id: "gui.menuBar.community",
         defaultMessage: "Community",
-        description: "accessibility text for the community button",
-    },
-    wiki: {
-        id: "gui.menuBar.wiki",
-        defaultMessage: "Wiki",
-        description: "accessibility text for the wiki button",
-    },
-    nomotutorials: {
-        id: "gui.menuBar.nomotutorials",
-        defaultMessage: "Nomokit Tutorials",
         description: "accessibility text for the community button",
     },
 });
@@ -232,7 +227,6 @@ class MenuBar extends React.Component {
             "handleClickNewProject",
             "handleClickRemix",
             "handleClickOpenCommunity",
-            "handleClickOpenWiki",
             "handleClickSave",
             "handleClickSaveAsCopy",
             "handleClickSeeCommunity",
@@ -392,12 +386,6 @@ class MenuBar extends React.Component {
     handleClickOpenCommunity() {
         if (isBrowser()) {
             window.open("https://nomo-kit.com/community");
-        }
-    }
-
-    handleClickOpenWiki() {
-        if (isBrowser()) {
-            window.open("https://nomo-kit.com");
         }
     }
 
@@ -954,46 +942,68 @@ class MenuBar extends React.Component {
                 <div className={styles.tailMenu}>
                     <div
                         aria-label={this.props.intl.formatMessage(
-                            ariaMessages.community,
+                            ariaMessages.learn,
                         )}
                         className={classNames(
                             styles.menuBarItem,
                             styles.hoverable,
+                            {[styles.active]: this.props.learnMenuOpen},
                         )}
-                        onClick={this.handleClickOpenCommunity}
+                        onMouseUp={this.props.onClickLearn}
                     >
-                        <img
-                            className={styles.communityIcon}
-                            src={communityIcon}
-                        />
-                        <FormattedMessage {...ariaMessages.community} />
-                    </div>
-                    <div
-                        aria-label={this.props.intl.formatMessage(
-                            ariaMessages.nomotutorials,
-                        )}
-                        className={classNames(
-                            styles.menuBarItem,
-                            styles.hoverable,
-                        )}
-                        onClick={this.handleClickOpenNomoTutorials}
-                    >
-                        <img className={styles.wikiIcon} src={wikiIcon} />
-                        <FormattedMessage {...ariaMessages.nomotutorials} />
-                    </div>
-                    <Divider className={classNames(styles.divider)} />
-                    <div
-                        aria-label={this.props.intl.formatMessage(
-                            ariaMessages.tutorials,
-                        )}
-                        className={classNames(
-                            styles.menuBarItem,
-                            styles.hoverable,
-                        )}
-                        onClick={this.props.onOpenTipLibrary}
-                    >
-                        <img className={styles.helpIcon} src={helpIcon} />
-                        <FormattedMessage {...ariaMessages.tutorials} />
+                        <FormattedMessage {...ariaMessages.learn} />
+                        <MenuBarMenu
+                            className={classNames(styles.menuBarMenu)}
+                            open={this.props.learnMenuOpen}
+                            place={this.props.isRtl ? 'right' : 'left'}
+                            onRequestClose={this.props.onRequestCloseLearn}
+                        >
+                            <MenuSection>
+                                <MenuItem className={styles.disabled}>
+                                    <FormattedMessage
+                                        defaultMessage="Getting started"
+                                        description="Learn menu item for getting started"
+                                        id="gui.menuBar.gettingStarted"
+                                    />
+                                </MenuItem>
+                                <MenuItem
+                                    isRtl={this.props.isRtl}
+                                    onClick={this.props.onOpenTipLibrary}
+                                >
+                                    <FormattedMessage {...ariaMessages.tutorials} />
+                                </MenuItem>
+                                <MenuItem className={styles.disabled}>
+                                    <FormattedMessage
+                                        defaultMessage="Examples (Coming Soon)"
+                                        description="Learn menu item for examples"
+                                        id="gui.menuBar.examples"
+                                    />
+                                </MenuItem>
+                                <MenuItem className={styles.disabled}>
+                                    <FormattedMessage
+                                        defaultMessage="Education Resource (Coming Soon)"
+                                        description="Learn menu item for education resources"
+                                        id="gui.menuBar.educationResource"
+                                    />
+                                </MenuItem>
+                                <MenuItem
+                                    isRtl={this.props.isRtl}
+                                    onClick={this.handleClickOpenNomoTutorials}
+                                >
+                                    <FormattedMessage
+                                        defaultMessage="Online Course"
+                                        description="Learn menu item for nomokit online courses"
+                                        id="gui.menuBar.onlineCourse"
+                                    />
+                                </MenuItem>
+                                <MenuItem
+                                    isRtl={this.props.isRtl}
+                                    onClick={this.handleClickOpenCommunity}
+                                >
+                                    <FormattedMessage {...ariaMessages.community} />
+                                </MenuItem>
+                            </MenuSection>
+                        </MenuBarMenu>
                     </div>
                     <Divider className={classNames(styles.divider)} />
                     {/* <div
@@ -1176,6 +1186,7 @@ MenuBar.propTypes = {
     editMenuOpen: PropTypes.bool,
     enableCommunity: PropTypes.bool,
     fileMenuOpen: PropTypes.bool,
+    learnMenuOpen: PropTypes.bool,
     settingMenuOpen: PropTypes.bool,
     intl: intlShape,
     isUpdating: PropTypes.bool,
@@ -1202,6 +1213,7 @@ MenuBar.propTypes = {
     onClickAccount: PropTypes.func,
     onClickEdit: PropTypes.func,
     onClickFile: PropTypes.func,
+    onClickLearn: PropTypes.func,
     onClickSetting: PropTypes.func,
     onClickLanguage: PropTypes.func,
     onClickLogin: PropTypes.func,
@@ -1225,6 +1237,7 @@ MenuBar.propTypes = {
     onRequestCloseAccount: PropTypes.func,
     onRequestCloseEdit: PropTypes.func,
     onRequestCloseFile: PropTypes.func,
+    onRequestCloseLearn: PropTypes.func,
     onRequestCloseSetting: PropTypes.func,
     onRequestCloseLanguage: PropTypes.func,
     onRequestCloseLogin: PropTypes.func,
@@ -1276,6 +1289,7 @@ const mapStateToProps = (state, ownProps) => {
         fileMenuOpen: fileMenuOpen(state),
         settingMenuOpen: settingMenuOpen(state),
         editMenuOpen: editMenuOpen(state),
+        learnMenuOpen: learnMenuOpen(state),
         isUpdating: getIsUpdating(loadingState),
         isRealtimeMode: state.scratchGui.programMode.isRealtimeMode,
         isRtl: state.locales.isRtl,
@@ -1315,6 +1329,8 @@ const mapDispatchToProps = (dispatch) => ({
     onRequestCloseSetting: () => dispatch(closeSettingMenu()),
     onClickEdit: () => dispatch(openEditMenu()),
     onRequestCloseEdit: () => dispatch(closeEditMenu()),
+    onClickLearn: () => dispatch(openLearnMenu()),
+    onRequestCloseLearn: () => dispatch(closeLearnMenu()),
     onClickLanguage: () => dispatch(openLanguageMenu()),
     onRequestCloseLanguage: () => dispatch(closeLanguageMenu()),
     onClickLogin: () => dispatch(openLoginMenu()),
