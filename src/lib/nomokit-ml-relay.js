@@ -44,15 +44,33 @@ const startNomokitMlRelay = () => {
         const reply = msg => source && source.postMessage(msg, '*');
 
         if (data.type === `${NS}hello`) {
+            // Answer immediately. `available` and `engines` are knowable synchronously,
+            // and the iframe abandons the handshake after a fixed deadline (see
+            // initDesktopBridge in nomokit-ml's src/lib/desktop/bridge.js). Awaiting the
+            // probes below before replying -- getVersion() and pip.list() each spawn a
+            // blocking subprocess in the desktop main process -- loses that race on slow
+            // hardware, and the iframe then reports "not desktop" and disables every
+            // desktop-only adapter. pythonVersion/canTrainYolo are informational, so they
+            // must never gate `available`.
+            const available = Boolean(py);
+            const engines = py ? ['browser', 'python'] : ['browser'];
             reply({
                 type: `${NS}desktop-ready`,
-                capabilities: {
-                    available: Boolean(py),
-                    pythonVersion: await resolvePythonVersion(py),
-                    engines: py ? ['browser', 'python'] : ['browser'],
-                    canTrainYolo: await isYoloInstalled()
-                }
+                capabilities: {available, pythonVersion: null, engines, canTrainYolo: false}
             });
+            // Refine with the slow fields once they resolve; the iframe merges any later
+            // desktop-ready over the first. Both probes swallow their own errors, so this
+            // chain settles even when the desktop bridges are missing or broken.
+            Promise.all([resolvePythonVersion(py), isYoloInstalled()])
+                .then(([pythonVersion, canTrainYolo]) => {
+                    reply({
+                        type: `${NS}desktop-ready`,
+                        capabilities: {available, pythonVersion, engines, canTrainYolo}
+                    });
+                })
+                .catch(() => {
+                    // Nothing to refine -- the immediate reply above already stands.
+                });
             return;
         }
 

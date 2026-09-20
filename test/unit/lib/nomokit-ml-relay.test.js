@@ -88,6 +88,65 @@ describe('nomokit-ml-relay', () => {
         );
     });
 
+    // Regression: the hello reply used to be awaited behind resolvePythonVersion()
+    // and isYoloInstalled(), both of which spawn blocking subprocesses in the desktop
+    // main process. On slow hardware that overshot the iframe's handshake deadline, so
+    // nomokit-ml concluded it was not running in the desktop and greyed out every
+    // desktop-only adapter. `available` must be reported without waiting on either probe.
+    test('replies to hello with available before the slow probes resolve', async () => {
+        let releaseVersion;
+        let releasePipList;
+        window.nomoproDesktopPython = {
+            getVersion: () => new Promise(resolve => {
+                releaseVersion = resolve;
+            })
+        };
+        window.electronAPI = {
+            pip: {
+                list: () => new Promise(resolve => {
+                    releasePipList = resolve;
+                })
+            }
+        };
+        stopRelay = startNomokitMlRelay();
+        const iframeWindow = createFakeIframeWindow();
+
+        dispatchFromIframe({type: 'nomokit-ml:hello'}, iframeWindow);
+        await flushPromises();
+
+        // Neither probe has settled yet, but the iframe already knows it is in desktop.
+        expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+            {
+                type: 'nomokit-ml:desktop-ready',
+                capabilities: {
+                    available: true,
+                    pythonVersion: null,
+                    engines: ['browser', 'python'],
+                    canTrainYolo: false
+                }
+            },
+            '*'
+        );
+
+        // ...and the refining reply follows once they do.
+        releaseVersion('3.11.9');
+        releasePipList({packages: [{name: 'ultralytics'}]});
+        await flushPromises();
+
+        expect(iframeWindow.postMessage).toHaveBeenCalledWith(
+            {
+                type: 'nomokit-ml:desktop-ready',
+                capabilities: {
+                    available: true,
+                    pythonVersion: '3.11.9',
+                    engines: ['browser', 'python'],
+                    canTrainYolo: true
+                }
+            },
+            '*'
+        );
+    });
+
     test('ignores py-start/py-send/py-stop in web mode (no desktop bridge)', () => {
         delete window.nomoproDesktopPython;
         stopRelay = startNomokitMlRelay();
