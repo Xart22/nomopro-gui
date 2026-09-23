@@ -25,6 +25,8 @@ import mlInsetIconURL from './ml/ml-small.png';
 import speechIconUrl from './speech/speech.png';
 import speechInsetIconURL from './speech/voice.png';
 
+import nomokitmlIconUrl from './nomokitml/nomokitml.png';
+import nomokitmlInsetIconURL from './nomokitml/nomokitml-small.png';
 import tm2scratchIconUrl from './tm2scratch/tm.png';
 import tm2scratchInsetIconURL from './tm2scratch/tm-small.png';
 
@@ -108,6 +110,32 @@ export default [
         disabled: false,
         bluetoothRequired: false,
         internetConnectionRequired: true
+    },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="NomoKit ML"
+                description="Name for the 'nomokitml' extension"
+                id="gui.extension.nomokitml.name"
+            />
+        ),
+        extensionId: 'nomokitml',
+        iconURL: nomokitmlIconUrl,
+        insetIconURL: nomokitmlInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Use a model you trained in NomoKit ML."
+                description="Description for the NomoKit ML extension"
+                id="gui.extension.nomokitml.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: false,
+        // Unlike Teachable Machine, nothing is fetched from the internet: the trained model, the
+        // backbone weights and the inference runtime all ship with the app. That is what makes it
+        // work in the offline desktop build.
+        internetConnectionRequired: false
     },
     {
         name: (

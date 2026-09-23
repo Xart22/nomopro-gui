@@ -58,6 +58,7 @@ import { PYODIDE_CONFIG } from "../components/python-ide/python-ide-config";
 import GUIComponent from "../components/gui/gui.jsx";
 import { setIsScratchDesktop } from "../lib/isScratchDesktop.js";
 import {startNomokitMlRelay} from '../lib/nomokit-ml-relay.js';
+import {createNomokitMlInferenceClient} from '../lib/nomokit-ml-inference.js';
 
 class GUI extends React.Component {
     state = {
@@ -297,15 +298,29 @@ class GUI extends React.Component {
         this.setState({showJuniorContent: false});
     };
 
+    // Web used to navigate away to the standalone /nomokit-ml page. It now opens the same overlay
+    // desktop does, so that the trainer and the inference host the NomoKit ML blocks talk to are
+    // one document -- which is what lets "Use in NomoPro" hand a model over with no upload, no URL
+    // and no storage hop. The old behaviour stays reachable as an escape hatch.
     handleSelectML = () => {
-        if (window.electronAPI?.getAppPath) {
-            this.setState({showMLContent: true});
-        } else {
+        if (window.__NOMOKIT_ML_STANDALONE__ === true && !window.electronAPI?.getAppPath) {
             window.location.href = '/nomokit-ml';
+            return;
         }
+        this.setState({showMLContent: true}, () => {
+            // Let the host release the camera and mic: the student is about to record samples with
+            // them, and the extension's frame pump may still be holding the camera.
+            if (this._mlInference) this._mlInference.setActive(true);
+        });
     };
     handleCloseMLContent = () => {
-        this.setState({showMLContent: false});
+        this.setState({showMLContent: false}, () => {
+            if (this._mlInference) this._mlInference.setActive(false);
+        });
+    };
+
+    handleMLHostRef = element => {
+        this._mlHostIframe = element;
     };
 
     handleShowLandingPage = () => {
@@ -332,8 +347,25 @@ class GUI extends React.Component {
         this.props.onStorageInit(storage);
         this.props.onVmInit(this.props.vm);
         // Relay the nested nomokit-ml iframe's postMessage protocol to the desktop Python IPC.
-        // No-op in web mode (window.nomoproDesktopPython is undefined there).
-        this._stopNomokitMlRelay = startNomokitMlRelay();
+        // The python half is a no-op in web mode (window.nomoproDesktopPython is undefined there);
+        // the inference handshake works in both.
+        //
+        // The client is created eagerly, before the iframe has loaded and before any extension
+        // exists. Requests made against it simply report "not ready" until attach() arrives, which
+        // removes every ordering dependency between iframe load, extension construction and the
+        // first block running.
+        this._mlInference = createNomokitMlInferenceClient();
+        window.nomokitMlInference = this._mlInference;
+        if (this.props.vm && this.props.vm.runtime) {
+            // Where the NomoKit ML extension looks first. Builtin extensions are unsandboxed on the
+            // main thread, so either handle works; runtime is preferred because it keeps the
+            // extension testable without a global.
+            this.props.vm.runtime.nomokitMlInference = this._mlInference;
+        }
+        this._stopNomokitMlRelay = startNomokitMlRelay({
+            getHostWindow: () => this._mlHostIframe && this._mlHostIframe.contentWindow,
+            onInferencePort: (port, meta) => this._mlInference.attach(port, meta)
+        });
         // Listen for extension add/remove events from the Python IDE UI
         this._onPythonIdeAdd = async (evt) => {
             const name = evt && evt.detail && evt.detail.name;
@@ -477,6 +509,17 @@ class GUI extends React.Component {
         if (this._stopNomokitMlRelay) {
             this._stopNomokitMlRelay();
         }
+        if (this._mlInference) {
+            this._mlInference.dispose();
+            if (window.nomokitMlInference === this._mlInference) {
+                delete window.nomokitMlInference;
+            }
+            if (this.props.vm && this.props.vm.runtime &&
+                this.props.vm.runtime.nomokitMlInference === this._mlInference) {
+                delete this.props.vm.runtime.nomokitMlInference;
+            }
+            this._mlInference = null;
+        }
         window.removeEventListener("message", this.handleMessage);
         if (this._onPythonIdeAdd) {
             window.removeEventListener(
@@ -574,6 +617,7 @@ class GUI extends React.Component {
                 onSelectML={this.handleSelectML}
                 onCloseJuniorContent={this.handleCloseJuniorContent}
                 onCloseMLContent={this.handleCloseMLContent}
+                onMLHostRef={this.handleMLHostRef}
                 onShowLandingPage={this.handleShowLandingPage}
                 onActivateCostumesTab={this.handleActivateCostumesTab}
                 onActivateSoundsTab={this.handleActivateSoundsTab}

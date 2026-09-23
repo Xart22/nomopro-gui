@@ -48,6 +48,7 @@ import UpdateModal from "../../containers/update-modal.jsx";
 
 import layout, { STAGE_SIZE_MODES } from "../../lib/layout-constants";
 import { resolveStageSize } from "../../lib/screen-utils";
+import { nomokitMlIndexUrl } from "../../lib/nomokit-ml-url";
 
 import styles from "./gui.css";
 import addExtensionIcon from "./icon--extensions.svg";
@@ -103,6 +104,7 @@ const GUIComponent = (props) => {
         onSelectML,
         onCloseJuniorContent,
         onCloseMLContent,
+        onMLHostRef,
         onShowLandingPage,
         connectionModalVisible,
         extensionConnectionModalVisible,
@@ -666,25 +668,35 @@ const GUIComponent = (props) => {
                     />
                 </Box>
             ) : null}
-            {showMLContent ? (
-                <Box className={styles.juniorOverlay}>
+            {/*
+              * Mounted unconditionally, and only *repositioned* when the overlay closes. This one
+              * iframe is both the ML trainer the student sees and the inference runtime the
+              * NomoKit ML blocks talk to, so unmounting it on close would drop the MessagePort and
+              * tear down any loaded model mid-project.
+              *
+              * Offscreen rather than display:none -- a display:none iframe gets no
+              * requestAnimationFrame, and speech-commands' feature extractor schedules its polling
+              * loop that way, so audio classification would silently stall. visibility:hidden is
+              * unreliable across Chromium versions for the same reason.
+              */}
+            <Box className={showMLContent ? styles.juniorOverlay : styles.mlHostHidden}>
+                {showMLContent ? (
                     <button
                         className={styles.juniorCloseButton}
                         onClick={onCloseMLContent}
                     >
                         &times;
                     </button>
-                    <iframe
-                        className={styles.juniorIframe}
-                        src={
-                            window.location.protocol === 'file:' && window.electronAPI?.getAppPath ?
-                                `file:///${window.electronAPI.getAppPath().replace(/\\/g, '/')}/src/gui/nomokit-ml/index.html` :
-                                '/nomokit-ml/index.html'
-                        }
-                        title="NomoML"
-                    />
-                </Box>
-            ) : null}
+                ) : null}
+                <iframe
+                    allow="camera; microphone"
+                    className={styles.juniorIframe}
+                    ref={onMLHostRef}
+                    referrerPolicy="no-referrer"
+                    src={nomokitMlIndexUrl()}
+                    title="NomoML"
+                />
+            </Box>
         </React.Fragment>
     );
 };
@@ -735,6 +747,7 @@ GUIComponent.propTypes = {
     onCloseAccountNav: PropTypes.func,
     onExtensionButtonClick: PropTypes.func,
     onLogOut: PropTypes.func,
+    onMLHostRef: PropTypes.func,
     onOpenRegistration: PropTypes.func,
     onRequestCloseBackdropLibrary: PropTypes.func,
     onRequestCloseCostumeLibrary: PropTypes.func,
