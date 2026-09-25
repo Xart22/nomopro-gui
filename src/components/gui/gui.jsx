@@ -97,12 +97,15 @@ const GUIComponent = (props) => {
         showLandingPage,
         showJuniorContent,
         showMLContent,
+        showCppContent,
         onSelectJuniorCode,
         onSelectBlockCode,
         onSelectPythonIDE,
         onSelectML,
+        onSelectCpp,
         onCloseJuniorContent,
         onCloseMLContent,
+        onCloseCppContent,
         onShowLandingPage,
         connectionModalVisible,
         extensionConnectionModalVisible,
@@ -202,6 +205,7 @@ const GUIComponent = (props) => {
                     onSelectBlockCode={onSelectBlockCode}
                     onSelectPythonIDE={onSelectPythonIDE}
                     onSelectML={onSelectML}
+                    onSelectCpp={onSelectCpp}
                 />
             ) : null}
             <MediaQuery minWidth={layout.fullSizeMinWidth}>
@@ -682,6 +686,25 @@ const GUIComponent = (props) => {
                                 '/nomokit-ml/index.html'
                         }
                         title="NomoML"
+                    />
+                </Box>
+            ) : null}
+            {showCppContent ? (
+                <Box className={styles.juniorOverlay}>
+                    <button
+                        className={styles.juniorCloseButton}
+                        onClick={onCloseCppContent}
+                    >
+                        &times;
+                    </button>
+                    <iframe
+                        className={styles.juniorIframe}
+                        src={
+                            window.electronAPI?.getAppPath ?
+                                `file:///${window.electronAPI.getAppPath().replace(/\\/g, '/')}/src/gui/nomokit-cpp/index.html` :
+                                '/nomokit-cpp/index.html'
+                        }
+                        title="Nomo C++"
                     />
                 </Box>
             ) : null}

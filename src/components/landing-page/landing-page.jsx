@@ -9,7 +9,8 @@ const LandingPage = ({
     onSelectJuniorCode,
     onSelectBlockCode,
     onSelectPythonIDE,
-    onSelectML
+    onSelectML,
+    onSelectCpp
 }) => (
     <div className={styles.overlay}>
         <div className={styles.container}>
@@ -74,6 +75,20 @@ const LandingPage = ({
                         Coding dengan kecerdasan buatan (ML)
                     </p>
                 </div>
+                <div
+                    className={styles.card}
+                    onClick={onSelectCpp}
+                >
+                    <img
+                        className={styles.cardIcon}
+                        src={nomoProIcon}
+                        alt="Nomo C++"
+                    />
+                    <div className={styles.cardLabel}>Nomo C++</div>
+                    <p className={styles.cardDesc}>
+                        Coding Arduino dengan editor C++ lengkap
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -83,7 +98,8 @@ LandingPage.propTypes = {
     onSelectJuniorCode: PropTypes.func.isRequired,
     onSelectBlockCode: PropTypes.func.isRequired,
     onSelectPythonIDE: PropTypes.func.isRequired,
-    onSelectML: PropTypes.func.isRequired
+    onSelectML: PropTypes.func.isRequired,
+    onSelectCpp: PropTypes.func.isRequired
 };
 
 export default LandingPage;

@@ -25,5 +25,6 @@ npm-*
 static/python/__pycache__/
 nomokitjr/*
 nomokit-ml/*
+nomokit-cpp/*
 
 .worktrees/

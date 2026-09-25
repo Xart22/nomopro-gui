@@ -67,7 +67,8 @@ class GUI extends React.Component {
         switchToMode: MODE_BLOCK,
         showLandingPage: true,
         showJuniorContent: false,
-        showMLContent: false
+        showMLContent: false,
+        showCppContent: false
     };
 
     isNeutralEditorTab = (tabIndex) =>
@@ -285,6 +286,9 @@ class GUI extends React.Component {
         if (event.data && event.data.type === 'closeMLContent') {
             this.handleCloseMLContent();
         }
+        if (event.data && event.data.type === 'closeCppContent') {
+            this.handleCloseCppContent();
+        }
     };
     handleSelectJuniorCode = () => {
         if (window.electronAPI?.getAppPath) {
@@ -306,6 +310,17 @@ class GUI extends React.Component {
     };
     handleCloseMLContent = () => {
         this.setState({showMLContent: false});
+    };
+
+    handleSelectCpp = () => {
+        if (window.electronAPI?.getAppPath) {
+            this.setState({showCppContent: true});
+        } else {
+            window.location.href = '/nomokit-cpp';
+        }
+    };
+    handleCloseCppContent = () => {
+        this.setState({showCppContent: false});
     };
 
     handleShowLandingPage = () => {
@@ -568,12 +583,15 @@ class GUI extends React.Component {
                 showLandingPage={this.state.showLandingPage}
                 showJuniorContent={this.state.showJuniorContent}
                 showMLContent={this.state.showMLContent}
+                showCppContent={this.state.showCppContent}
                 onSelectJuniorCode={this.handleSelectJuniorCode}
                 onSelectBlockCode={this.handleSelectBlockCode}
                 onSelectPythonIDE={this.handleSelectPythonIDE}
                 onSelectML={this.handleSelectML}
+                onSelectCpp={this.handleSelectCpp}
                 onCloseJuniorContent={this.handleCloseJuniorContent}
                 onCloseMLContent={this.handleCloseMLContent}
+                onCloseCppContent={this.handleCloseCppContent}
                 onShowLandingPage={this.handleShowLandingPage}
                 onActivateCostumesTab={this.handleActivateCostumesTab}
                 onActivateSoundsTab={this.handleActivateSoundsTab}

@@ -1,3 +1,5 @@
 node_modules/*
 build/*
 dist/*
+# Fase 0: repo frontend terpisah (pola nomokit-ml/nomokitjr) — punya lint sendiri
+nomokit-cpp/*
