@@ -33,6 +33,12 @@ const base = {
             path.resolve(__dirname, 'nomokit-ml'),
             path.resolve(__dirname, 'nomokit-cpp')
         ],
+        // Without this every contentBase root is served at '/', so nomokit-ml/index.html lands on
+        // '/index.html' (shadowed by the GUI's own) and '/nomokit-ml/index.html' 404s -- while the
+        // production build serves them nested, because CopyWebpackPlugin copies each into its own
+        // folder. That mismatch meant the embedded Jr and ML tools could not be opened from the dev
+        // server at all. Keep these aligned with the CopyWebpackPlugin entries below.
+        contentBasePublicPath: ['/', '/nomokitjr', '/nomokit-ml'],
         host: '0.0.0.0',
         port: process.env.PORT || 8601
     },

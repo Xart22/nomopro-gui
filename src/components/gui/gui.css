@@ -472,3 +472,21 @@ $fade-out-distance: 15px;
     height: 100%;
     border: none;
 }
+
+/*
+ * The NomoKit ML iframe when the overlay is closed. It stays mounted because it is also the
+ * inference runtime behind the NomoKit ML blocks.
+ *
+ * Deliberately positioned offscreen rather than hidden: a display:none iframe is not rendered and
+ * therefore gets no requestAnimationFrame, which stalls speech-commands' feature extractor and so
+ * silently kills audio classification. It needs real layout dimensions for the same reason.
+ */
+.ml-host-hidden {
+    position: fixed;
+    left: -10000px;
+    top: 0;
+    width: 640px;
+    height: 480px;
+    pointer-events: none;
+    z-index: -1;
+}
