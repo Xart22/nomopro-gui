@@ -382,8 +382,7 @@ export default [
                 description="Message to help people connect to their WeDo."
                 id="gui.extension.wedo2.connectingMessage"
             />
-        ),
-        helpLink: 'https://scratch.mit.edu/wedo'
+        )
     },
     {
         name: (

@@ -49,6 +49,7 @@ import UpdateModal from "../../containers/update-modal.jsx";
 import layout, { STAGE_SIZE_MODES } from "../../lib/layout-constants";
 import { resolveStageSize } from "../../lib/screen-utils";
 import { nomokitMlIndexUrl } from "../../lib/nomokit-ml-url";
+import { nomokitCppIndexUrl } from "../../lib/nomokit-cpp-url";
 
 import styles from "./gui.css";
 import addExtensionIcon from "./icon--extensions.svg";
@@ -703,19 +704,9 @@ const GUIComponent = (props) => {
             </Box>
             {showCppContent ? (
                 <Box className={styles.juniorOverlay}>
-                    <button
-                        className={styles.juniorCloseButton}
-                        onClick={onCloseCppContent}
-                    >
-                        &times;
-                    </button>
                     <iframe
                         className={styles.juniorIframe}
-                        src={
-                            window.electronAPI?.getAppPath ?
-                                `file:///${window.electronAPI.getAppPath().replace(/\\/g, '/')}/src/gui/nomokit-cpp/index.html` :
-                                '/nomokit-cpp/index.html'
-                        }
+                        src={nomokitCppIndexUrl()}
                         title="Nomo C++"
                     />
                 </Box>

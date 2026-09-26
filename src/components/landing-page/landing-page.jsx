@@ -1,6 +1,8 @@
+/* eslint-disable react/jsx-no-literals */
 import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './landing-page.css';
+import {isDesktop} from '../../shared/env';
 import nomokitJrIcon from './nomokit-jr.png';
 import nomoProIcon from './nomo.png';
 import nomoMlIcon from './nomokit-ml.png';
@@ -58,7 +60,7 @@ const LandingPage = ({
                     />
                     <div className={styles.cardLabel}>Nomo Py</div>
                     <p className={styles.cardDesc}>
-                        Coding Python dengan editor lengkap
+                        Coding Python dengan editor
                     </p>
                 </div>
                 <div
@@ -76,8 +78,9 @@ const LandingPage = ({
                     </p>
                 </div>
                 <div
-                    className={styles.card}
-                    onClick={onSelectCpp}
+                    className={isDesktop ? styles.card : `${styles.card} ${styles.cardDisabled}`}
+                    onClick={isDesktop ? onSelectCpp : null}
+                    title={isDesktop ? null : 'Hanya tersedia di versi desktop'}
                 >
                     <img
                         className={styles.cardIcon}
@@ -86,8 +89,13 @@ const LandingPage = ({
                     />
                     <div className={styles.cardLabel}>Nomo C++</div>
                     <p className={styles.cardDesc}>
-                        Coding Arduino dengan editor C++ lengkap
+                        Coding Arduino dengan editor C++
                     </p>
+                    {isDesktop ? null : (
+                        <p className={styles.cardNote}>
+                            Hanya tersedia di versi desktop
+                        </p>
+                    )}
                 </div>
             </div>
         </div>

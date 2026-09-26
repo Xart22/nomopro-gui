@@ -68,6 +68,20 @@
     transform: translateY(-2px);
 }
 
+.cardDisabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.cardDisabled:hover {
+    transform: none;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+}
+
+.cardDisabled:active {
+    transform: none;
+}
+
 .cardIcon {
     height: 72px;
     flex-shrink: 0;
@@ -84,5 +98,13 @@
     font-size: 0.82rem;
     color: #888;
     line-height: 1.45;
+    margin: 0;
+}
+
+.cardNote {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #d9534f;
+    line-height: 1.35;
     margin: 0;
 }

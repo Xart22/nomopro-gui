@@ -290,6 +290,11 @@ class GUI extends React.Component {
         if (event.data && event.data.type === 'closeCppContent') {
             this.handleCloseCppContent();
         }
+        // Home dari Nomo C++: tutup overlay + tampilkan landing page lagi.
+        if (event.data && event.data.type === 'homeCppContent') {
+            this.handleCloseCppContent();
+            this.handleShowLandingPage();
+        }
     };
     handleSelectJuniorCode = () => {
         if (window.electronAPI?.getAppPath) {
